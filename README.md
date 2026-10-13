@@ -4,13 +4,13 @@
 
 # Pixora
 
-**浏览器里的免费图片工具箱。按宽度等比缩放，一步完成格式转换。**
+**浏览器里的免费图片工具箱。格式转换、按宽度等比缩放、AI 超分放大、在线修图，一次拖拽完成。**
 
 无需注册 · 无使用限制 · 图片绝不上传 · MIT 开源
 
 [![Live Demo](https://img.shields.io/badge/demo-online-4d6bfe?style=flat-square)](https://xuboboo.github.io/pixora/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-16a34a?style=flat-square)](LICENSE)
-[![Zero dependencies](https://img.shields.io/badge/dependencies-0-8b5cf6?style=flat-square)](#技术栈)
+[![No build](https://img.shields.io/badge/build-0-8b5cf6?style=flat-square)](#技术栈)
 [![Lighthouse](https://img.shields.io/badge/lighthouse-100%2F100-16a34a?style=flat-square)](#性能与-seo)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-4d6bfe?style=flat-square)](CONTRIBUTING.md)
 
@@ -24,12 +24,20 @@
 
 Pixora 把「打开在线 PS → 上传图片 → 文件 → 导出为 PNG → 手动填宽度 → 保存」这一串操作，压缩成**一次拖拽**。
 
-你只需要拖入图片、选一个宽度（比如 400 或 600），高度会**自动按原图比例**换算，然后直接下载。
+首页工具箱管两件事：**格式转换**（PNG / JPG / WEBP / BMP / ICO，浏览器支持时多出 AVIF）与
+**调整尺寸**（指定宽度或按比例，高度自动换算）。两者是独立模式，换格式绝不会悄悄改动尺寸。
+整个过程在浏览器内完成，**图片不会上传到任何服务器**。
 
-想转格式也一样简单 —— 把输出格式从 PNG 换成 JPG / WEBP / BMP / ICO 即可，
-浏览器支持时还会自动多出 AVIF。整个过程在浏览器内完成，**图片不会上传到任何服务器**。
+此外还有两个专门页面：
 
-它不做臃肿的全能编辑器 —— 只把最高频的「改尺寸 + 转格式 + 导出」做到一步到位。
+- **AI 放大**（首页工具箱的「AI 放大」模式）—— 用 Real-ESRGAN x4v3 在浏览器本地推理，
+  最高放大 4 倍，输入上限 150 万像素。不放大时只做轻量增强，同样是纯本地、不上传。
+- **在线修图**（[`/editor/`](https://xuboboo.github.io/pixora/editor/)）—— 裁剪、画笔、橡皮、
+  形状、文字、取色，加上亮度 / 对比度 / 饱和度 / 色温 / 模糊 / 锐化 / 暗角七项实时调整、
+  九个滤镜、旋转翻转与撤销重做。它不追求替代 Photoshop，只把最高频的几件事做到随手可用。
+
+工具箱本身保持克制 —— 只做「改尺寸 + 转格式 + 放大」三件一步到位的事；需要修图时，
+旁边就有一个不逼你注册的编辑器。
 
 > **和 Convertio 这类在线转换器的区别**：Convertio 把文件上传到服务器转换，再下载回来。
 > Pixora 用的是浏览器自带的图像编解码能力，**文件从头到尾没有离开你的设备** ——
@@ -54,11 +62,14 @@ Pixora 把「打开在线 PS → 上传图片 → 文件 → 导出为 PNG → �
 | **35 个格式专属页** | 每种转换组合都有独立页面，输出格式已预设，从导航一处可达 |
 | **不会走进死胡同** | 未匹配地址由品牌化 404 页接管，仍然给出全部 35 条转换入口 |
 | **隐私优先** | 解码 / 缩放 / 编码全部在本地完成，无上传、无存储、无追踪 |
-| **零依赖** | 纯手写 HTML / CSS / JavaScript，无框架、无构建、无第三方库 |
+| **零 npm 依赖 / 无构建** | 没有 `package.json`、没有打包步骤；AI 推理运行时与模型全部自托管在 `assets/` 下 |
+| **AI 超分放大** | 首页工具箱的「AI 放大」模式：Real-ESRGAN x4v3 端上推理，最高 4 倍、输入上限 150 万像素；不放大时只做轻量增强 |
+| **在线修图编辑器** | [`/editor/`](https://xuboboo.github.io/pixora/editor/)：7 种工具 + 7 项实时调整 + 9 个滤镜 + 裁剪旋转翻转 + 撤销重做 + PNG/JPG/WEBP 导出 |
 | **专业级画质** | 分步降采样 + 高质量重采样，大幅缩小时依旧锐利 |
-| **离线可用** | 页面加载后断网也能继续处理 |
+| **离线可用** | 页面加载后断网也能继续处理（AI 放大需模型已加载） |
 | **明暗双主题** | 跟随系统偏好，也可手动切换并记忆 |
 | **粘贴即用** | 支持 `Ctrl` + `V` 直接粘贴剪贴板截图 |
+| **可复用的图像内核** | `assets/js/pixora-lib.js`：不碰 DOM、只吃普通对象，浏览器 `<script>` / Node `require` / ESM 三种方式引入，见 [`docs/api.md`](docs/api.md) |
 | **全设备适配** | 320px 手机到 2560px 宽屏共 18 个断点零横向溢出，触摸目标 ≥44px |
 
 ## 怎么找到想要的转换
@@ -143,12 +154,16 @@ Pixora 的前提是**图片不上传**，因此不会为了凑格式数量而引
 
 ## 技术栈
 
-Pixora 刻意保持极简 —— **没有 `package.json`，没有构建步骤，没有依赖**。
+Pixora 刻意保持极简 —— **没有 `package.json`，没有构建步骤，没有 npm 依赖**。
+第三方的东西只有 AI 推理用到的 ONNX Runtime WebAssembly 与模型文件，两者都自托管在
+`assets/` 下，不连任何 CDN。
 
 - **标记**：语义化 HTML5（`header` / `nav` / `main` / `section` / `article` / `footer`）
 - **样式**：原生 CSS3 —— 自定义属性（Design Tokens）、`color-mix()`、Grid、`clamp()` 流体排版、`prefers-color-scheme` / `prefers-reduced-motion`
-- **脚本**：原生 ES2017+（`async/await`、`createImageBitmap`、`IntersectionObserver`），无任何运行时依赖
+- **脚本**：原生 ES2017+（`async/await`、`createImageBitmap`、`IntersectionObserver`），无任何 npm 运行时依赖
 - **图像引擎**：`createImageBitmap` → `OffscreenCanvas`/`Canvas` → 分步降采样 → `toBlob` 编码
+- **AI 推理**：ONNX Runtime WebAssembly（自托管 `assets/ort/`）跑 Real-ESRGAN x4v3（自托管
+  `assets/models/`），WebGPU 可用时自动切换执行提供方
 - **自研编码器**：BMP（BITMAPFILEHEADER + 24-bit BGR 自底向上 + 4 字节行对齐）、
   ICO（ICONDIR + 内嵌 PNG）、ZIP（Local File Header + Central Directory + EOCD，CRC32 查表，
   优先 `CompressionStream("deflate-raw")`，不可用时降级为 store 模式）
@@ -156,16 +171,26 @@ Pixora 刻意保持极简 —— **没有 `package.json`，没有构建步骤，
 
 ```
 pixora/
-├── index.html                     # 单页官网 + 在线工具
+├── index.html                     # 单页官网 + 在线工具（格式转换 / 调整尺寸 / AI 放大）
 ├── 404.html                       # 品牌化 404（生成产物，勿手改）
+├── editor/index.html              # 在线修图编辑器（生成产物，勿手改）
 ├── convert/                       # 格式转换落地页矩阵（生成产物，勿手改）
 │   ├── index.html                 # 全部格式转换总览
 │   └── <from>-to-<to>/index.html  # 35 个转换页，每个都内嵌可用的转换器
 ├── tools/
-│   └── gen-convert-pages.mjs      # 落地页 + 总览页 + 404 页 + sitemap.xml 生成器
+│   ├── shell.mjs                  # 全站共用外壳：页头、页脚、图标、导航列（带页面深度参数）
+│   ├── gen-convert-pages.mjs      # 落地页 + 总览页 + 404 页 + sitemap.xml 生成器
+│   ├── gen-editor-page.mjs        # 在线修图编辑器页生成器
+│   ├── gen-doc-pages.mjs          # 5 个项目文档页（由 md / LICENSE / CHANGELOG.md 生成）
+│   └── test-lib.mjs               # 图像内核单测（49 项）
 ├── assets/
 │   ├── css/style.css              # 设计系统（Design Tokens + 组件）
-│   ├── js/main.js                 # 主题、导航、动效、图像引擎
+│   ├── js/
+│   │   ├── pixora-lib.js          # 图像能力内核（UMD、零 DOM 依赖，可被其他工具复用）
+│   │   ├── main.js                # 主题、导航、动效、首页工具箱图像引擎
+│   │   └── editor.js              # 在线修图编辑器
+│   ├── ort/                       # 自托管 ONNX Runtime WebAssembly
+│   ├── models/                    # 自托管 Real-ESRGAN x4v3 ONNX 模型
 │   └── img/
 │       ├── logo.svg               # 主标志
 │       ├── logo-mono.svg          # 单色标志
@@ -177,15 +202,20 @@ pixora/
 │       ├── icon-512.png           # PWA 图标
 │       ├── icon-maskable-512.png  # PWA 自适应图标
 │       └── og.png                 # 1200×630 社交分享图
+├── docs/
+│   ├── api.md                     # 图像内核 API（浏览器 / Node / ESM 三种引入）
+│   ├── ai-upscale.md              # Real-ESRGAN 分块推理的感受野标定过程
+│   ├── convertio-逆向分析报告.md        # 竞品逆向分析（1.1.0 格式矩阵的参考依据）
+│   └── 竞品入口与信息架构逆向分析.md    # iLoveIMG / Convertio / CloudConvert 入口对比（1.2.0 依据）
+├── license.html / contributing.html / code-of-conduct.html / security.html
+│                                  # 四个项目文档页（本地渲染，生成产物）
+├── changelog.html                 # 更新日志页（本地渲染，生成产物）
 ├── robots.txt                     # 抓取策略（含 AI 爬虫显式放行）
-├── sitemap.xml                    # 站点地图（由生成器写入，37 条）
+├── sitemap.xml                    # 站点地图（由生成器写入，43 条）
 ├── site.webmanifest               # PWA 清单
 ├── feed.xml                       # RSS 2.0 订阅
 ├── llms.txt                       # 面向大模型的可读站点摘要
 ├── humans.txt                     # 站点与作者信息
-├── docs/
-│   ├── convertio-逆向分析报告.md        # 竞品逆向分析（1.1.0 格式矩阵的参考依据）
-│   └── 竞品入口与信息架构逆向分析.md    # iLoveIMG / Convertio / CloudConvert 入口对比（1.2.0 依据）
 ├── 8f3a1c9e7b2d4f60a5c8e1b93d7f2046.txt  # IndexNow 密钥
 ├── .well-known/security.txt       # 安全联系信息
 ├── .nojekyll                      # 关闭 GitHub Pages 的 Jekyll 处理
@@ -196,19 +226,44 @@ pixora/
 └── CHANGELOG.md                   # 更新日志
 ```
 
-`convert/`、`404.html` 与 `sitemap.xml` 是生成产物。改内容请改 `tools/gen-convert-pages.mjs`，
-然后运行：
+`convert/`、`404.html`、`editor/index.html`、五个项目文档页与 `sitemap.xml` 都是生成产物。
+改内容请改对应的生成器，然后运行：
 
 ```bash
-node tools/gen-convert-pages.mjs
+node tools/gen-convert-pages.mjs   # 落地页 + 总览页 + 404 + sitemap.xml
+node tools/gen-editor-page.mjs     # 在线修图编辑器页
+node tools/gen-doc-pages.mjs       # 五个项目文档页
 ```
 
 生成器同时负责四件事：写入 35 个落地页与总览页、写入 `404.html`、重写 `sitemap.xml`、
 以及通过 `<!-- NAV:START/END -->` 与 `<!-- FMTINDEX:START/END -->` 标记
 把页头导航与首页格式索引同步进 `index.html`。**这几块不要手改**——
-导航在 37 个页面里必须一致，任何一处手改都会让它们开始漂移。
+导航在 43 个页面里必须一致，任何一处手改都会让它们开始漂移。
 
 生成器幂等：连续运行两次输出完全一致，可以放心地反复跑。
+
+## 可复用的图像内核
+
+`assets/js/pixora-lib.js` 把站点里零散的图像实现收拢成一份**不碰 DOM 的内核**：
+降采样阶梯、24 位 BMP 编码、ZIP 打包与 CRC32、超分分块表、完整像素调整链
+（LUT → 饱和度 → sepia → 反色 → 模糊 → 锐化 → 暗角）。首页工具箱与编辑器原先各抄了一份
+像素链，现在全部委托内核，重复实现与漂移面一起消失。
+
+内核只吃普通对象和数字，所以浏览器里能用、Node 里也能用，你自己写的工具可以直接调用：
+
+```js
+// 浏览器
+const Pixora = window.Pixora;
+Pixora.pixels.adjust(imageData.data, w, h, { brightness: 30, blur: 2 });
+Pixora.zip.build([{ name: "a.png", data: blob }, { name: "b.png", data: blob }]);
+
+// Node
+const Pixora = require("./assets/js/pixora-lib.js");
+const ladder = Pixora.resize.ladder(4000, 3000, 1200);
+```
+
+完整签名、行为细节与基准向量见 [`docs/api.md`](docs/api.md)；
+内核单测 `node tools/test-lib.mjs`（49 项）。
 
 ## 部署形态与路径前缀
 
@@ -242,7 +297,7 @@ Pixora 的 SEO 不是「加几个 meta 标签」，而是**从渲染路径到结
 
 单个 `@graph` 中互相引用，语义完整、无重复：
 
-- `WebSite` → `Organization` → `WebPage` → `SoftwareApplication`（`featureList` 7 项）
+- `WebSite` → `Organization` → `WebPage` → `SoftwareApplication`（`featureList` 12 项）
 - `ImageObject`（OG 图，含 `width`/`height`/`caption`）
 - `HowTo`（三步工作流：拖入 → 选格式与宽度 → 下载或打包，可直接竞争富结果）
 - `FAQPage`（7 条问答富结果，与页面可见文案一一对应）
@@ -325,6 +380,11 @@ npx serve .
 | 移动端 Chrome / Safari | 15+ |
 
 核心依赖 `createImageBitmap`、`Canvas 2D`、`toBlob`、CSS 自定义属性。
+在线修图编辑器额外依赖 Pointer Events（触摸用）、`OffscreenCanvas`（可加速时）。
+
+**AI 放大**依赖 WebAssembly（ONNX Runtime 自托管）与模型文件，需要能跑 WASM 的现代浏览器；
+支持 WebGPU 时会自动切换执行提供方，否则回落到 WASM SIMD 多线程。
+这两者都不可用时，「AI 放大」模式会明确提示当前浏览器不支持，而不是给一个点了没反应的按钮。
 
 **格式支持差异**：PNG / JPG / BMP / ICO 在所有目标浏览器上都可导出（BMP、ICO 由页面内编码器生成，
 不依赖浏览器）。WEBP 编码需要 Chrome 32+ / Firefox 96+ / Safari 16+。
@@ -337,8 +397,16 @@ npx serve .
 
 - 新的图片处理能力（裁剪、旋转、水印、压缩）
 - 更多**端上可实现的格式编码器**（如 QOI、TGA、PPM）
+- 更多可复用到 `pixora-lib.js` 的纯函数式图像能力
+- 在线修图编辑器的新工具与快捷键
 - 无障碍与国际化改进
 - 性能与算法优化
+
+改内核请先跑单测：
+
+```bash
+node tools/test-lib.mjs
+```
 
 参与本项目即表示你同意遵守 [行为准则](CODE_OF_CONDUCT.md)。
 发现安全问题时，请按 [安全政策](SECURITY.md) 私下报告，不要开公开 Issue。

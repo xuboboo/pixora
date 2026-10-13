@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<title>更新日志 — Pixora</title>
+<meta name="description" content="Pixora 的完整版本记录：每个版本改了什么、为什么改、如何验证。">
+<meta name="author" content="Pixora contributors">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#080c16" media="(prefers-color-scheme: dark)">
+
+<link rel="canonical" href="https://xuboboo.github.io/pixora/changelog.html">
+<link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/changelog.html">
+<link rel="icon" href="./assets/img/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="./assets/img/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="./assets/img/apple-touch-icon.png">
+<link rel="manifest" href="./site.webmanifest">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Pixora">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:title" content="更新日志 — Pixora">
+<meta property="og:description" content="Pixora 的完整版本记录：每个版本改了什么、为什么改、如何验证。">
+<meta property="og:url" content="https://xuboboo.github.io/pixora/changelog.html">
+<meta property="og:image" content="https://xuboboo.github.io/pixora/assets/img/og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<script>
+(function(){try{var t=localStorage.getItem("pixora-theme");if(t!=="dark"&&t!=="light"){t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.setAttribute("data-theme",t)}catch(e){}})();
+</script>
+
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<a class="skip-link" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="./" aria-label="Pixora 首页">
+      <img src="./assets/img/logo.svg" width="32" height="32" alt="Pixora logo" fetchpriority="high">
+      <span>Pixora</span>
+    </a>
+
+    <nav class="nav" id="nav" aria-label="主导航">
+      <a href="./#tool">在线工具</a>
+      <details class="nav-drop" data-href="./convert/">
+        <summary>
+          <span>格式转换</span>
+          <svg class="nav-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </summary>
+        <div class="nav-panel">
+          <div class="nav-panel-head">
+            <strong>按目标格式转换</strong>
+            <a href="./convert/">全部 35 种组合 →</a>
+          </div>
+          <div class="nav-panel-cols"><div class="nav-col">
+              <span class="nav-col-title">转 PNG</span>
+              <ul>
+                <li><a href="./convert/jpg-to-png/">JPG 转 PNG</a></li>
+                <li><a href="./convert/webp-to-png/">WEBP 转 PNG</a></li>
+                <li><a href="./convert/gif-to-png/">GIF 转 PNG</a></li>
+                <li><a href="./convert/bmp-to-png/">BMP 转 PNG</a></li>
+                <li><a href="./convert/avif-to-png/">AVIF 转 PNG</a></li>
+                <li><a href="./convert/svg-to-png/">SVG 转 PNG</a></li>
+                <li><a href="./convert/ico-to-png/">ICO 转 PNG</a></li>
+      </ul>
+    </div>
+<div class="nav-col">
+              <span class="nav-col-title">转 JPG</span>
+              <ul>
+                <li><a href="./convert/png-to-jpg/">PNG 转 JPG</a></li>
+                <li><a href="./convert/webp-to-jpg/">WEBP 转 JPG</a></li>
+                <li><a href="./convert/gif-to-jpg/">GIF 转 JPG</a></li>
+                <li><a href="./convert/bmp-to-jpg/">BMP 转 JPG</a></li>
+                <li><a href="./convert/avif-to-jpg/">AVIF 转 JPG</a></li>
+                <li><a href="./convert/svg-to-jpg/">SVG 转 JPG</a></li>
+                <li><a href="./convert/ico-to-jpg/">ICO 转 JPG</a></li>
+      </ul>
+    </div>
+<div class="nav-col">
+              <span class="nav-col-title">转 WEBP</span>
+              <ul>
+                <li><a href="./convert/png-to-webp/">PNG 转 WEBP</a></li>
+                <li><a href="./convert/jpg-to-webp/">JPG 转 WEBP</a></li>
+                <li><a href="./convert/gif-to-webp/">GIF 转 WEBP</a></li>
+                <li><a href="./convert/bmp-to-webp/">BMP 转 WEBP</a></li>
+                <li><a href="./convert/avif-to-webp/">AVIF 转 WEBP</a></li>
+                <li><a href="./convert/svg-to-webp/">SVG 转 WEBP</a></li>
+                <li><a href="./convert/ico-to-webp/">ICO 转 WEBP</a></li>
+      </ul>
+    </div>
+<div class="nav-col">
+              <span class="nav-col-title">转 BMP</span>
+              <ul>
+                <li><a href="./convert/png-to-bmp/">PNG 转 BMP</a></li>
+                <li><a href="./convert/jpg-to-bmp/">JPG 转 BMP</a></li>
+                <li><a href="./convert/webp-to-bmp/">WEBP 转 BMP</a></li>
+                <li><a href="./convert/gif-to-bmp/">GIF 转 BMP</a></li>
+                <li><a href="./convert/avif-to-bmp/">AVIF 转 BMP</a></li>
+                <li><a href="./convert/svg-to-bmp/">SVG 转 BMP</a></li>
+                <li><a href="./convert/ico-to-bmp/">ICO 转 BMP</a></li>
+      </ul>
+    </div>
+<div class="nav-col">
+              <span class="nav-col-title">转 ICO</span>
+              <ul>
+                <li><a href="./convert/png-to-ico/">PNG 转 ICO</a></li>
+                <li><a href="./convert/jpg-to-ico/">JPG 转 ICO</a></li>
+                <li><a href="./convert/webp-to-ico/">WEBP 转 ICO</a></li>
+                <li><a href="./convert/gif-to-ico/">GIF 转 ICO</a></li>
+                <li><a href="./convert/bmp-to-ico/">BMP 转 ICO</a></li>
+                <li><a href="./convert/avif-to-ico/">AVIF 转 ICO</a></li>
+                <li><a href="./convert/svg-to-ico/">SVG 转 ICO</a></li>
+      </ul>
+    </div></div>
+        </div>
+      </details>
+      <a href="./#formats">支持的格式</a>
+      <a href="./#how">工作流</a>
+      <a href="./#compare">对比</a>
+      <a href="./#faq">常见问题</a>
+    </nav>
+
+    <div class="header-actions">
+      <button class="icon-btn" data-theme-toggle type="button" aria-label="切换主题" aria-pressed="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <a class="btn btn-ghost btn-sm" href="https://github.com/xuboboo/pixora" target="_blank" rel="noopener" aria-label="GitHub 仓库">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.34-1.3-1.7-1.3-1.7-1.06-.72.08-.71.08-.71 1.17.08 1.79 1.2 1.79 1.2 1.04 1.79 2.74 1.27 3.4.97.11-.76.41-1.28.74-1.57-2.55-.29-5.23-1.28-5.23-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.25 5.69.42.36.79 1.07.79 2.16v3.2c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5z"/></svg>
+        <span>GitHub</span>
+      </a>
+      <button class="icon-btn nav-toggle" type="button" aria-label="打开菜单" aria-expanded="false" aria-controls="nav">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <section class="section doc-page" aria-labelledby="doc-title">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="面包屑导航">
+        <a href="./">Pixora</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">更新日志</span>
+      </nav>
+
+      <div class="section-head">
+        <span class="eyebrow">项目文档</span>
+        <h1 id="doc-title">更新日志</h1>
+        <p>每一次改动的动机与验证方式都记在这里。</p>
+      </div>
+
+      <article class="prose reveal">
+<p>本项目遵循 <a href="https://semver.org/lang/zh-CN/" target="_blank" rel="noopener">语义化版本</a>， 变更记录参考 <a href="https://keepachangelog.com/zh-CN/1.1.0/" target="_blank" rel="noopener">Keep a Changelog</a>。</p>
+<h2 id="1-3-0-2026-10-13">[1.3.0] — 2026-10-13</h2>
+<p>一次能力扩展：站点从「格式转换 + 等比缩放」长成「转换 + 缩放 + AI 放大 + 在线修图」 四件事。同时把散落三份的图像实现收拢成一个内核，其他工具可以直接调用。</p>
+<h3 id="新增">新增</h3>
+<ul><li><strong>AI 超分放大</strong></li><li>首页工具箱新增「AI 放大」模式，用 <strong>Real-ESRGAN x4v3</strong> 在浏览器本地推理，单张最高</li></ul>
+<p>    放大 4 倍、输入上限 150 万像素；不放大时只做轻量增强，仍是纯本地、不上传   - 模型分块推理，块的边缘交叠区由内核统一计算，避免拼接缝   - 验收 23 项，含与 Python 原生 ONNX Runtime 的逐像素比对（最大差 1、差 &gt;2 为 0），     标定过程见 <a href="./docs/ai-upscale.md"><code>docs/ai-upscale.md</code></a></p>
+<ul><li><strong>在线修图编辑器</strong>（<code>/editor/</code>）</li><li>移动 / 裁剪 / 画笔 / 橡皮 / 形状 / 文字 / 取色共 7 种工具</li><li>亮度、对比度、饱和度、色温、模糊、锐化、暗角 7 项实时调整，9 个滤镜预设</li><li>旋转 90°、水平/垂直翻转、画布尺寸、撤销重做（按画布面积自动收窄历史深度）</li><li>拖放与粘贴导入，PNG / JPG / WEBP 导出，JPEG 自动铺白底</li><li>验收 65 项端到端，全部通过</li><li><strong>四个项目文档页本地化</strong></li><li>MIT 许可证 / 贡献指南 / 行为准则 / 安全政策原本跳到 GitHub，现在站内渲染</li><li>404 页的对应链接一并改本地；转换总览页与 35 个转换页的页脚链接同步修正</li></ul>
+<h3 id="重构">重构</h3>
+<ul><li><strong>抽出图像内核 <code>assets/js/pixora-lib.js</code></strong></li><li>浏览器 <code>&lt;script&gt;</code>、Node <code>require</code>、ESM 三种方式都能引入；<strong>不碰 DOM</strong>，只吃普通</li></ul>
+<p>    对象和数字，所以同一份实现能被任意页面和其他工具共用   - 收录：降采样阶梯、24 位 BMP 编码、ZIP 打包与 CRC32、超分分块表、完整像素调整链   - 首页工具与编辑器原先各抄了一份像素链，现在全部委托内核，删掉重复实现与漂移面   - 内核单测 49 项通过（<code>node tools/test-lib.mjs</code>），浏览器适配层见 <a href="./docs/api.md"><code>docs/api.md</code></a></p>
+<ul><li><strong>首页文案</strong>：Hero、特性卡与徽标反映已上线的 AI 放大与在线修图；AI 生图以</li></ul>
+<p>  「规划中」卡片诚实预留，不作虚假承诺</p>
+<h3 id="修复">修复</h3>
+<ul><li><code>main.js</code> 第 1205 行无守卫的 <code>$(&quot;#wpresets&quot;)</code>：文档页 / 404 页 / 编辑器页上会抛</li></ul>
+<p>  TypeError，把后面整段 Boot（<code>load()</code> / <code>syncUI()</code> / <code>applyParams()</code>）连带带掉</p>
+<ul><li>编辑器橡皮完全失效：橡皮原先画在中间的 stroke 层，该层于是透明，再以 <code>source-over</code></li></ul>
+<p>  合成回文档层等于什么也没发生。改为直接作用文档层并用 <code>destination-out</code></p>
+<ul><li>编辑器形状不落笔：按下点每帧被覆盖，形状退化成零面积碎片；且形状只活在 overlay</li></ul>
+<p>  预览里、从没提交。改为固定锚点 + 每帧重画</p>
+<ul><li>编辑器文字不落笔：<code>commitStroke</code> 因 <code>dirty</code> 未置位跳过合成，且文字分支漏了</li></ul>
+<p>  <code>beginStroke()</code>，<code>restore()</code> 会把不匹配的 <code>save()</code> 一起 POP</p>
+<ul><li>编辑器工具滑杆把「画笔粗细」写进了图像调整参数，滑块能拖但什么都不改</li><li>编辑器页三个资源 404 + 35 条导航链接指向不存在的路径：外壳把 <code>assets/</code> 与页脚链接</li></ul>
+<p>  全写死成根相对，<code>editor/</code> 深一层就全断。改为显式传入页面相对深度</p>
+<ul><li><code>.section</code> 的 104px 上下留白把编辑器画布推到首屏外（900px 视口下鼠标点不到下半张</li></ul>
+<p>  图）。改为编辑器页面单独收紧</p>
+<ul><li><code>convert/index.html</code> 与 <code>404.html</code> 的页脚用了 <code>../../</code> 前缀，12 条断链</li><li>sitemap 漏掉 <code>editor/</code> 与 5 个新页面（37 → 43 条）</li></ul>
+<h3 id="验收">验收</h3>
+<ul><li>编辑器 65 项端到端全部通过，无页面错误</li><li>AI 放大 23 项全部通过</li><li>内核单测 49 项全部通过</li><li><code>linkint</code> / <code>links</code> / <code>verify-pages</code> / <code>mkmodes</code> / <code>small</code> / <code>small2</code> / <code>final</code> 全部通过</li></ul>
+<h2 id="1-2-4-2026-10-13">[1.2.4] — 2026-10-13</h2>
+<p>导航可用性修复。用户反馈：页头「格式转换」点下去只是把卡片开开合合、不跳转， 而鼠标想移到卡片上时它又会自己关掉。</p>
+<h3 id="修复">修复</h3>
+<ul><li><strong>鼠标移入卡片时面板自动关闭</strong></li><li>面板锚定在页头的下边缘，而触发区自身的盒子在它上方约 11px 处结束。指针穿过这</li></ul>
+<p>    条缝时落在 <code>.nav</code> 上 —— 已经在 <code>&lt;details&gt;</code> 之外 —— 于是 <code>mouseleave</code> 在途中就     触发，面板恰好在指针抵达时收起   - 修法两层：面板上方加一条<strong>不可见的过渡带</strong>（<code>::before</code>，13px，仅桌面），让指针     全程不离开面板的盒子；同时给关闭加 <strong>200ms 宽限</strong>，重新进入即取消   - 移动端（≤900px）抽屉里面板是 <code>position: static</code>，本来就没有缝，所以过渡带     只在 <code>(hover: hover) and (min-width: 901px)</code> 下生效</p>
+<ul><li><strong>点击「格式转换」现在会跳转到转换总览页</strong></li><li>此前鼠标设备上触发区的点击被 <code>preventDefault()</code> 吞掉，只留下悬停开合 ——</li></ul>
+<p>    点它等于什么都不做   - 现在指针点击直接前往该导航项代表的页面（转换总览 <code>/convert/</code>），由生成器为     每种页面形态给出正确前缀；键盘激活（<code>detail === 0</code>）保留原生开合，因此不用     指针也能展开面板</p>
+<h3 id="验收">验收</h3>
+<ul><li>新增导航交互套件（20 项）：从触发区下移全程保持展开、在缝中停留 400ms 仍展开、</li></ul>
+<p>  面板可接收指针、面板内链接可点击跳转、点击触发区跳转 <code>/convert/</code>（首页与落地页   各一次）、键盘 Enter 开合不跳转、Escape 与外部点击关闭、移动端点按开合不跳转、   三种页面形态下 35 条面板链接均指向 <code>/convert/&lt;slug&gt;/</code></p>
+<ul><li>既有多套件复跑通过：内链与资源（2187 内链 + 266 资源，0 断链 0 越界）、</li></ul>
+<p>  链接可达性、跨文件一致性（18 项）、模式分离、工具能力、深链、404、   窄屏与列数（320–1200px）</p>
+<ul><li>顺带修正两个审计脚本中已过时的断言（点击展开 → 点击跳转；窄屏列数与触摸端</li></ul>
+<p>  44px 触摸目标导致的「单行」误判）</p>
+<h2 id="1-2-3-2026-10-13">[1.2.3] — 2026-10-13</h2>
+<p>收尾版本。1.2.2 把工具默认模式改成「格式转换」之后，首页首屏的预览卡还在演示缩放流程， 和工具实际打开时的样子对不上；同时发现 RSS 订阅停在 1.2.0，两次发布都没进源。 这一版把这些收干净，并补上能自动发现同类漂移的检查。</p>
+<h3 id="修复">修复</h3>
+<ul><li><strong>首页 Hero 预览卡与默认模式不一致</strong></li><li>预览卡此前演示的是「目标宽度 400（高度自动）」，前后对比为 1448×1086 → 400×300，</li></ul>
+<p>    而工具现在默认是「格式转换」，不会再动尺寸 —— 用户第一眼看到的和打开后看到的是两回事   - 改为演示纯格式转换：<strong>1448×1086 → 1448×1086</strong>，PNG 2.4 MB → WEBP 96 KB，     <code>↓96%</code> 角标承担体积叙事；日志行改为「尺寸保持原样」   - 预览卡顶部补上模式切换的缩略，与真实控件同形，让「有两种模式」在第一屏就成立</p>
+<ul><li><strong>预览卡两栏改为等宽</strong></li><li>原先是 <code>1.32fr / 1fr</code>，输出栏更窄——那是在暗示图片被缩小了，与「尺寸保持原样」自相矛盾</li><li>窄屏下同样移除了输出栏的 <code>max-width: 64%</code> 限制</li></ul>
+<h3 id="改进">改进</h3>
+<ul><li><strong>RSS 补上 1.2.1 与 1.2.2 两个版本条目</strong>：<code>feed.xml</code> 此前停在 1.2.0，</li></ul>
+<p>  <code>lastBuildDate</code> 也停留在 1.2.0 的发布时间。订阅者错过两次发布</p>
+<ul><li><strong>新增跨文件一致性检查</strong>（<code>consistency.mjs</code>），覆盖那些「既不是链接、也不会让页面报错」的漂移：</li><li><code>CHANGELOG</code> 最新版本 == <code>index.html</code> 的 <code>softwareVersion</code> == <code>feed.xml</code> 最新条目</li><li>每个版本在 <code>CHANGELOG</code> 里都有对应的 release 链接定义</li><li><code>sitemap.xml</code> 条目数 == 磁盘页面数，且每条都对应真实存在的页面；<code>404.html</code> 不得列入</li><li><code>feed.xml</code> 与 <code>sitemap.xml</code> 的 XML 良构性</li><li><code>robots.txt</code> 指向 sitemap；<code>site.webmanifest</code> 图标与 <code>og:image</code> 都真实存在</li><li>首页 <code>NAV</code> / <code>FMTINDEX</code> 注入块的链接数符合预期</li></ul>
+<p>  这一版修掉的两个漂移（<code>softwareVersion</code> 停在 1.1.0、RSS 停在 1.2.0）此前都只能靠人工翻文件发现——   它们既不是断链，也不会让任何页面报错。</p>
+<h3 id="验收">验收</h3>
+<ul><li>一致性检查全部通过（18 项）</li><li>18 设备审计：0 项不合格、全部 0px 溢出、最小字号 12px</li><li>既有全部套件复跑通过：可达性、链接与资源完整性、导航宽度与交互、落地页矩阵、</li></ul>
+<p>  工具能力、模式分离、深链、404 页</p>
+<h2 id="1-2-2-2026-10-13">[1.2.2] — 2026-10-13</h2>
+<p>严重缺陷修复。用户反馈「<strong>这个格式转换工具有严重 bug，你只是转换格式，不需要你调整宽高</strong>」—— 属实：<code>state.width</code> 默认值是 400，而尺寸控件与格式控件共用同一组状态，于是<strong>每一个格式转换页 都会把图片缩到 400px 宽</strong>。一张 1200×800 的照片在 <code>/convert/png-to-jpg/</code> 上得到的是 400×267。</p>
+<p>格式转换与调整尺寸是两种不同的意图，此前被混在一起，而缩放那一方还赢了默认值。 此版本把两者拆成显式模式。</p>
+<h3 id="修复">修复</h3>
+<ul><li><strong>格式转换不再改动图片尺寸</strong></li><li>根因：<code>computeSize()</code> 无条件套用 <code>state.width</code>，而该字段默认 400；</li></ul>
+<p>    落地页只预设了输出格式，没有把尺寸置为「不缩放」的概念   - 现在 <code>computeSize()</code> 仅在 <code>resize</code> 模式生效，否则原样透传源图宽高   - ICO 的 256px 上限在两种模式下都保留——那是格式本身的定义，不是用户的缩放意图   - 输出文件名也只在真正改过尺寸时才带 <code>_宽x高</code>，否则保持原名与新扩展名     （此前转换页会产出 <code>photo_1200x800.jpg</code> 这种看着像被缩过的名字）</p>
+<ul><li><strong>落地页强制关闭缩放，且不污染 localStorage</strong></li><li>落地页的 <code>?w=</code> / <code>?scale=</code> 一律忽略：该页的契约就是「只换格式」，</li></ul>
+<p>    接受尺寸参数等于让同一个页面有两个互相矛盾的含义   - 关键细节：落地页在内存里把缩放关掉，但<strong>不写回 <code>state.resize</code></strong>。     因为 <code>applyParams()</code> 每次加载落地页都会 <code>save()</code>，直接改写状态会把「关闭」     持久化下去，导致回到首页时用户上次选的「调整尺寸」被遗忘</p>
+<ul><li><strong>首页状态栏在调整尺寸模式下仍声称「尺寸保持原样」</strong></li><li>状态文案只在启动时计算过一次，切换模式后没有重算。改为随模式刷新</li><li><strong>结构化数据与文案同步</strong>：<code>softwareVersion</code> 此前停在 <code>1.1.0</code>；</li></ul>
+<p>  落地页 HowTo 的步骤 2 还在教用户「设定目标宽度 400 / 600」；   SVG 相关说明也还写着「转位图前必须先设定目标宽度」</p>
+<h3 id="新增">新增</h3>
+<ul><li><strong>首页工具箱的「格式转换 / 调整尺寸」模式切换</strong></li><li>分段控件置于投放区下方，默认停在<strong>格式转换</strong>——因为它是不改变用户未要求之物的那一侧</li><li>提示文案随模式切换：<code>只换格式，图片尺寸保持原样</code> ↔ <code>可改宽高：按宽度、按原图比例，或锁定宽高比</code></li><li>模式写入 localStorage，刷新与返回首页都记得；落地页则一律回到「只换格式」</li><li><strong>落地页的说明条</strong>：明确写出「这个页面只换格式，<strong>图片尺寸保持原样</strong>，不会被缩小」，</li></ul>
+<p>  并给出通往完整工具箱的链接，让想同时改尺寸的人知道去哪</p>
+<h3 id="改进">改进</h3>
+<ul><li>尺寸相关控件（目标宽度 / 目标高度 / 缩放方式 / 常用宽度 / 按原图比例 / 锁定宽高比 / 不放大）</li></ul>
+<p>  统一标记 <code>data-resize-only</code>，由 <code>[data-resize=&quot;off&quot;]</code> 的 CSS 规则整组隐藏。   刻意用 CSS 隐藏而不是从 DOM 移除——<code>syncUI()</code> 依赖这些元素存在，   删掉会让格式同步一起失效</p>
+<ul><li><code>data-resize=&quot;off&quot;</code> 直接写进静态 HTML，避免脚本执行前尺寸控件闪现</li><li>首页功能卡片补到 9 张（3×3），新增「转换与缩放互不干扰」「35 个格式专属页」「可离线使用」</li><li>工作流步骤由「设定宽度」改为「选处理方式」，反映两种模式</li></ul>
+<h3 id="验收">验收</h3>
+<ul><li>落地页 1200×800 → <strong>1200×800</strong>（此前 400×267），三个不同目标格式逐一验证</li><li>落地页忽略 <code>?w=600</code> 与 <code>?scale=50</code>，仍输出 1200×800</li><li>首页默认同样保持 1200×800；切到「调整尺寸」后 400 宽 → 400×267，比例 50% → 600×400</li><li>模式记忆：刷新后保留；访问落地页后回首页仍保留用户的选择</li><li>转换模式下 ICO 仍遵守 256px 上限（256×171）</li><li>落地页与首页在 390px 下均 0px 横向溢出</li><li>既有全部套件复跑通过：可达性、链接与资源完整性、导航宽度与交互、落地页矩阵、</li></ul>
+<p>  工具能力、深链、404 页</p>
+<h2 id="1-2-1-2026-10-13">[1.2.1] — 2026-10-13</h2>
+<p>修复版本。1.2.0 上线后做了一轮「按项目自身定位反查缺口」的审计，发现两处真实缺陷： 总览页的站点图标与 Web App 清单全部 404，以及站点<strong>没有 404 页</strong>——用户一旦走错地址 就被交给 GitHub 的默认页，等于把 1.2.0 刚解决的「找不到入口」问题以更严重的形式重演一遍。</p>
+<h3 id="修复">修复</h3>
+<ul><li><strong>总览页 <code>/convert/</code> 的 favicon、apple-touch-icon 与 web manifest 全部 404</strong></li><li>这三个 <code>&lt;link&gt;</code> 的前缀被硬编码为 <code>../../</code>，从 <code>/convert/</code> 解析后落到站点根<strong>之外</strong></li><li>同一页的样式表与 logo 用的是 <code>../</code>，是对的——所以肉眼与截图都看不出异常</li><li>根因：<code>HEAD_ICONS</code> 是一个硬编码前缀的常量，对 <code>/convert/&lt;slug&gt;/</code> 正确、对 <code>/convert/</code> 错误。</li></ul>
+<p>    已改为按页面位置参数化的 <code>headIcons(prefix)</code>，两处调用点分别传 <code>LOC.slug.up</code> 与 <code>LOC.hub.up</code>   - 该缺陷此前一直没被发现，是因为内链审计只走 <code>&lt;a href&gt;</code>，从不检查 <code>&lt;link href&gt;</code></p>
+<ul><li><strong>404 页标题声称「32 种转换组合」，而其正下方就列着 35 条链接</strong></li><li>组合数被手算为 <code>INPUTS.length × (OUTPUTS.length - 1)</code> = 8 × 4 = 32；</li></ul>
+<p>    正确算法是 <code>OUTPUTS.length × (INPUTS.length - 1)</code> = 5 × 7 = 35     ——每个输出格式在输入侧排除掉的是它自己，而不是每一个输出格式   - 改为由 <code>INPUTS</code> / <code>OUTPUTS</code> 推导的 <code>PAIR_COUNT</code>，并在生成时断言它与实际组合数一致，     不一致直接抛错终止构建   - 同时给审计加了一道守卫：所有页面中出现的「全部 N 种转换组合」都必须等于该页实际渲染的链接数。     首页那两处数字是手写的，此前没有任何机制阻止它们漂移</p>
+<h3 id="新增">新增</h3>
+<ul><li><strong>品牌化 404 页（<code>404.html</code>）</strong></li><li>GitHub Pages 对任意未匹配路径都会返回该文件，因此它是走错地址的用户看到的最后一屏。</li></ul>
+<p>    页面带有与首页<strong>相同的 35 条格式索引</strong>、8 个热门转换入口，以及回到工具箱 / 首页 / 总览页的三个出口   - <code>robots</code> 为 <code>noindex, follow</code>：页面本身绝不参与排名，但其中的链接仍应被抓取   - 刻意不声明 <code>canonical</code>——404 页面对应任意 URL，声明 canonical 等于谎称它是另一个页面   - 用一段渐进增强脚本回显实际请求的路径，让用户知道自己在哪走错了   - 路径全部使用<strong>站点绝对前缀</strong>（<code>/pixora/…</code>）而非相对路径：GitHub Pages 渲染该文件时     地址栏仍是原始请求 URL，相对路径会解析到一个可能根本不存在的目录。     也没有采用 <code>&lt;base&gt;</code>——它会把 <code>#main</code> 跳转链接一并指向首页</p>
+<h3 id="改进">改进</h3>
+<ul><li><strong>内链审计升级为「链接 + 资源」双层，并显式建模部署前缀</strong></li><li>覆盖 <code>&lt;a href&gt;</code> / <code>&lt;link href&gt;</code> / <code>&lt;script src&gt;</code> / <code>&lt;img src&gt;</code> / <code>&lt;source src&gt;</code> / <code>&lt;video src&gt;</code>，</li></ul>
+<p>    单次审计从 2 138 条增至 <strong>2 187 条内链 + 266 条资源引用</strong>   - 新增解析器自检：内置 10 个用例，其中 3 个是历史 bug 反例（旧 favicon 前缀、旧死链写法、多退一级），     自检不通过则整个审计直接退出——避免审计脚本自己悄悄失效   - 关键修正：仅按<strong>文件系统</strong>解析不足以发现 favicon 那类问题。本地站点根与服务根是同一个目录，     <code>path.join</code> 会在根部静默吞掉 <code>..</code>；而线上站点位于 <code>/pixora/</code> 之下，向上越界即落到部署之外。     解析器因此改为自行维护目录段栈，越出站点根会被明确报告而不是被静默钳制</p>
+<h3 id="验收">验收</h3>
+<ul><li>解析器自检 <strong>10/10</strong>（含 3 个历史 bug 反例）</li><li>38 个页面：<strong>2 187 条</strong>内部链接 + <strong>266 条</strong>资源引用，0 断链、0 越界</li><li>404 页在 3 种未匹配路径（同级 / 深层嵌套 / 伪文件名）下渲染：状态码 404、样式生效、</li></ul>
+<p>  无断图、无失败子资源、无页面错误、0px 横向溢出；390px 与 320px 同样 0px 溢出</p>
+<ul><li>生成器幂等性复验通过（连续两次运行输出一致）</li><li>既有 5 组套件全部复跑通过，无回归</li></ul>
+<h2 id="1-2-0-2026-10-13">[1.2.0] — 2026-10-13</h2>
+<p>可发现性与工具能力版本。1.1.0 上线了 36 个格式转换页，但入口只放在页面中段和页脚， 用户反馈「<strong>找不到入口</strong>」。此版本参考对 <a href="https://www.iloveimg.com/zh-cn" target="_blank" rel="noopener">iLoveIMG</a>、 <a href="https://convertio.co/zh/" target="_blank" rel="noopener">Convertio</a>、<a href="https://cloudconvert.com/" target="_blank" rel="noopener">CloudConvert</a> 三家的 入口与信息架构逆向分析（见 <a href="docs/竞品入口与信息架构逆向分析.md"><code>docs/竞品入口与信息架构逆向分析.md</code></a>）， 把格式矩阵提到距页面顶部一次交互的位置，并补齐两项竞品都有而 Pixora 缺失的缩放能力。</p>
+<h3 id="新增">新增</h3>
+<ul><li><strong>导航「格式转换」巨型菜单</strong></li><li>主导航新增 <code>&lt;details&gt;</code> 巨型菜单，按<strong>输出格式</strong>分 5 组（转 PNG / JPG / WEBP / BMP / ICO），</li></ul>
+<p>    每组 7 条，共 35 个转换页 + 1 个总览入口   - <strong>全站 37 个页面统一</strong>（首页 + 35 个转换页 + 总览页），此前落地页的导航甚至没有格式转换项   - 当前页在菜单内以 <code>aria-current=&quot;page&quot;</code> 高亮   - 桌面端支持点击与鼠标悬停两种展开方式，Escape / 外部点击关闭；键盘激活走原生 toggle   - 移动端抽屉内自动转为内联展开的两列分组列表，无浮层、无横向溢出</p>
+<ul><li><strong>首页「全部 35 种转换组合」分组索引</strong></li><li><code>#conversions</code> 由 6 张手写卡片升级为<strong>全部 35 条链接</strong>的分组索引，取代原先只有 6 个入口的做法</li><li>5 个分组对应 5 个编码器，索引本身即引擎能力地图</li><li><strong>工具新增「按原图比例」缩放</strong></li><li><code>25% / 50% / 75% / 100%</code> 四个快捷 chip，对应 iLoveIMG「按百分比」Tab 的能力</li><li>批量场景下<strong>按每张图自身像素</strong>换算，不同尺寸的图片可以一起处理</li><li>激活时宽度输入框禁用并显示 placeholder「按原图」；再次点击同一比例、点击任一常用宽度 chip、</li></ul>
+<p>    或手动输入宽度都会退出比例模式</p>
+<ul><li><strong>工具新增「不放大」开关</strong></li><li>目标尺寸超过原图时按轴钳制回原尺寸，避免把小图放大成一团模糊</li><li>只影响放大方向，缩小不受影响</li><li><strong>本次会话统计</strong></li><li>结果区显示 <code>本次已处理 N 张 · 原始 X → 输出 Y · 减少 Z%</code></li><li>端上工具拿不到 Convertio 那样的全局计数，但会话内这些数字是真实且用户真正关心的</li><li><strong><code>?scale=</code> 深链参数</strong>：如 <code>?scale=50</code>，与既有 <code>?to=</code> / <code>?w=</code> / <code>?mode=</code> / <code>?q=</code> 一致</li></ul>
+<h3 id="改进">改进</h3>
+<ul><li><strong>Hero「快速预览」卡重做</strong>：原先是三块纯渐变色块，读起来像占位图。现在是<strong>同一张插画的原图 / 输出前后对比</strong>，</li></ul>
+<p>  带尺寸与体积标注、<code>↓96%</code> 降幅角标，以及工具真实会给出的参数行。插画为内联 SVG，不产生额外请求</p>
+<ul><li><strong>导航与格式索引改为生成器产出</strong>：<code>tools/gen-convert-pages.mjs</code> 新增 <code>nav()</code> 与 <code>formatIndex()</code>，</li></ul>
+<p>  通过 <code>&lt;!-- NAV:START/END --&gt;</code>、<code>&lt;!-- FMTINDEX:START/END --&gt;</code> 标记自动同步 <code>index.html</code>，   两份拷贝不再可能各自漂移——而漂移正是当初入口丢失的根因</p>
+<ul><li>导航断点由 860px 提到 900px（实测 861px 时仅剩 33px 余量，900px 时余量 72px）</li><li>工具区「处理选项」列新增第三个开关，<code>.tool-options</code> 改为 <code>auto-fit</code> 自适应列数</li></ul>
+<h3 id="说明">说明</h3>
+<ul><li>竞品对比中<strong>未采纳</strong>的做法：iLoveIMG 的 <code>data-category</code> 筛选条（35 个页面只有一种类别，是伪需求）、</li></ul>
+<p>  Convertio 的多云盘来源菜单（与「零上传」定位自相矛盾）、CloudConvert 把信息架构全压到页脚（对新用户与爬虫都不友好）</p>
+<ul><li>竞品对比中<strong>改造后采纳</strong>的做法：Convertio 的实时计数器改为「本次会话统计」，</li></ul>
+<p>  因为端上工具无法诚实声称全局转换量</p>
+<h3 id="修复">修复</h3>
+<ul><li><strong>总览页 <code>/convert/</code> 的 35 条导航链接全部是死链</strong></li><li>总览页位于 <code>/convert/</code>，却按「首页深度」生成导航，输出了 <code>convert/png-to-jpg/</code> 这类相对路径，</li></ul>
+<p>    实际解析为 <code>/convert/convert/png-to-jpg/</code>   - 根因是把「距站点根的距离」和「距 <code>/convert/</code> 的距离」压缩成了一个 <code>depth</code> 数字，     而这两者对总览页并不相等   - 改为显式的三态位置表（<code>root</code> / <code>hub</code> / <code>slug</code>），各自独立给出两个前缀   - 该问题在「链接是否存在」的检查下不可见，需校验<strong>解析后的目标是否真实存在</strong>才会暴露</p>
+<h3 id="验收">验收</h3>
+<ul><li>全站内链可达性：37 个页面 × 35 个转换目标，<strong>导航内可达 35/35</strong></li><li>内链完整性：37 个页面共 <strong>2 138 条</strong>内部链接全部指向真实存在的文件，0 断链</li><li>首屏可见的转换入口：<strong>32 个</strong>（此前为 0）</li><li>18 设备溢出审计：首页与落地页均 0px 溢出，最小字号 12px</li><li>端到端转换：PNG / JPG / WEBP / BMP / ICO 全部通过；比例缩放与不放大行为逐项验证通过</li><li>落地页矩阵：36 个文件 title / description / canonical 全唯一，JSON-LD 全可解析</li></ul>
+<h2 id="1-1-0-2026-10-13">[1.1.0] — 2026-10-13</h2>
+<p>格式转换版本。在原有「按宽度等比缩放」之上，加入一套<strong>完全在浏览器内运行</strong>的图片格式转换引擎， 并把官网文案、结构化数据、对比表与 FAQ 全部对齐到新能力。此版本的格式矩阵参考了对 <a href="https://convertio.co/zh/image-converter/" target="_blank" rel="noopener">Convertio 图片转换器</a> 的逆向分析结论（见 <a href="docs/convertio-逆向分析报告.md"><code>docs/convertio-逆向分析报告.md</code></a>）， 但实现路径完全不同：Convertio 是服务端转换，Pixora 是端上转换。</p>
+<h3 id="新增">新增</h3>
+<ul><li><strong>图片格式转换引擎</strong></li><li>输出格式从 3 种扩展到 <strong>6 种</strong>：PNG / JPG / WEBP / AVIF / BMP / ICO</li><li><strong>运行时能力探测</strong>：启动时用 Canvas 实际编码一遍并校验返回 blob 的 MIME，</li></ul>
+<p>    只有真正可编码的格式才会出现在下拉框里（因此 AVIF 只在支持的浏览器上出现）   - <strong>手写 BMP 编码器</strong>：BITMAPFILEHEADER + BITMAPINFOHEADER + 24-bit BGR 自底向上像素数据，     行按 4 字节对齐（<code>rowSize = ((24 × width + 31) &gt;&gt; 5) &lt;&lt; 2</code>）   - <strong>手写 ICO 编码器</strong>：22 字节 ICONDIR/ICONDIRENTRY + 内嵌 PNG，最长边超过 256px 时自动等比缩到 256   - <strong>手写 ZIP 打包</strong>：Local File Header + Central Directory + EOCD 完整结构，     CRC32 查表实现，优先使用 <code>CompressionStream(&quot;deflate-raw&quot;)</code> 压缩、不可用时降级为 store 模式   - <strong>透明背景处理</strong>：目标格式不支持 alpha（JPG / BMP）时，自动弹出背景填充色选择器，     把透明区域合成到指定底色，避免出现黑块   - <strong>体积变化提示</strong>：每张结果卡片显示相对原图的体积变化（<code>↓29%</code> / <code>↑679%</code>）   - <strong>「用当前设置重转」</strong>：改完设置不必重新拖图，直接对已有结果重跑   - <strong>「打包下载 ZIP」</strong>：批量结果一键打包，文件名形如 <code>pixora-20261013.zip</code>   - <strong>ICO 专用预设</strong>：选中 ICO 时，宽度预设自动切换为图标尺寸 <code>16 / 32 / 48 / 64 / 128 / 256</code>   - <strong>解码回退链</strong>：<code>createImageBitmap</code> 失败时回退到 <code>&lt;img&gt;</code> 解码（覆盖 SVG 等场景）</p>
+<ul><li><strong>官网</strong></li><li>新增「支持的格式」区块（<code>#formats</code>）：6 张格式卡片 + 3 组说明</li></ul>
+<p>    （输入格式 / 为什么输出只有这几种 / 为什么有些格式不支持）   - 对比表新增第 5 列「上传式在线转换器」，并补齐「图片是否离开设备」「文件保留策略」     「输出格式数量」「透明背景」「批量 + 打包下载」「断网后仍可用」「第三方追踪脚本」等行，共 13 行   - FAQ 从 4 条扩展到 7 条，新增「为什么不能转换 HEIC 或相机 RAW 文件？」     「格式转换会降低画质吗？」「透明背景会怎么处理？」     「Pixora 和 Convertio 这类在线转换器有什么区别？」   - 导航新增「格式」入口   - Hero / meta / OG / Twitter 文案全面扩写格式转换关键词</p>
+<ul><li><strong>格式转换落地页矩阵（SEO）</strong></li><li>复刻 Convertio 的核心 SEO 结构：按格式拆分的长尾落地页，但只列<strong>真正能完成的组合</strong></li><li>8 种可解码输入 × 5 种可编码输出，去掉 5 组同格式自转 → <strong>35 个转换页 + 1 个总览页</strong></li><li>每一页都内嵌完整转换器，通过 <code>&lt;html data-convert-to&gt;</code> 预配置输出格式 ——</li></ul>
+<p>    是能用的工具页，不是只有 CTA 的门页   - 支持深链：<code>/?to=jpg&amp;w=800</code> 会带着格式与宽度进入工具（<code>jpg</code> 与 <code>jpeg</code> 两种写法都接受）   - 每页独立的 <code>title</code> / <code>description</code> / <code>canonical</code>，36 个页面全部唯一（脚本校验）   - 每页带 <code>FAQPage</code> + <code>HowTo</code> + <code>BreadcrumbList</code>，且 schema 条目数与可见条目数一致   - 相关转换区块按「同输入」「同输出」双向互链，任意两页最多两跳可达   - 新增 <code>tools/gen-convert-pages.mjs</code>：一键生成全部落地页并重写 <code>sitemap.xml</code>（37 条）   - 首页新增「常见格式转换」区块与页脚入口，保证爬虫可发现</p>
+<ul><li><strong>SEO</strong></li><li><code>SoftwareApplication.featureList</code> 扩展到 7 项，<code>softwareVersion</code> 升到 <code>1.1.0</code></li><li><code>HowTo</code> 步骤更新为「拖入图片 → 选择目标格式与宽度 → 下载或打包」</li><li><code>FAQPage</code> 结构化数据同步到 7 条，与页面可见文案一一对应</li><li><code>sitemap.xml</code> 从 1 条扩到 37 条</li></ul>
+<h3 id="改进">改进</h3>
+<ul><li><strong>全设备适配</strong>：在 18 个断点（320 → 2560）上重做布局审计并修复</li><li><code>.tool-controls</code> 默认两列、≥860px 四列，避免平板宽度出现「第四项独占一行」</li><li>新增 860px 断点（品牌 + 6 个导航项 + 2 个操作按钮在 860px 以下排不下，改用抽屉导航）</li><li>新增 420px 断点，收窄小屏留白</li><li>移动端「目标高度」标签不再换行，四列标签高度统一为 21px，输入框对齐</li><li>输出格式下拉的选项文案精简为纯格式名，避免窄屏被裁切</li><li><code>.status</code> 在 420px 列布局下不再撑成空白盒（tool-bar 高度 181px → 36~60px）</li><li><strong>触摸可用性</strong></li><li><code>@media (pointer: coarse)</code> 下把所有交互目标提升到 ≥44px（图标按钮 44×44、按钮、预设 chip、开关行、页脚链接）</li><li><code>@media (hover: none)</code> 下撤销卡片抬升与按钮位移，避免触屏上 hover 态卡住</li><li>页脚链接、结果卡片下载按钮在小屏下补足可点击高度</li><li><strong>可访问性</strong></li><li><code>.container</code> 使用 <code>env(safe-area-inset-*)</code>，适配刘海屏横屏</li><li>预设按钮补 <code>aria-pressed</code> 与 <code>role=&quot;group&quot;</code></li></ul>
+<h3 id="说明">说明</h3>
+<ul><li>AVIF <strong>编码</strong>支持度远低于<strong>解码</strong>支持度（多数浏览器能显示 AVIF 但无法导出 AVIF），</li></ul>
+<p>  因此本版本对 AVIF 采用运行时探测而非无条件列出。</p>
+<ul><li>BMP 为无压缩位图，体积通常是原图的数十倍，仅建议用于特定兼容场景；</li></ul>
+<p>  结果卡片会用 <code>↑6944%</code> 这类标记提示体积膨胀。</p>
+<ul><li>转换仍是<strong>端上</strong>完成，不做任何上传。这也是与 Convertio 最本质的区别。</li></ul>
+<h2 id="1-0-1-2026-10-13">[1.0.1] — 2026-10-13</h2>
+<p>细节打磨版本。修复「处理选项」开关渲染错位，并统一了一批对齐、对比度与可访问性问题。</p>
+<h3 id="修复">修复</h3>
+<ul><li><strong>「处理选项」开关与文字重叠</strong>（严重）</li><li>根因是 CSS 优先级冲突：开关行本身是 <code>&lt;label&gt;</code>，被 <code>.field label { display: block }</code>（0,1,1）</li></ul>
+<p>    压过 <code>.switch-row { display: inline-flex }</code>（0,1,0）。行内布局塌陷为块级后，     绝对定位的滑块失去 flex 盒，直接画在了自己的说明文字上。   - 现以 <code>.field .switch-row</code> 提高优先级，并把字号 / 字重 / 颜色 / 间距从「字段标签」样式里还原。</p>
+<ul><li>开关在键盘聚焦时没有任何视觉反馈 —— 真实复选框被视觉隐藏，改为在滑块轨道上绘制聚焦环。</li><li>宽度预设按钮的选中态仅靠颜色表达，补齐 <code>aria-pressed</code> 与 <code>role=&quot;group&quot;</code>。</li><li>锚点跳转（如 <code>#tool</code>）会被 64px 粘性页头遮住标题，补 <code>scroll-padding-top</code>。</li><li>暗色模式下，填充式品牌色块（主按钮、预设按钮、步骤徽标、CTA 横幅、选区）使用为深色背景</li></ul>
+<p>  调亮过的 <code>--brand</code>，白字对比度仅约 2.8:1；新增 <code>--brand-fill</code> / <code>--brand-fill-2</code> 令牌，   让填充面在两种主题下都保持饱和色（白字对比度 ≥ 4.3:1）。</p>
+<ul><li>暗色模式下 CTA 横幅内的白色主按钮文字用了浅蓝 <code>--brand-ink</code>，对比度不足，改用 <code>--brand-fill</code>。</li></ul>
+<h3 id="改进">改进</h3>
+<ul><li>消除主题闪烁：<code>&lt;head&gt;</code> 内联引导脚本在样式表之前确定主题，深色用户不再先看到白屏。</li><li>无脚本兜底：进场动画改为 <code>.js .reveal</code>，脚本不可用时内容正常可见，而不是整页空白。</li><li>打印时强制显示 <code>.reveal</code> 元素。</li><li><code>theme-color</code> 在手动切换主题后会移除 <code>media</code> 条件，浏览器 UI 颜色不再与页面主题脱节。</li><li>「常用宽度」与「处理选项」两列统一基线：预设行与开关组等高居中。</li></ul>
+<h2 id="1-0-0-2026-10-13">[1.0.0] — 2026-10-13</h2>
+<p>首个正式版本。Pixora 从一个「减少在线 PS 导出步骤」的实际需求出发，被重新设计为一个 零依赖、隐私优先、SEO 完备的浏览器端图片工具站点。</p>
+<h3 id="新增">新增</h3>
+<ul><li><strong>图像引擎</strong></li><li>按宽度等比缩放：高度自动按原图比例计算（等价于 Photoshop「存储为 Web」的锁定比例）</li><li>三种缩放模式：等比适应（不变形）、拉伸填满、等比填充（居中裁剪）</li><li>分步降采样算法（逐级减半），大幅缩小时保持锐利</li><li>支持导出 PNG（无损）/ JPG / WEBP，非 PNG 可调质量</li><li>自动处理 EXIF 方向（<code>imageOrientation: &quot;from-image&quot;</code>）</li><li>输出文件名自动带上尺寸，如 <code>驱动发布图_400x300.png</code></li></ul>
+<ul><li><strong>交互</strong></li><li>拖放、点击选择、<code>Ctrl</code> + <code>V</code> 粘贴截图三种输入方式</li><li>批量处理：一次拖入多张，统一设置、逐张输出</li><li>宽度预设 400 / 600 / 800 / 1200 / 1920，可自定义</li><li>设置持久化到 <code>localStorage</code></li><li>可选「拖入即自动下载」（默认关闭）</li></ul>
+<ul><li><strong>站点</strong></li><li>DeepSeek 风格的 SaaS 级官网首页：Hero、在线工具、功能网格、数据带、工作流、对比表、FAQ、CTA、多列页脚</li><li>明暗双主题，跟随系统并可手动切换</li><li>滚动进场动画（<code>IntersectionObserver</code>），尊重 <code>prefers-reduced-motion</code></li><li>响应式布局，适配移动端（含抽屉式导航）</li></ul>
+<ul><li><strong>品牌视觉</strong></li><li>全新 logo：渐变圆角方块 + 三级递进方块（隐喻「缩放 / 变换」）</li><li>完整图标体系：SVG 站点图标、PNG 回退、iOS 主屏图标、PWA 192/512、maskable 自适应图标</li><li>1200×630 OG 社交分享图</li></ul>
+<ul><li><strong>SEO 与可发现性</strong></li><li>JSON-LD <code>@graph</code>：<code>WebSite</code> / <code>Organization</code> / <code>WebPage</code> / <code>ImageObject</code> / <code>SoftwareApplication</code> / <code>HowTo</code> / <code>FAQPage</code></li><li>Open Graph + Twitter Card 完整字段</li><li><code>canonical</code> 与 <code>hreflang</code>（<code>zh-CN</code> / <code>x-default</code>）</li><li><code>robots.txt</code>（显式放行 AI 爬虫）、<code>sitemap.xml</code>（含 image / xhtml 命名空间）</li><li><strong>Speculation Rules API</strong> 声明式预渲染 / 预取</li><li>PWA 清单、<code>llms.txt</code>、<code>feed.xml</code>（RSS 2.0）、<code>humans.txt</code>、<code>.well-known/security.txt</code></li><li>IndexNow 密钥文件，支持 Bing / Yandex 即时索引</li><li>零第三方请求，无渲染阻塞脚本</li></ul>
+<h3 id="说明">说明</h3>
+<ul><li>首个版本不包含图层级编辑能力。若需要精细修图，建议搭配 Photopea 等完整编辑器使用。</li><li>结构化数据刻意不含 <code>aggregateRating</code>，以避免标注虚假评价。</li></ul>
+<p>[1.3.0]: https://github.com/xuboboo/pixora/releases/tag/v1.3.0 [1.2.4]: https://github.com/xuboboo/pixora/releases/tag/v1.2.4 [1.2.3]: https://github.com/xuboboo/pixora/releases/tag/v1.2.3 [1.2.2]: https://github.com/xuboboo/pixora/releases/tag/v1.2.2 [1.2.1]: https://github.com/xuboboo/pixora/releases/tag/v1.2.1 [1.2.0]: https://github.com/xuboboo/pixora/releases/tag/v1.2.0 [1.1.0]: https://github.com/xuboboo/pixora/releases/tag/v1.1.0 [1.0.1]: https://github.com/xuboboo/pixora/releases/tag/v1.0.1 [1.0.0]: https://github.com/xuboboo/pixora/releases/tag/v1.0.0</p>
+      </article>
+
+      <p class="doc-src">本篇内容同时维护在仓库的 <code>CHANGELOG.md</code> 中，
+        由 <code>tools/gen-doc-pages.mjs</code> 转换生成，改动请改源文件而不是这一页。</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer" aria-labelledby="footer-title">
+  <div class="container">
+    <h2 id="footer-title" class="visually-hidden" style="position:absolute;left:-9999px">页脚导航</h2>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="./" aria-label="Pixora 首页">
+          <img src="./assets/img/logo.svg" width="32" height="32" alt="Pixora logo" loading="lazy">
+          <span>Pixora</span>
+        </a>
+        <p style="margin-top:12px">浏览器里的免费图片工具：格式转换、缩放、AI 放大与在线修图。全程本地处理，图片不上传，无需注册，没有次数限制。</p>
+        <div class="footer-social">
+          <a class="icon-btn" href="https://github.com/xuboboo/pixora" target="_blank" rel="noopener" aria-label="GitHub 仓库">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.34-1.3-1.7-1.3-1.7-1.06-.72.08-.71.08-.71 1.17.08 1.79 1.2 1.79 1.2 1.04 1.79 2.74 1.27 3.4.97.11-.76.41-1.28.74-1.57-2.55-.29-5.23-1.28-5.23-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.25 5.69.42.36.79 1.07.79 2.16v3.2c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5z"/></svg>
+          </a>
+          <a class="icon-btn" href="https://github.com/xuboboo/pixora/issues" target="_blank" rel="noopener" aria-label="反馈问题">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2-2z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <nav class="footer-col" aria-label="产品">
+        <h4>产品</h4>
+        <ul>
+          <li><a href="./#tool">图片工具箱</a></li>
+          <li><a href="./editor/">在线修图</a></li>
+          <li><a href="./#features">功能特性</a></li>
+          <li><a href="./#formats">支持的格式</a></li>
+          <li><a href="./convert/">全部格式转换</a></li>
+          <li><a href="./#faq">常见问题</a></li>
+        </ul>
+      </nav>
+
+      <nav class="footer-col" aria-label="资源">
+        <h4>资源</h4>
+        <ul>
+          <li><a href="https://github.com/xuboboo/pixora" target="_blank" rel="noopener">GitHub 仓库</a></li>
+          <li><a href="https://github.com/xuboboo/pixora/blob/main/README.md" target="_blank" rel="noopener">项目文档</a></li>
+          <li><a href="./changelog.html">更新日志</a></li>
+          <li><a href="./feed.xml" type="application/rss+xml">RSS 订阅</a></li>
+          <li><a href="./llms.txt">llms.txt</a></li>
+        </ul>
+      </nav>
+
+      <nav class="footer-col" aria-label="关于">
+        <h4>关于</h4>
+        <ul>
+          <li><a href="./license.html">MIT 许可证</a></li>
+          <li><a href="./contributing.html">贡献指南</a></li>
+          <li><a href="./code-of-conduct.html">行为准则</a></li>
+          <li><a href="./security.html">安全政策</a></li>
+          <li><a href="https://github.com/xuboboo/pixora/issues" target="_blank" rel="noopener">问题反馈</a></li>
+          <li><a href="./humans.txt">humans.txt</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> Pixora · 基于 MIT 许可证开源</span>
+      <nav aria-label="法律与元信息">
+        <a href="./sitemap.xml">站点地图</a>
+        <a href="./robots.txt">robots.txt</a>
+        <a href="./.well-known/security.txt">security.txt</a>
+        <a href="https://github.com/xuboboo/pixora" target="_blank" rel="noopener">源码</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/main.js" defer></script>
+</body>
+</html>

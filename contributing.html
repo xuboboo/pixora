@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<title>贡献指南 — Pixora</title>
+<meta name="description" content="如何参与 Pixora 开发：项目的设计原则（零依赖、隐私不可妥协、不臃肿）、开发流程、代码规范、提交信息约定与审计测试。">
+<meta name="author" content="Pixora contributors">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#080c16" media="(prefers-color-scheme: dark)">
+
+<link rel="canonical" href="https://xuboboo.github.io/pixora/contributing.html">
+<link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/contributing.html">
+<link rel="icon" href="./assets/img/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="./assets/img/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="./assets/img/apple-touch-icon.png">
+<link rel="manifest" href="./site.webmanifest">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Pixora">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:title" content="贡献指南 — Pixora">
+<meta property="og:description" content="如何参与 Pixora 开发：项目的设计原则（零依赖、隐私不可妥协、不臃肿）、开发流程、代码规范、提交信息约定与审计测试。">
+<meta property="og:url" content="https://xuboboo.github.io/pixora/contributing.html">
+<meta property="og:image" content="https://xuboboo.github.io/pixora/assets/img/og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<script>
+(function(){try{var t=localStorage.getItem("pixora-theme");if(t!=="dark"&&t!=="light"){t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.setAttribute("data-theme",t)}catch(e){}})();
+</script>
+
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<a class="skip-link" href="#main">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="./" aria-label="Pixora 首页">
+      <img src="./assets/img/logo.svg" width="32" height="32" alt="Pixora logo" fetchpriority="high">
+      <span>Pixora</span>
+    </a>
+
+    <nav class="nav" id="nav" aria-label="主导航">
+      <a href="./#tool">在线工具</a>
+      <details class="nav-drop" data-href="./convert/">
+        <summary>
+          <span>格式转换</span>
+          <svg class="nav-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </summary>
+        <div class="nav-panel">
+          <div class="nav-panel-head">
+            <strong>按目标格式转换</strong>
+            <a href="./convert/">全部 35 种组合 →</a>
+          </div>
+          <div class="nav-panel-cols"><div class="nav-col">
+              <span class="nav-col-title">转 PNG</span>
+              <ul>
+                <li><a href="./convert/jpg-to-png/">JPG 转 PNG</a></li>
+                <li><a href="./convert/webp-to-png/">WEBP 转 PNG</a></li>
+                <li><a href="./convert/gif-to-png/">GIF 转 PNG</a></li>
+                <li><a href="./convert/bmp-to-png/">BMP 转 PNG</a></li>
+                <li><a href="./convert/avif-to-png/">AVIF 转 PNG</a></li>
+                <li><a href="./convert/svg-to-png/">SVG 转 PNG</a></li>
+                <li><a href="./convert/ico-to-png/">ICO 转 PNG</a></li>
+      </ul>
+    </div>
+<div class="nav-col">
+              <span class="nav-col-title">转 JPG</span>
+              <ul>
+                <li><a href="./convert/png-to-jpg/">PNG 转 JPG</a></li>
+                <li><a href="./convert/webp-to-jpg/">WEBP 转 JPG</a></li>
+                <li><a href="./convert/gif-to-jpg/">GIF 转 JPG</a></li>
+                <li><a href="./convert/bmp-to-jpg/">BMP 转 JPG</a></li>
+                <li><a href="./convert/avif-to-jpg/">AVIF 转 JPG</a></li>
+                <li><a href="./convert/svg-to-jpg/">SVG 转 JPG</a></li>
+                <li><a href="./convert/ico-to-jpg/">ICO 转 JPG</a></li>
+      </ul>
+    </div>
+<div class="nav-col">
+              <span class="nav-col-title">转 WEBP</span>
+              <ul>
+                <li><a href="./convert/png-to-webp/">PNG 转 WEBP</a></li>
+                <li><a href="./convert/jpg-to-webp/">JPG 转 WEBP</a></li>
+                <li><a href="./convert/gif-to-webp/">GIF 转 WEBP</a></li>
+                <li><a href="./convert/bmp-to-webp/">BMP 转 WEBP</a></li>
+                <li><a href="./convert/avif-to-webp/">AVIF 转 WEBP</a></li>
+                <li><a href="./convert/svg-to-webp/">SVG 转 WEBP</a></li>
+                <li><a href="./convert/ico-to-webp/">ICO 转 WEBP</a></li>
+      </ul>
+    </div>
+<div class="nav-col">
+              <span class="nav-col-title">转 BMP</span>
+              <ul>
+                <li><a href="./convert/png-to-bmp/">PNG 转 BMP</a></li>
+                <li><a href="./convert/jpg-to-bmp/">JPG 转 BMP</a></li>
+                <li><a href="./convert/webp-to-bmp/">WEBP 转 BMP</a></li>
+                <li><a href="./convert/gif-to-bmp/">GIF 转 BMP</a></li>
+                <li><a href="./convert/avif-to-bmp/">AVIF 转 BMP</a></li>
+                <li><a href="./convert/svg-to-bmp/">SVG 转 BMP</a></li>
+                <li><a href="./convert/ico-to-bmp/">ICO 转 BMP</a></li>
+      </ul>
+    </div>
+<div class="nav-col">
+              <span class="nav-col-title">转 ICO</span>
+              <ul>
+                <li><a href="./convert/png-to-ico/">PNG 转 ICO</a></li>
+                <li><a href="./convert/jpg-to-ico/">JPG 转 ICO</a></li>
+                <li><a href="./convert/webp-to-ico/">WEBP 转 ICO</a></li>
+                <li><a href="./convert/gif-to-ico/">GIF 转 ICO</a></li>
+                <li><a href="./convert/bmp-to-ico/">BMP 转 ICO</a></li>
+                <li><a href="./convert/avif-to-ico/">AVIF 转 ICO</a></li>
+                <li><a href="./convert/svg-to-ico/">SVG 转 ICO</a></li>
+      </ul>
+    </div></div>
+        </div>
+      </details>
+      <a href="./#formats">支持的格式</a>
+      <a href="./#how">工作流</a>
+      <a href="./#compare">对比</a>
+      <a href="./#faq">常见问题</a>
+    </nav>
+
+    <div class="header-actions">
+      <button class="icon-btn" data-theme-toggle type="button" aria-label="切换主题" aria-pressed="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <a class="btn btn-ghost btn-sm" href="https://github.com/xuboboo/pixora" target="_blank" rel="noopener" aria-label="GitHub 仓库">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.34-1.3-1.7-1.3-1.7-1.06-.72.08-.71.08-.71 1.17.08 1.79 1.2 1.79 1.2 1.04 1.79 2.74 1.27 3.4.97.11-.76.41-1.28.74-1.57-2.55-.29-5.23-1.28-5.23-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.25 5.69.42.36.79 1.07.79 2.16v3.2c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5z"/></svg>
+        <span>GitHub</span>
+      </a>
+      <button class="icon-btn nav-toggle" type="button" aria-label="打开菜单" aria-expanded="false" aria-controls="nav">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <section class="section doc-page" aria-labelledby="doc-title">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="面包屑导航">
+        <a href="./">Pixora</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">贡献指南</span>
+      </nav>
+
+      <div class="section-head">
+        <span class="eyebrow">项目文档</span>
+        <h1 id="doc-title">贡献指南</h1>
+        <p>在动手之前请先读一遍设计原则。Pixora 的取舍都写在那几条底线里。</p>
+      </div>
+
+      <article class="prose reveal">
+<p>感谢你愿意为 Pixora 出一份力。本文档说明如何参与开发。</p>
+<h2 id="设计原则">设计原则</h2>
+<p>在动手之前，请先理解项目的三条底线：</p>
+<ol><li><strong>零依赖</strong>。不要引入框架、运行时库或 CSS 框架。所有代码必须是手写的原生 HTML / CSS / JavaScript。</li><li><strong>隐私不可妥协</strong>。任何功能都不得把用户图片发送到服务器。所有处理必须留在浏览器内。</li><li><strong>不臃肿</strong>。Pixora 是「把高频操作做到极致」的工具，不是全能编辑器。新功能必须证明它值得占用首屏体积。</li></ol>
+<p>如果某个改动会破坏以上任一条，请先开 Issue 讨论。</p>
+<h2 id="开发流程">开发流程</h2>
+<pre><code class="language-bash"># 1. Fork 并克隆
+git clone https://github.com/&lt;your-name&gt;/pixora.git
+cd pixora
+
+# 2. 起一个静态服务器（无构建步骤）
+python -m http.server 8080
+# 打开 http://localhost:8080
+
+# 3. 新建分支
+git checkout -b feat/your-feature</code></pre>
+<h2 id="代码规范">代码规范</h2>
+<h3 id="通用">通用</h3>
+<ul><li>缩进 2 空格，使用 ASCII 直引号</li><li>文件结尾保留一个换行</li><li>不提交压缩/混淆后的代码（站点本身就是源码）</li></ul>
+<h3 id="html">HTML</h3>
+<ul><li>语义化标签优先（<code>header</code> / <code>nav</code> / <code>main</code> / <code>section</code> / <code>article</code> / <code>footer</code>）</li><li>每页仅一个 <code>&lt;h1&gt;</code>，标题层级不跳级</li><li>所有 <code>&lt;img&gt;</code> 必须有 <code>alt</code>；装饰性图片用 <code>alt=&quot;&quot;</code></li><li>交互元素必须可用键盘操作，并有可见焦点样式</li></ul>
+<h3 id="css">CSS</h3>
+<ul><li>颜色、间距、圆角一律走 <code>:root</code> 中的 Design Token，不写魔法值</li><li>深色模式通过 <code>html[data-theme=&quot;dark&quot;]</code> 覆盖 Token，而不是散落的 <code>@media</code> 分支</li><li>新组件放在 <code>assets/css/style.css</code> 对应分区下，保持分区编号连续</li></ul>
+<h3 id="javascript">JavaScript</h3>
+<ul><li>原生 ES2017+，不引入任何依赖</li><li>使用 IIFE 包裹，避免污染全局</li><li>DOM 查询用 <code>querySelector</code> / <code>querySelectorAll</code>，缓存重复查询</li><li>异步统一用 <code>async/await</code>，错误必须被 <code>try/catch</code> 捕获并给出用户可读提示</li><li>新增的可交互控件需同步更新 <code>aria-*</code> 属性</li></ul>
+<h2 id="无障碍-accessibility">无障碍（Accessibility）</h2>
+<p>提交前请自查：</p>
+<ul><li>[ ] 全站可用 <code>Tab</code> 键走通，焦点可见</li><li>[ ] 所有图片有合适的 <code>alt</code></li><li>[ ] 颜色对比度达到 WCAG AA（正文 ≥ 4.5:1）</li><li>[ ] 尊重 <code>prefers-reduced-motion</code></li><li>[ ] 表单控件有关联的 <code>&lt;label&gt;</code></li></ul>
+<h2 id="seo-检查清单">SEO 检查清单</h2>
+<p>改动页面结构时，请确认以下项没有被破坏：</p>
+<ul><li>[ ] <code>&lt;title&gt;</code> 唯一且长度合理（中文 ≤ 30 字为宜）</li><li>[ ] <code>&lt;meta name=&quot;description&quot;&gt;</code> 存在且与页面内容一致</li><li>[ ] <code>&lt;link rel=&quot;canonical&quot;&gt;</code> 指向正式地址</li><li>[ ] JSON-LD <code>@graph</code> 与页面可见内容一致（<strong>不要标注页面上不存在的 FAQ</strong>）</li><li>[ ] 新增图片资源同步更新 <code>sitemap.xml</code> 的 <code>image:image</code></li><li>[ ] OG 图仍为 1200×630</li></ul>
+<blockquote><p>结构化数据必须与可见内容一致。为了让富结果好看而编造评分、价格或问答，属于违规行为，会被直接拒绝。</p></blockquote>
+<h2 id="提交信息">提交信息</h2>
+<p>使用 <a href="https://www.conventionalcommits.org/" target="_blank" rel="noopener">Conventional Commits</a>：</p>
+<pre><code>feat: 新增按高度等比缩放
+fix: 修复暗色模式下开关轨道对比度不足
+perf: 降低大图缩放的中间画布内存占用
+docs: 补充部署说明
+a11y: 为拖放区补充键盘操作
+seo: 为 FAQ 补充 HowTo 结构化数据</code></pre>
+<h2 id="提交-pull-request">提交 Pull Request</h2>
+<ol><li>确保改动聚焦单一主题</li><li>在 PR 描述里说明：<strong>做了什么 / 为什么 / 如何验证</strong></li><li>附上前后对比截图（涉及 UI 时）</li><li>若改动影响 SEO 或性能，请说明验证方式</li></ol>
+<h2 id="安全">安全</h2>
+<p>如果发现安全问题（例如 XSS、隐私泄露、可被利用的解析漏洞），请<strong>不要</strong>公开开 Issue，而是通过 <a href=".well-known/security.txt">security.txt</a> 中的渠道私下联系维护者。</p>
+<h2 id="许可证">许可证</h2>
+<p>你的贡献将以 <a href="LICENSE">MIT</a> 许可证发布。</p>
+      </article>
+
+      <p class="doc-src">本篇内容同时维护在仓库的 <code>CONTRIBUTING.md</code> 中，
+        由 <code>tools/gen-doc-pages.mjs</code> 转换生成，改动请改源文件而不是这一页。</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer" aria-labelledby="footer-title">
+  <div class="container">
+    <h2 id="footer-title" class="visually-hidden" style="position:absolute;left:-9999px">页脚导航</h2>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="./" aria-label="Pixora 首页">
+          <img src="./assets/img/logo.svg" width="32" height="32" alt="Pixora logo" loading="lazy">
+          <span>Pixora</span>
+        </a>
+        <p style="margin-top:12px">浏览器里的免费图片工具：格式转换、缩放、AI 放大与在线修图。全程本地处理，图片不上传，无需注册，没有次数限制。</p>
+        <div class="footer-social">
+          <a class="icon-btn" href="https://github.com/xuboboo/pixora" target="_blank" rel="noopener" aria-label="GitHub 仓库">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.34-1.3-1.7-1.3-1.7-1.06-.72.08-.71.08-.71 1.17.08 1.79 1.2 1.79 1.2 1.04 1.79 2.74 1.27 3.4.97.11-.76.41-1.28.74-1.57-2.55-.29-5.23-1.28-5.23-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.25 5.69.42.36.79 1.07.79 2.16v3.2c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5z"/></svg>
+          </a>
+          <a class="icon-btn" href="https://github.com/xuboboo/pixora/issues" target="_blank" rel="noopener" aria-label="反馈问题">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2-2z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <nav class="footer-col" aria-label="产品">
+        <h4>产品</h4>
+        <ul>
+          <li><a href="./#tool">图片工具箱</a></li>
+          <li><a href="./editor/">在线修图</a></li>
+          <li><a href="./#features">功能特性</a></li>
+          <li><a href="./#formats">支持的格式</a></li>
+          <li><a href="./convert/">全部格式转换</a></li>
+          <li><a href="./#faq">常见问题</a></li>
+        </ul>
+      </nav>
+
+      <nav class="footer-col" aria-label="资源">
+        <h4>资源</h4>
+        <ul>
+          <li><a href="https://github.com/xuboboo/pixora" target="_blank" rel="noopener">GitHub 仓库</a></li>
+          <li><a href="https://github.com/xuboboo/pixora/blob/main/README.md" target="_blank" rel="noopener">项目文档</a></li>
+          <li><a href="./changelog.html">更新日志</a></li>
+          <li><a href="./feed.xml" type="application/rss+xml">RSS 订阅</a></li>
+          <li><a href="./llms.txt">llms.txt</a></li>
+        </ul>
+      </nav>
+
+      <nav class="footer-col" aria-label="关于">
+        <h4>关于</h4>
+        <ul>
+          <li><a href="./license.html">MIT 许可证</a></li>
+          <li><a href="./contributing.html">贡献指南</a></li>
+          <li><a href="./code-of-conduct.html">行为准则</a></li>
+          <li><a href="./security.html">安全政策</a></li>
+          <li><a href="https://github.com/xuboboo/pixora/issues" target="_blank" rel="noopener">问题反馈</a></li>
+          <li><a href="./humans.txt">humans.txt</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> Pixora · 基于 MIT 许可证开源</span>
+      <nav aria-label="法律与元信息">
+        <a href="./sitemap.xml">站点地图</a>
+        <a href="./robots.txt">robots.txt</a>
+        <a href="./.well-known/security.txt">security.txt</a>
+        <a href="https://github.com/xuboboo/pixora" target="_blank" rel="noopener">源码</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/main.js" defer></script>
+</body>
+</html>

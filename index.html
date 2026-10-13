@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
 <!-- ===================== Primary SEO ===================== -->
-<title>Pixora 免费在线图片格式转换与缩放工具 — PNG/JPG/WEBP/AVIF 互转，无需上传</title>
-<meta name="description" content="浏览器里的免费图片格式转换与缩放工具：拖入图片即可转成 PNG、JPG、WEBP、BMP、ICO（支持时含 AVIF），可按宽度等比缩放、批量打包 ZIP 下载。无需注册、无使用限制，图片全程在本地处理、绝不上传服务器。">
-<meta name="keywords" content="在线图片格式转换,图片格式转换器,PNG转JPG,JPG转PNG,WEBP转换,AVIF转换,BMP转换,ICO图标生成,在线图片缩放,图片等比缩放,按宽度缩放,批量图片转换,免费图片处理,浏览器图片工具,无上传图片编辑,在线PS替代">
+<title>Pixora 免费在线图片工具 — 格式转换 · 缩放 · AI 放大 · 在线修图，全部本地完成</title>
+<meta name="description" content="浏览器里的免费图片工具：拖入图片即可转成 PNG、JPG、WEBP、BMP、ICO（支持时含 AVIF），可按宽度等比缩放，用 Real-ESRGAN 在本机做 AI 超分放大，还有裁切、旋转、调色、加文字的在线修图。无需注册、无使用限制，图片全程在本地处理、绝不上传服务器。">
+<meta name="keywords" content="在线图片格式转换,图片格式转换器,PNG转JPG,JPG转PNG,WEBP转换,AVIF转换,BMP转换,ICO图标生成,在线图片缩放,图片等比缩放,按宽度缩放,批量图片转换,免费图片处理,浏览器图片工具,无上传图片编辑,在线PS替代,AI图片放大,图片超分辨率,在线修图,图片编辑器">
 <meta name="author" content="Pixora contributors">
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 <meta name="googlebot" content="index, follow, max-image-preview:large">
@@ -142,7 +142,7 @@
       "applicationSubCategory": "Image Editing",
       "operatingSystem": "Any modern web browser",
       "browserRequirements": "Requires Canvas 2D and createImageBitmap support",
-      "softwareVersion": "1.2.4",
+      "softwareVersion": "1.3.0",
       "isAccessibleForFree": true,
       "license": "https://opensource.org/licenses/MIT",
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY", "availability": "https://schema.org/InStock" },
@@ -153,6 +153,8 @@
         "批量处理多张图片，并可打包为 ZIP 下载",
         "有损格式可调质量，透明通道可保留或指定填充色",
         "100% 浏览器本地处理，图片不上传",
+        "AI 超分放大：Real-ESRGAN x4v3 在浏览器本地推理，最高放大 4 倍（输入上限 150 万像素）",
+        "在线修图编辑器：7 种工具、7 项实时调整、9 个滤镜、裁剪旋转翻转与撤销重做",
         "无需注册、无使用次数限制",
         "零依赖、可离线使用"
       ],
@@ -309,16 +311,21 @@
     <div class="container hero-grid">
       <div>
         <span class="eyebrow">浏览器原生 · 零上传 · 开源</span>
-        <h1 id="hero-title">在浏览器里，<span class="grad">一步</span>完成图片缩放与格式转换</h1>
+        <h1 id="hero-title">在浏览器里，<span class="grad">一步</span>完成图片转换、缩放、放大与修图</h1>
         <p class="hero-lead">
           把「上传图片 → 等待转换 → 选择格式 → 手动填宽度 → 下载」压缩成一次拖拽。
-          支持 PNG / JPG / WEBP / BMP / ICO 互转（浏览器支持时还会多出 AVIF），可批量打包下载 ——
+          PNG / JPG / WEBP / BMP / ICO 互转（浏览器支持时还会多出 AVIF），按宽度等比缩放，
+          Real-ESRGAN 本机超分放大，另有裁切、调色、加文字的在线修图 —— 可批量打包下载，
           无需注册、没有次数限制，图片永远留在你的设备上。
         </p>
         <div class="hero-cta">
           <a class="btn btn-primary" href="#tool">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>
             立即开始，无需注册
+          </a>
+          <a class="btn btn-ghost" href="editor/">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg>
+            在线修图
           </a>
           <a class="btn btn-ghost" href="convert/">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h11l-3-3M20 17H9l3 3"/><path d="M4 7v3M20 17v-3"/></svg>
@@ -329,6 +336,8 @@
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>完全免费</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>无使用限制</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>格式互转 · 含 ICO</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>AI 超分放大</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>在线修图</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>图片不上传</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>MIT 开源</li>
         </ul>
@@ -470,14 +479,33 @@
           <input type="file" id="file" accept="image/*" multiple hidden>
         </div>
 
-        <!-- 两种意图分开：格式转换不动尺寸，调整尺寸才动。默认取前者 ——
-             它不改变用户没有要求改变的东西。 -->
+        <!-- 三种意图分开：格式转换不动尺寸，调整尺寸才动，AI 放大是把丢失的细节
+             用卷积网络猜回来。默认取第一个 —— 它不改变用户没有要求改变的东西。 -->
         <div class="tool-modes" data-mode-switch>
           <div class="seg" id="toolmodes" role="tablist" aria-label="处理方式">
             <button class="seg-btn on" type="button" role="tab" data-mode="convert" aria-selected="true">格式转换</button>
             <button class="seg-btn" type="button" role="tab" data-mode="resize" aria-selected="false">调整尺寸</button>
+            <button class="seg-btn" type="button" role="tab" data-mode="ai" aria-selected="false">AI 放大</button>
           </div>
           <p class="seg-hint" id="modehint2">只换格式，图片尺寸保持原样</p>
+        </div>
+
+        <!-- AI 放大的门槛。模型 5MB、推理运行时 22MB，不该因为有人点了一下标签就偷偷
+             下走，所以先把事实摆出来（多大、在哪跑、有没有限制），按了「启用」才真的开始加载。 -->
+        <div class="ai-gate" id="aigate" hidden>
+          <b>AI 放大要先把模型取到本机。</b>
+          模型约 <b>5 MB</b>、推理运行时约 <b>22 MB</b>，只下载一次、之后走浏览器缓存；模型和图片
+          都只在你自己的设备上，不上传任何内容，也没有张数或时长限制。
+          <div class="ai-gate-row">
+            <button class="btn btn-sm" type="button" id="aienable">启用 AI 放大</button>
+            <span class="ai-gate-note">大图要数十秒，取决于你的设备</span>
+          </div>
+        </div>
+
+        <div class="ai-prog" id="aiprog" hidden role="progressbar"
+             aria-label="AI 放大进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="ai-prog-track"><span id="aibar"></span></div>
+          <p class="ai-prog-text" id="aiprogtext"></p>
         </div>
 
         <div class="tool-controls">
@@ -558,6 +586,14 @@
               </label>
             </div>
           </div>
+          <div class="field" id="airow" hidden>
+            <label id="aiscale-label">放大倍数</label>
+            <div class="presets" role="group" aria-labelledby="aiscale-label">
+              <button class="chip" type="button" data-scale="2" aria-pressed="false">2 倍</button>
+              <button class="chip on" type="button" data-scale="4" aria-pressed="true">4 倍</button>
+            </div>
+            <p class="field-hint">模型本身是 4 倍；2 倍由 4 倍结果高质量降采样而来，画质一样、文件小得多。</p>
+          </div>
           <div class="field">
             <label id="misc-label">其他</label>
             <div class="switch-stack" role="group" aria-labelledby="misc-label">
@@ -572,6 +608,7 @@
         <div class="tool-bar">
           <div class="status" id="status" role="status" aria-live="polite">已就绪 · 拖入图片即可</div>
           <div class="tool-bar-actions">
+            <button class="btn btn-ghost btn-sm" id="aicancel" type="button" hidden>取消</button>
             <button class="btn btn-ghost btn-sm" id="again" type="button" hidden>用当前设置重转</button>
             <button class="btn btn-ghost btn-sm" id="zip" type="button" hidden>打包下载 ZIP</button>
             <button class="btn btn-ghost btn-sm" id="clear" type="button">清空结果</button>
@@ -591,10 +628,22 @@
       <div class="section-head">
         <span class="eyebrow">功能</span>
         <h2 id="features-title">把高频操作做到极致</h2>
-        <p>不做臃肿的全能编辑器，只把「改尺寸、转格式、导出」这三件最高频的事做到一步完成 —— 而且互不打扰：只换格式就不会动你的尺寸。</p>
+        <p>四件最常做的事各归各的模式，互不打扰：只换格式就不会动你的尺寸，放大的模型要你点头才下载，修图单独一页。后续还会加入 AI 生图。</p>
       </div>
 
       <div class="grid grid-3">
+        <article class="card reveal">
+          <div class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3H3v18h18z"/><path d="M9 3v18M3 9h18"/></svg></div>
+          <h3>AI 超分放大</h3>
+          <p>用 Real-ESRGAN x4v3 之前，先把模型请到本机：模型 5MB + 推理运行时 22MB，只此一次，之后断网也能用。分块推理按感受野实测标定，拼接处与整图一次算完逐位一致，支持 2× 与 4×。</p>
+        </article>
+
+        <article class="card reveal">
+          <div class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg></div>
+          <h3>在线修图</h3>
+          <p>独立一页的编辑器：裁切、旋转翻转、画笔、橡皮、形状、文字、取色，加上亮度 / 对比度 / 饱和度 / 色温 / 模糊 / 锐化 / 暗角与九种滤镜，撤销重做随便退，导出 PNG / JPG / WEBP。</p>
+        </article>
+
         <article class="card reveal">
           <div class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3H3v18h18z"/><path d="M9 3v18M3 9h18"/></svg></div>
           <h3>转换与缩放互不干扰</h3>
@@ -617,6 +666,12 @@
           <div class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>
           <h3>五种格式互转</h3>
           <p>输出 PNG、JPG、WEBP、BMP、ICO，浏览器支持时自动多出 AVIF。可编码的格式在运行时探测得出，其余由页面内建编码器补齐，并可按质量滑块平衡体积与画质。</p>
+        </article>
+
+        <article class="card reveal">
+          <div class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 1.9 5.8H20l-4.9 3.6 1.9 5.8L12 14.6 6.9 18.2l1.9-5.8L4 8.8h6.1z"/></svg></div>
+          <h3>AI 生图 · 规划中</h3>
+          <p>下一步打算把「文生图」也搬进浏览器：同样先下载模型、同样本地推理、同样不上传。现在还没有上线 —— 这里先把坑位和规矩讲清楚，免得以后悄悄变卦。</p>
         </article>
 
         <article class="card reveal">
@@ -959,7 +1014,7 @@
           <img src="assets/img/logo.svg" width="32" height="32" alt="Pixora logo" loading="lazy">
           <span>Pixora</span>
         </a>
-        <p style="margin-top:12px">浏览器里的免费图片格式转换与缩放工具。PNG / JPG / WEBP / AVIF / BMP / ICO 互转，批量打包下载，图片全程本地处理、绝不上传。</p>
+        <p style="margin-top:12px">浏览器里的免费图片工具：格式转换、缩放、AI 放大与在线修图。PNG / JPG / WEBP / AVIF / BMP / ICO 互转，批量打包下载，图片全程本地处理、绝不上传。</p>
         <div class="footer-social">
           <a class="icon-btn" href="https://github.com/xuboboo/pixora" target="_blank" rel="noopener" aria-label="GitHub 仓库">
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.34-1.3-1.7-1.3-1.7-1.06-.72.08-.71.08-.71 1.17.08 1.79 1.2 1.79 1.2 1.04 1.79 2.74 1.27 3.4.97.11-.76.41-1.28.74-1.57-2.55-.29-5.23-1.28-5.23-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.25 5.69.42.36.79 1.07.79 2.16v3.2c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5z"/></svg>
@@ -973,7 +1028,8 @@
       <nav class="footer-col" aria-label="产品">
         <h4>产品</h4>
         <ul>
-          <li><a href="#tool">图片格式转换工具</a></li>
+          <li><a href="#tool">图片工具箱</a></li>
+          <li><a href="editor/">在线修图</a></li>
           <li><a href="#features">功能特性</a></li>
           <li><a href="#formats">支持的格式</a></li>
           <li><a href="convert/">全部格式转换</a></li>
@@ -988,7 +1044,7 @@
         <ul>
           <li><a href="https://github.com/xuboboo/pixora" target="_blank" rel="noopener">GitHub 仓库</a></li>
           <li><a href="https://github.com/xuboboo/pixora/blob/main/README.md" target="_blank" rel="noopener">项目文档</a></li>
-          <li><a href="https://github.com/xuboboo/pixora/blob/main/CHANGELOG.md" target="_blank" rel="noopener">更新日志</a></li>
+          <li><a href="changelog.html">更新日志</a></li>
           <li><a href="feed.xml" type="application/rss+xml">RSS 订阅</a></li>
           <li><a href="llms.txt">llms.txt</a></li>
         </ul>
@@ -997,10 +1053,10 @@
       <nav class="footer-col" aria-label="关于">
         <h4>关于</h4>
         <ul>
-          <li><a href="https://github.com/xuboboo/pixora/blob/main/LICENSE" target="_blank" rel="noopener">MIT 许可证</a></li>
-          <li><a href="https://github.com/xuboboo/pixora/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">贡献指南</a></li>
-          <li><a href="https://github.com/xuboboo/pixora/blob/main/CODE_OF_CONDUCT.md" target="_blank" rel="noopener">行为准则</a></li>
-          <li><a href="https://github.com/xuboboo/pixora/blob/main/SECURITY.md" target="_blank" rel="noopener">安全政策</a></li>
+          <li><a href="license.html">MIT 许可证</a></li>
+          <li><a href="contributing.html">贡献指南</a></li>
+          <li><a href="code-of-conduct.html">行为准则</a></li>
+          <li><a href="security.html">安全政策</a></li>
           <li><a href="https://github.com/xuboboo/pixora/issues" target="_blank" rel="noopener">问题反馈</a></li>
           <li><a href="humans.txt">humans.txt</a></li>
         </ul>
@@ -1019,6 +1075,7 @@
   </div>
 </footer>
 
+<script src="assets/js/pixora-lib.js" defer></script>
 <script src="assets/js/main.js" defer></script>
 </body>
 </html>

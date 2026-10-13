@@ -10,5 +10,11 @@
 *.woff binary
 *.woff2 binary
 
+# AI 放大用的推理运行时与模型。ONNX 是 protobuf，WASM 是二进制模块，两者都不能让
+# git 碰换行符 —— 上面那条 * text=auto 只靠内容嗅探，对这两个后缀不够保险。
+*.onnx binary
+*.wasm binary
+*.data binary
+
 # Keep SVG as text so diffs stay readable
 *.svg text eol=lf

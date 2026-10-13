@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<title>在线修图 — 浏览器里裁切、调色、加文字的图片编辑器 | Pixora</title>
+<meta name="description" content="免费在线修图：裁切、旋转翻转、亮度对比度饱和度调整、滤镜、画笔、形状、文字与取色，全部在浏览器本地完成，图片不上传、无需注册、没有次数限制。">
+<meta name="author" content="Pixora contributors">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#080c16" media="(prefers-color-scheme: dark)">
+
+<link rel="canonical" href="https://xuboboo.github.io/pixora/editor/">
+<link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/editor/">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/img/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pixora">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:title" content="在线修图 — 浏览器里的图片编辑器 | Pixora">
+<meta property="og:description" content="裁切、旋转、调色、滤镜、画笔、文字，全部在本地完成。图片不上传，无需注册。">
+<meta property="og:url" content="https://xuboboo.github.io/pixora/editor/">
+<meta property="og:image" content="https://xuboboo.github.io/pixora/assets/img/og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<script>
+(function(){try{var t=localStorage.getItem("pixora-theme");if(t!=="dark"&&t!=="light"){t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.setAttribute("data-theme",t)}catch(e){}})();
+</script>
+
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+<a class="skip-link" href="#ed-stage">跳到画布</a>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="../" aria-label="Pixora 首页">
+      <img src="../assets/img/logo.svg" width="32" height="32" alt="Pixora logo" fetchpriority="high">
+      <span>Pixora</span>
+    </a>
+
+    <nav class="nav" id="nav" aria-label="主导航">
+      <a href="../#tool">在线工具</a>
+      <details class="nav-drop" data-href="../convert/">
+        <summary>
+          <span>格式转换</span>
+          <svg class="nav-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </summary>
+        <div class="nav-panel">
+          <div class="nav-panel-head">
+            <strong>按目标格式转换</strong>
+            <a href="../convert/">全部 35 种组合 →</a>
+          </div>
+          <div class="nav-panel-cols"><div class="nav-col">
+              <span class="nav-col-title">转 PNG</span>
+              <ul>
+                <li><a href="../convert/jpg-to-png/">JPG 转 PNG</a></li>
+                <li><a href="../convert/webp-to-png/">WEBP 转 PNG</a></li>
+                <li><a href="../convert/gif-to-png/">GIF 转 PNG</a></li>
+                <li><a href="../convert/bmp-to-png/">BMP 转 PNG</a></li>
+                <li><a href="../convert/avif-to-png/">AVIF 转 PNG</a></li>
+                <li><a href="../convert/svg-to-png/">SVG 转 PNG</a></li>
+                <li><a href="../convert/ico-to-png/">ICO 转 PNG</a></li>
+      </ul>
+    </div>
+<div class="nav-col">
+              <span class="nav-col-title">转 JPG</span>
+              <ul>
+                <li><a href="../convert/png-to-jpg/">PNG 转 JPG</a></li>
+                <li><a href="../convert/webp-to-jpg/">WEBP 转 JPG</a></li>
+                <li><a href="../convert/gif-to-jpg/">GIF 转 JPG</a></li>
+                <li><a href="../convert/bmp-to-jpg/">BMP 转 JPG</a></li>
+                <li><a href="../convert/avif-to-jpg/">AVIF 转 JPG</a></li>
+                <li><a href="../convert/svg-to-jpg/">SVG 转 JPG</a></li>
+                <li><a href="../convert/ico-to-jpg/">ICO 转 JPG</a></li>
+      </ul>
+    </div>
+<div class="nav-col">
+              <span class="nav-col-title">转 WEBP</span>
+              <ul>
+                <li><a href="../convert/png-to-webp/">PNG 转 WEBP</a></li>
+                <li><a href="../convert/jpg-to-webp/">JPG 转 WEBP</a></li>
+                <li><a href="../convert/gif-to-webp/">GIF 转 WEBP</a></li>
+                <li><a href="../convert/bmp-to-webp/">BMP 转 WEBP</a></li>
+                <li><a href="../convert/avif-to-webp/">AVIF 转 WEBP</a></li>
+                <li><a href="../convert/svg-to-webp/">SVG 转 WEBP</a></li>
+                <li><a href="../convert/ico-to-webp/">ICO 转 WEBP</a></li>
+      </ul>
+    </div>
+<div class="nav-col">
+              <span class="nav-col-title">转 BMP</span>
+              <ul>
+                <li><a href="../convert/png-to-bmp/">PNG 转 BMP</a></li>
+                <li><a href="../convert/jpg-to-bmp/">JPG 转 BMP</a></li>
+                <li><a href="../convert/webp-to-bmp/">WEBP 转 BMP</a></li>
+                <li><a href="../convert/gif-to-bmp/">GIF 转 BMP</a></li>
+                <li><a href="../convert/avif-to-bmp/">AVIF 转 BMP</a></li>
+                <li><a href="../convert/svg-to-bmp/">SVG 转 BMP</a></li>
+                <li><a href="../convert/ico-to-bmp/">ICO 转 BMP</a></li>
+      </ul>
+    </div>
+<div class="nav-col">
+              <span class="nav-col-title">转 ICO</span>
+              <ul>
+                <li><a href="../convert/png-to-ico/">PNG 转 ICO</a></li>
+                <li><a href="../convert/jpg-to-ico/">JPG 转 ICO</a></li>
+                <li><a href="../convert/webp-to-ico/">WEBP 转 ICO</a></li>
+                <li><a href="../convert/gif-to-ico/">GIF 转 ICO</a></li>
+                <li><a href="../convert/bmp-to-ico/">BMP 转 ICO</a></li>
+                <li><a href="../convert/avif-to-ico/">AVIF 转 ICO</a></li>
+                <li><a href="../convert/svg-to-ico/">SVG 转 ICO</a></li>
+      </ul>
+    </div></div>
+        </div>
+      </details>
+      <a href="../#formats">支持的格式</a>
+      <a href="../#how">工作流</a>
+      <a href="../#compare">对比</a>
+      <a href="../#faq">常见问题</a>
+    </nav>
+
+    <div class="header-actions">
+      <button class="icon-btn" data-theme-toggle type="button" aria-label="切换主题" aria-pressed="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <a class="btn btn-ghost btn-sm" href="https://github.com/xuboboo/pixora" target="_blank" rel="noopener" aria-label="GitHub 仓库">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.34-1.3-1.7-1.3-1.7-1.06-.72.08-.71.08-.71 1.17.08 1.79 1.2 1.79 1.2 1.04 1.79 2.74 1.27 3.4.97.11-.76.41-1.28.74-1.57-2.55-.29-5.23-1.28-5.23-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.25 5.69.42.36.79 1.07.79 2.16v3.2c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5z"/></svg>
+        <span>GitHub</span>
+      </a>
+      <button class="icon-btn nav-toggle" type="button" aria-label="打开菜单" aria-expanded="false" aria-controls="nav">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <section class="section editor-page" aria-labelledby="editor-title">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">在线修图</span>
+        <h1 id="editor-title">浏览器里的图片编辑器</h1>
+        <p>裁切、旋转、调色、加字、画画，一次做完。和工具箱一样：图片全程留在本机，不上传、不注册、不限次数。</p>
+      </div>
+
+      <div class="editor" id="editor">
+        <div class="editor-bar">
+          <button class="btn btn-sm" id="ed-open" type="button">打开图片</button>
+          <input type="file" id="ed-file" accept="image/*" hidden>
+          <span class="editor-bar-sep" aria-hidden="true"></span>
+          <button class="icon-btn" id="ed-undo" type="button" aria-label="撤销" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7v6h6"/><path d="M3 13a9 9 0 1 0 3-7L3 9"/></svg>
+          </button>
+          <button class="icon-btn" id="ed-redo" type="button" aria-label="重做" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 7v6h-6"/><path d="M21 13a9 9 0 1 1-3-7l3 3"/></svg>
+          </button>
+          <button class="icon-btn" id="ed-reset" type="button" aria-label="重置为原图" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9 9 0 0 0-6.4 2.6L3 8"/><path d="M3 3v5h5"/></svg>
+          </button>
+          <p class="editor-info" id="ed-info">尚未打开图片</p>
+          <span class="editor-bar-spacer"></span>
+          <button class="icon-btn" id="ed-zoom-out" type="button" aria-label="缩小">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg>
+          </button>
+          <span class="editor-zoom-val" id="ed-zoom">100%</span>
+          <button class="icon-btn" id="ed-zoom-in" type="button" aria-label="放大">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+          <button class="btn btn-ghost btn-sm" id="ed-fit" type="button">适配</button>
+          <button class="btn btn-sm" id="ed-export-open" type="button" disabled>导出</button>
+        </div>
+
+        <div class="editor-body">
+          <div class="editor-rail" role="toolbar" aria-label="编辑工具">
+            <button class="ed-tool on" type="button" data-tool="move" aria-pressed="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/></svg>
+              <span>移动</span>
+            </button>
+            <button class="ed-tool" type="button" data-tool="crop" aria-pressed="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></svg>
+              <span>裁剪</span>
+            </button>
+            <button class="ed-tool" type="button" data-tool="brush" aria-pressed="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+              <span>画笔</span>
+            </button>
+            <button class="ed-tool" type="button" data-tool="eraser" aria-pressed="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 21h10"/><path d="M5 15l4 4M9 11l6 6"/><path d="M14.5 4.5 20 10l-8 8H6l-2-2 8-8 2.5-3.5z"/></svg>
+              <span>橡皮</span>
+            </button>
+            <button class="ed-tool" type="button" data-tool="shapes" aria-pressed="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="9" height="9" rx="1"/><circle cx="17" cy="17" r="4"/></svg>
+              <span>形状</span>
+            </button>
+            <button class="ed-tool" type="button" data-tool="text" aria-pressed="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7V5h16v2M9 19h6M12 5v14"/></svg>
+              <span>文字</span>
+            </button>
+            <button class="ed-tool" type="button" data-tool="pick" aria-pressed="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 22 1-5 12-12 4 4L7 21l-5 1z"/><path d="m15 5 4 4"/><path d="M17.5 2.5a2.12 2.12 0 0 1 3 3L19 7l-4-4 2.5-2.5z"/></svg>
+              <span>取色</span>
+            </button>
+          </div>
+
+          <div class="editor-stage" id="ed-stage">
+            <canvas id="ed-view" aria-label="图片画布"></canvas>
+            <div class="editor-empty" id="ed-empty">
+              <div class="big" aria-hidden="true">🖌️</div>
+              <h3>把图片拖到这里</h3>
+              <small>或点「打开图片」，也可以 Ctrl + V 粘贴 · 全程本地处理</small>
+            </div>
+            <p class="editor-hint" id="ed-hint" hidden></p>
+          </div>
+
+          <aside class="editor-side" aria-label="编辑选项">
+            <section class="panel" id="ed-tool-panel" hidden>
+              <h2 id="ed-tool-title">工具</h2>
+              <div class="panel-body" id="ed-tool-body"></div>
+            </section>
+
+            <section class="panel" id="ed-adjust-panel" hidden>
+              <h2>调整</h2>
+              <p class="panel-note">滑块是实时预览，点「应用」才落进历史、才会被撤销覆盖。</p>
+              <div class="sliders" id="ed-adjust"></div>
+              <div class="panel-actions">
+                <button class="btn btn-ghost btn-sm" id="ed-adj-reset" type="button">还原</button>
+                <button class="btn btn-sm" id="ed-adj-apply" type="button" disabled>应用</button>
+              </div>
+            </section>
+
+            <section class="panel" id="ed-filter-panel" hidden>
+              <h2>滤镜</h2>
+              <p class="panel-note">立即生效，可在历史里撤销。</p>
+              <div class="chips" id="ed-filters" role="group" aria-label="滤镜预设"></div>
+            </section>
+
+            <section class="panel" id="ed-canvas-panel" hidden>
+              <h2>画布</h2>
+              <div class="panel-grid">
+                <label>宽 (px)<input type="number" id="ed-cw" min="1" max="8000" step="1"></label>
+                <label>高 (px)<input type="number" id="ed-ch" min="1" max="8000" step="1"></label>
+              </div>
+              <div class="panel-actions">
+                <button class="btn btn-ghost btn-sm" id="ed-rotate-l" type="button">左转 90°</button>
+                <button class="btn btn-ghost btn-sm" id="ed-rotate-r" type="button">右转 90°</button>
+              </div>
+              <div class="panel-actions">
+                <button class="btn btn-ghost btn-sm" id="ed-flip-h" type="button">水平翻转</button>
+                <button class="btn btn-ghost btn-sm" id="ed-flip-v" type="button">垂直翻转</button>
+              </div>
+            </section>
+          </aside>
+        </div>
+
+        <div class="editor-export" id="ed-export-bar" hidden>
+          <div class="editor-export-row">
+            <label>格式
+              <select id="ed-format">
+                <option value="png">PNG</option>
+                <option value="jpeg">JPG</option>
+                <option value="webp">WEBP</option>
+              </select>
+            </label>
+            <label id="ed-q-wrap">质量 <output id="ed-qv">92</output>%
+              <input type="range" id="ed-q" min="50" max="100" value="92">
+            </label>
+            <button class="btn btn-sm" id="ed-download" type="button">下载图片</button>
+            <button class="btn btn-ghost btn-sm" id="ed-export-close" type="button">收起</button>
+          </div>
+          <p class="editor-export-note" id="ed-export-note"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer" aria-labelledby="footer-title">
+  <div class="container">
+    <h2 id="footer-title" class="visually-hidden" style="position:absolute;left:-9999px">页脚导航</h2>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="../" aria-label="Pixora 首页">
+          <img src="../assets/img/logo.svg" width="32" height="32" alt="Pixora logo" loading="lazy">
+          <span>Pixora</span>
+        </a>
+        <p style="margin-top:12px">浏览器里的免费图片工具：格式转换、缩放、AI 放大与在线修图。全程本地处理，图片不上传，无需注册，没有次数限制。</p>
+        <div class="footer-social">
+          <a class="icon-btn" href="https://github.com/xuboboo/pixora" target="_blank" rel="noopener" aria-label="GitHub 仓库">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.34-1.3-1.7-1.3-1.7-1.06-.72.08-.71.08-.71 1.17.08 1.79 1.2 1.79 1.2 1.04 1.79 2.74 1.27 3.4.97.11-.76.41-1.28.74-1.57-2.55-.29-5.23-1.28-5.23-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.25 5.69.42.36.79 1.07.79 2.16v3.2c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5z"/></svg>
+          </a>
+          <a class="icon-btn" href="https://github.com/xuboboo/pixora/issues" target="_blank" rel="noopener" aria-label="反馈问题">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2-2z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <nav class="footer-col" aria-label="产品">
+        <h4>产品</h4>
+        <ul>
+          <li><a href="../#tool">图片工具箱</a></li>
+          <li><a href="../editor/">在线修图</a></li>
+          <li><a href="../#features">功能特性</a></li>
+          <li><a href="../#formats">支持的格式</a></li>
+          <li><a href="../convert/">全部格式转换</a></li>
+          <li><a href="../#faq">常见问题</a></li>
+        </ul>
+      </nav>
+
+      <nav class="footer-col" aria-label="资源">
+        <h4>资源</h4>
+        <ul>
+          <li><a href="https://github.com/xuboboo/pixora" target="_blank" rel="noopener">GitHub 仓库</a></li>
+          <li><a href="https://github.com/xuboboo/pixora/blob/main/README.md" target="_blank" rel="noopener">项目文档</a></li>
+          <li><a href="../changelog.html">更新日志</a></li>
+          <li><a href="../feed.xml" type="application/rss+xml">RSS 订阅</a></li>
+          <li><a href="../llms.txt">llms.txt</a></li>
+        </ul>
+      </nav>
+
+      <nav class="footer-col" aria-label="关于">
+        <h4>关于</h4>
+        <ul>
+          <li><a href="../license.html">MIT 许可证</a></li>
+          <li><a href="../contributing.html">贡献指南</a></li>
+          <li><a href="../code-of-conduct.html">行为准则</a></li>
+          <li><a href="../security.html">安全政策</a></li>
+          <li><a href="https://github.com/xuboboo/pixora/issues" target="_blank" rel="noopener">问题反馈</a></li>
+          <li><a href="../humans.txt">humans.txt</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> Pixora · 基于 MIT 许可证开源</span>
+      <nav aria-label="法律与元信息">
+        <a href="../sitemap.xml">站点地图</a>
+        <a href="../robots.txt">robots.txt</a>
+        <a href="../.well-known/security.txt">security.txt</a>
+        <a href="https://github.com/xuboboo/pixora" target="_blank" rel="noopener">源码</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/js/pixora-lib.js" defer></script>
+<script src="../assets/js/main.js" defer></script>
+<script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

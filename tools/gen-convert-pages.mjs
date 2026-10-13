@@ -291,7 +291,7 @@ ${indent(nav(loc, current), 4)}
 </header>`;
 }
 
-const TOOL = (from, to) => `      <div class="tool reveal">
+const TOOL = (from, to, loc) => `      <div class="tool reveal">
         <div class="tool-head">
           <span class="dot" aria-hidden="true"></span>
           <strong>Pixora ${F[from].label} 转 ${F[to].label}</strong>
@@ -341,7 +341,7 @@ const TOOL = (from, to) => `      <div class="tool reveal">
              上的 CSS 隐藏，而不是从 DOM 里删掉 —— syncUI 依赖这些元素存在）。 -->
         <p class="tool-note" data-convert-note>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16v-4M12 8h.01"/><circle cx="12" cy="12" r="10"/></svg>
-          <span>这个页面只换格式，<b>图片尺寸保持原样</b>，不会被缩小。需要同时调整宽高？<a href="${LOC.slug.up}#tool">用完整工具箱</a>。</span>
+          <span>这个页面只换格式，<b>图片尺寸保持原样</b>，不会被缩小。需要同时调整宽高？<a href="${LOC[loc].up}#tool">用完整工具箱</a>。</span>
         </p>
 
         <div class="field tool-row" id="qwrap" hidden>
@@ -426,7 +426,7 @@ function footer(loc) {
           <img src="${p}assets/img/logo.svg" width="32" height="32" alt="Pixora logo" loading="lazy">
           <span>Pixora</span>
         </a>
-        <p style="margin-top:12px">浏览器里的免费图片格式转换与缩放工具。PNG / JPG / WEBP / AVIF / BMP / ICO 互转，批量打包下载，图片全程本地处理、绝不上传。</p>
+        <p style="margin-top:12px">浏览器里的免费图片工具：格式转换、缩放、AI 放大与在线修图。PNG / JPG / WEBP / AVIF / BMP / ICO 互转，批量打包下载，图片全程本地处理、绝不上传。</p>
         <div class="footer-social">
           <a class="icon-btn" href="https://github.com/xuboboo/pixora" target="_blank" rel="noopener" aria-label="GitHub 仓库">
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.34-1.3-1.7-1.3-1.7-1.06-.72.08-.71.08-.71 1.17.08 1.79 1.2 1.79 1.2 1.04 1.79 2.74 1.27 3.4.97.11-.76.41-1.28.74-1.57-2.55-.29-5.23-1.28-5.23-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.25 5.69.42.36.79 1.07.79 2.16v3.2c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5z"/></svg>
@@ -440,7 +440,8 @@ function footer(loc) {
       <nav class="footer-col" aria-label="产品">
         <h4>产品</h4>
         <ul>
-          <li><a href="${p}#tool">图片格式转换工具</a></li>
+          <li><a href="${p}#tool">图片工具箱</a></li>
+          <li><a href="${p}editor/">在线修图</a></li>
           <li><a href="${p}#features">功能特性</a></li>
           <li><a href="${p}#formats">支持的格式</a></li>
           <li><a href="${p}convert/">全部格式转换</a></li>
@@ -454,7 +455,7 @@ function footer(loc) {
         <ul>
           <li><a href="https://github.com/xuboboo/pixora" target="_blank" rel="noopener">GitHub 仓库</a></li>
           <li><a href="https://github.com/xuboboo/pixora/blob/main/README.md" target="_blank" rel="noopener">项目文档</a></li>
-          <li><a href="https://github.com/xuboboo/pixora/blob/main/CHANGELOG.md" target="_blank" rel="noopener">更新日志</a></li>
+          <li><a href="${p}changelog.html">更新日志</a></li>
           <li><a href="${p}feed.xml" type="application/rss+xml">RSS 订阅</a></li>
           <li><a href="${p}llms.txt">llms.txt</a></li>
         </ul>
@@ -463,10 +464,10 @@ function footer(loc) {
       <nav class="footer-col" aria-label="关于">
         <h4>关于</h4>
         <ul>
-          <li><a href="https://github.com/xuboboo/pixora/blob/main/LICENSE" target="_blank" rel="noopener">MIT 许可证</a></li>
-          <li><a href="https://github.com/xuboboo/pixora/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">贡献指南</a></li>
-          <li><a href="https://github.com/xuboboo/pixora/blob/main/CODE_OF_CONDUCT.md" target="_blank" rel="noopener">行为准则</a></li>
-          <li><a href="https://github.com/xuboboo/pixora/blob/main/SECURITY.md" target="_blank" rel="noopener">安全政策</a></li>
+          <li><a href="${p}license.html">MIT 许可证</a></li>
+          <li><a href="${p}contributing.html">贡献指南</a></li>
+          <li><a href="${p}code-of-conduct.html">行为准则</a></li>
+          <li><a href="${p}security.html">安全政策</a></li>
           <li><a href="https://github.com/xuboboo/pixora/issues" target="_blank" rel="noopener">问题反馈</a></li>
           <li><a href="${p}humans.txt">humans.txt</a></li>
         </ul>
@@ -638,7 +639,7 @@ ${header("slug", slug)}
         <p>把 ${s.label} 图片拖进来，直接得到 ${t.label}。可按宽度等比缩放、可批量、可打包下载 —— 全部在浏览器里完成，<strong>图片不会上传到任何服务器</strong>，也不需要注册。</p>
       </div>
 
-${TOOL(from, to)}
+${TOOL(from, to, "slug")}
     </div>
   </section>
 
@@ -1086,10 +1087,18 @@ fs.writeFileSync(path.join(ROOT, "404.html"), notFound(), "utf8");
 /* ------------------------------------------------------------- sitemap.xml */
 
 const today = "2026-10-13";
+/* 除了转换矩阵，站点还有产品页与项目文档页。它们此前整段漏在 sitemap 外 ——
+   一致性审计只拿 index + convert 去比，所以看起来"完全一致"，其实是个窄名单造成的假象。 */
 const urls = [
   { loc: `${SITE}/`, priority: "1.0", freq: "weekly" },
+  { loc: `${SITE}/editor/`, priority: "0.9", freq: "weekly" },
   { loc: `${SITE}/convert/`, priority: "0.9", freq: "weekly" },
   ...pairs.map(([f, t]) => ({ loc: `${SITE}/convert/${f}-to-${t}/`, priority: "0.8", freq: "monthly" })),
+  { loc: `${SITE}/changelog.html`, priority: "0.4", freq: "weekly" },
+  { loc: `${SITE}/license.html`, priority: "0.3", freq: "yearly" },
+  { loc: `${SITE}/contributing.html`, priority: "0.3", freq: "monthly" },
+  { loc: `${SITE}/code-of-conduct.html`, priority: "0.3", freq: "yearly" },
+  { loc: `${SITE}/security.html`, priority: "0.3", freq: "yearly" },
 ];
 
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>

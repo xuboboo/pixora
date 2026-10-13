@@ -16,6 +16,12 @@
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
 
+  /* main.js 自己的 URL。AI 放大要按它反推 assets/ort 与 assets/models 的位置 ——
+     页面有的在根目录、有的在 convert/xxx-to-yyy/ 下面，用相对路径写死必然有一处错。
+     document.currentScript 只在脚本同步执行期间有效，所以必须在这里就取下来。 */
+  var SELF = (document.currentScript && document.currentScript.src) ||
+    (function () { var s = $('script[src*="assets/js/main.js"]'); return s && s.src; })() || null;
+
   /* ---------- Theme ---------- */
   var THEME_KEY = "pixora-theme";
   var root = document.documentElement;
@@ -173,6 +179,9 @@
   var spresets = $("#spresets"), noupEl = $("#noup"), statEl = $("#stat");
   var zipBtn = $("#zip"), againBtn = $("#again"), clearBtn = $("#clear");
   var modeTabs = $("#toolmodes"), modeHint2 = $("#modehint2");
+  var aiGate = $("#aigate"), aiRow = $("#airow"), aiEnable = $("#aienable");
+  var aiProg = $("#aiprog"), aiBar = $("#aibar"), aiProgText = $("#aiprogtext");
+  var aiCancel = $("#aicancel");
 
   /* ---------- Tool mode ----------
      Two genuinely different jobs were sharing one set of controls, and the
@@ -188,13 +197,20 @@
                    one: nothing changes that the user did not ask to change. */
   var TOOL_MODE = document.documentElement.getAttribute("data-tool-mode") || "full";
   var CAN_RESIZE = TOOL_MODE === "full";
+  /* AI 放大同理：35 张格式落地页的契约是「只换格式」，往那儿塞一个要先下载 25MB
+     模型的功能，既跑不动也不是访客来的目的。它只在首页工具箱里出现。 */
+  var CAN_AI = TOOL_MODE === "full";
 
   /* Whether resizing is actually in effect *here*. Deliberately does not write
      back to state.resize: a landing page forcing the mode off must not leak into
      localStorage, or a later visit to the toolbox would forget the mode the user
      picked there. (applyParams() saves on every landing-page load, so mutating
      state.resize here would persist the forced value.) */
-  function resizeOn() { return CAN_RESIZE && !!state.resize; }
+  function aiOn() { return CAN_AI && !!state.ai; }
+  /* 三个模式互斥，靠切换处写死；这里再兜一次底，免得 localStorage 里两个标志
+     同时为真时出现「既放大又缩放」的自相矛盾状态。 */
+  function resizeOn() { return CAN_RESIZE && !!state.resize && !aiOn(); }
+
 
   /* ---------- Format registry ----------
      alpha:  whether the container can carry transparency
@@ -281,7 +297,11 @@
        resolved per image rather than baked into one width up front.
        noUpscale: never enlarge past the source, which is what iloveimg offers as
        "如果像素较小则不放大" and what stops a thumbnail being blown up to mush. */
-    scale: null, noUpscale: false
+    scale: null, noUpscale: false,
+    /* ai/aiScale: the third mode. The model is natively 4x; 2x is that result
+       downsampled, which costs the same compute but halves the output — the only
+       reason to pick it is the smaller file, so the UI says so. */
+    ai: false, aiScale: 4
   };
 
   function save() { try { localStorage.setItem(LS, JSON.stringify(state)); } catch (e) {} }
@@ -370,19 +390,25 @@
      the tree so syncUI keeps working); this only keeps the attribute and the
      tab state honest. */
   function applyMode() {
-    var on = resizeOn();
+    var on = resizeOn(), ai = aiOn();
     document.documentElement.setAttribute("data-resize", on ? "on" : "off");
+    document.documentElement.setAttribute("data-ai", ai ? "on" : "off");
     if (modeTabs) {
       $$(".seg-btn", modeTabs).forEach(function (b) {
-        var sel = (b.dataset.mode === "resize") === on;
+        var m = b.dataset.mode;
+        var sel = m === "ai" ? ai : (m === "resize" ? on : (!on && !ai));
         b.classList.toggle("on", sel);
         b.setAttribute("aria-selected", String(sel));
       });
     }
+    /* 模型没就绪时，AI 档位下露出的是一块说明 + 启用按钮，不是设置项。 */
+    if (aiGate) aiGate.hidden = !(ai && !srReady());
+    if (aiRow) aiRow.hidden = !(ai && srReady());
     if (modeHint2) {
-      modeHint2.textContent = on
-        ? "可改宽高：按宽度、按原图比例，或锁定宽高比"
-        : "只换格式，图片尺寸保持原样";
+      modeHint2.textContent = ai
+        ? "超分放大在本机推理 · 图片不上传，也不受次数限制"
+        : on ? "可改宽高：按宽度、按原图比例，或锁定宽高比"
+             : "只换格式，图片尺寸保持原样";
     }
   }
 
@@ -431,9 +457,21 @@
         b.setAttribute("aria-pressed", String(on));
       });
     }
+    if (aiRow) {
+      $$(".chip", aiRow).forEach(function (b) {
+        var on = Number(b.dataset.scale) === Number(state.aiScale);
+        b.classList.toggle("on", on);
+        b.setAttribute("aria-pressed", String(on));
+      });
+    }
   }
 
   function computeSize(sw, sh) {
+    /* AI 放大：倍数由模型决定，宽高比不动，尺寸不能手改。 */
+    if (aiOn()) {
+      var k = state.aiScale === 2 ? 2 : SR.SCALE;
+      return { w: Math.max(1, Math.round(sw * k)), h: Math.max(1, Math.round(sh * k)) };
+    }
     /* 格式转换模式：尺寸原样透传。下面 ICO 的 256px 上限仍然适用，因为那是
        格式本身的定义，不是用户的缩放意图。 */
     var w = sw, h = sh;
@@ -512,11 +550,12 @@
     bc.drawImage(src, sx, sy, cw, ch, 0, 0, cw, ch);
 
     /* Step-halving downsample: a single big jump aliases badly, so walk the
-       size down by factors of two before the final draw. */
-    var cur = base, maxOut = Math.max(dw, dh);
-    while (Math.max(cur.width, cur.height) > Math.max(2 * maxOut, 4) && Math.max(cur.width, cur.height) > 4) {
-      var nw = Math.max(1, Math.floor(cur.width / 2));
-      var nh = Math.max(1, Math.floor(cur.height / 2));
+       size down by factors of two before the final draw. 中间那些尺寸由内核算，
+       这里只负责把每一级画出来。 */
+    var cur = base;
+    var ladder = Pixora.resize.ladder(cw, ch, Math.max(dw, dh));
+    for (var li = 0; li < ladder.length; li++) {
+      var nw = ladder[li].w, nh = ladder[li].h;
       var t = document.createElement("canvas"); t.width = nw; t.height = nh;
       var tc = t.getContext("2d");
       tc.imageSmoothingEnabled = true; tc.imageSmoothingQuality = "high";
@@ -533,6 +572,9 @@
   }
 
   /* ---------- Encoders ---------- */
+  /* 底层编解码/分块/像素链都在 pixora-lib.js 里，页面只负责 canvas <-> ImageData
+     这一层。之前这里各抄了一份 encodeBMP 和 buildZip，编辑器又抄了第三份像素链，
+     三处随时会漂移。 */
   function canvasToBlob(canvas, mime, quality) {
     return new Promise(function (resolve, reject) {
       canvas.toBlob(function (b) { b ? resolve(b) : reject(new Error("编码失败")); },
@@ -541,34 +583,11 @@
   }
 
   /* BMP: 24-bit BGR, bottom-up rows, each row padded to a 4-byte boundary.
-     Written by hand because Canvas has no BMP encoder. */
+     Canvas 没有 BMP 编码器，所以走内核里手写的那一个。 */
   function encodeBMP(canvas) {
     var w = canvas.width, h = canvas.height;
-    var src = canvas.getContext("2d").getImageData(0, 0, w, h).data;
-    var rowSize = ((24 * w + 31) >> 5) << 2;
-    var pixelBytes = rowSize * h;
-    var buf = new ArrayBuffer(54 + pixelBytes);
-    var dv = new DataView(buf);
-    dv.setUint8(0, 0x42); dv.setUint8(1, 0x4D);          // "BM"
-    dv.setUint32(2, 54 + pixelBytes, true);               // file size
-    dv.setUint32(10, 54, true);                           // pixel data offset
-    dv.setUint32(14, 40, true);                           // BITMAPINFOHEADER size
-    dv.setInt32(18, w, true);
-    dv.setInt32(22, h, true);                             // positive → bottom-up
-    dv.setUint16(26, 1, true);                            // planes
-    dv.setUint16(28, 24, true);                           // bits per pixel
-    dv.setUint32(30, 0, true);                            // BI_RGB, no compression
-    dv.setUint32(34, pixelBytes, true);
-    dv.setInt32(38, 2835, true); dv.setInt32(42, 2835, true);  // 72 DPI
-    var out = new Uint8Array(buf);
-    for (var y = 0; y < h; y++) {
-      var srcRow = (h - 1 - y) * w * 4;
-      var dstRow = 54 + y * rowSize;
-      for (var x = 0; x < w; x++) {
-        var si = srcRow + x * 4, di = dstRow + x * 3;
-        out[di] = src[si + 2]; out[di + 1] = src[si + 1]; out[di + 2] = src[si];
-      }
-    }
+    var img = canvas.getContext("2d").getImageData(0, 0, w, h);
+    var buf = Pixora.encode.bmp({ w: w, h: h, data: img.data });
     return Promise.resolve(new Blob([buf], { type: "image/bmp" }));
   }
 
@@ -602,102 +621,165 @@
     return canvasToBlob(canvas, FORMATS[fmt].mime, FORMATS[fmt].quality ? quality / 100 : undefined);
   }
 
-  /* ---------- ZIP (store or deflate, no dependencies) ---------- */
-  var CRC_TABLE = (function () {
-    var t = new Uint32Array(256);
-    for (var n = 0; n < 256; n++) {
-      var c = n;
-      for (var k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
-      t[n] = c >>> 0;
-    }
-    return t;
-  })();
-  function crc32(bytes) {
-    var c = 0xFFFFFFFF;
-    for (var i = 0; i < bytes.length; i++) c = CRC_TABLE[(c ^ bytes[i]) & 0xFF] ^ (c >>> 8);
-    return (c ^ 0xFFFFFFFF) >>> 0;
+  /* ======================================================================
+     AI 放大 —— Real-ESRGAN general x4v3，跑在访客自己的设备上
+
+     和上面那套 canvas 重采样是两回事：那些只是把已有像素搬来搬去，这个是真的用
+     卷积网络把丢失的细节猜回来。代价也真实 —— 算力来自访客的 GPU/CPU 而不是服务
+     器集群，所以慢，所以有单张尺寸上限，所以第一次要下模型。
+
+     网络是全卷积的，但输入边长固定 336，于是推理必须分块：每块喂 336×336，出
+     1344×1344，只取正中 256×256 那块（放大后 1024×1024）。外围那 40 像素是「上下文
+     余量」—— 卷积核看得见邻域，块与块之间不给足余量，拼起来就有接缝。
+
+     余量为什么取 40：用扰动法实测感受野半径 33.8 输入像素（把输入左上角 8×8 换成
+     噪声，输出到第 163 像素才不再变化）。40 覆盖得住，实测分块结果与整图一次推理在
+     内部逐位相同；降到 24 就开始出现 1/255 的接缝。标定过程见 docs/ai-upscale.md。
+     ====================================================================== */
+  /* 分块参数与分块表都在 pixora-lib.js 里。编辑器与工具箱共用一份，
+     就不会出现「一边改了感受野、另一边不知道」这种事故。 */
+  var SR = Pixora.sr;
+  var sr = { ort: null, session: null, loading: null, ep: "", error: null };
+  var srPerTile = 2200;   // 每块耗时估计，首块实测后替换，只用于进度条的剩余时间
+  function srReady() { return !!sr.session; }
+
+  /* 资源位置从 main.js 自身反推。页面有的在根目录，有的在 convert/xxx-to-yyy/ 两层
+     深处，写死相对路径必然有一处错。 */
+  function srUrls() {
+    if (!SELF) return null;
+    var assets = new URL("../", SELF);
+    return {
+      ort: new URL("ort/ort.webgpu.min.mjs", assets).href,
+      /* wasmPaths 必须是绝对 URL：写成相对路径时 ORT 会拿它再拼一次模块自身的
+         位置，变成 /ort/ort/ort-wasm-simd-threaded.jsep.mjs 而 404。 */
+      wasm: new URL("ort/", assets).href,
+      model: new URL("models/realesr-general-x4v3-t336.onnx", assets).href
+    };
   }
-  function deflateRaw(bytes) {
-    if (typeof CompressionStream !== "function") return Promise.resolve(null);
-    try {
-      var cs = new CompressionStream("deflate-raw");
-      var writer = cs.writable.getWriter();
-      writer.write(bytes);
-      writer.close();
-      return new Response(cs.readable).arrayBuffer()
-        .then(function (ab) { return new Uint8Array(ab); })
-        .catch(function () { return null; });
-    } catch (e) { return Promise.resolve(null); }
+
+  function srProviders() {
+    if (!navigator.gpu || !navigator.gpu.requestAdapter) return Promise.resolve(["wasm"]);
+    return navigator.gpu.requestAdapter().then(function (ad) {
+      return ad ? ["webgpu", "wasm"] : ["wasm"];
+    }).catch(function () { return ["wasm"]; });
   }
-  /* 2000-01-01 00:00 in MS-DOS date/time — a fixed stamp keeps output stable. */
-  var DOS_DATE = 0x2821, DOS_TIME = 0x0000;
 
-  function buildZip(entries) {
-    var enc = new TextEncoder();
-    var parts = [], central = [], offset = 0;
-    var chain = Promise.resolve();
-    entries.forEach(function (entry) {
-      chain = chain.then(function () {
-        return entry.blob.arrayBuffer().then(function (ab) {
-          var raw = new Uint8Array(ab);
-          return deflateRaw(raw).then(function (packed) {
-            var data = raw, method = 0;
-            if (packed && packed.length < raw.length) { data = packed; method = 8; }
-            var nameBytes = enc.encode(entry.name);
-            var crc = crc32(raw);
-
-            var lh = new DataView(new ArrayBuffer(30));
-            lh.setUint32(0, 0x04034b50, true);
-            lh.setUint16(4, 20, true);
-            lh.setUint16(6, 0x0800, true);              // UTF-8 file names
-            lh.setUint16(8, method, true);
-            lh.setUint16(10, DOS_TIME, true);
-            lh.setUint16(12, DOS_DATE, true);
-            lh.setUint32(14, crc, true);
-            lh.setUint32(18, data.length, true);
-            lh.setUint32(22, raw.length, true);
-            lh.setUint16(26, nameBytes.length, true);
-            lh.setUint16(28, 0, true);
-            parts.push(new Uint8Array(lh.buffer), nameBytes, data);
-
-            var ch = new DataView(new ArrayBuffer(46));
-            ch.setUint32(0, 0x02014b50, true);
-            ch.setUint16(4, 20, true);
-            ch.setUint16(6, 20, true);
-            ch.setUint16(8, 0x0800, true);
-            ch.setUint16(10, method, true);
-            ch.setUint16(12, DOS_TIME, true);
-            ch.setUint16(14, DOS_DATE, true);
-            ch.setUint32(16, crc, true);
-            ch.setUint32(20, data.length, true);
-            ch.setUint32(24, raw.length, true);
-            ch.setUint16(28, nameBytes.length, true);
-            ch.setUint32(42, offset, true);
-            central.push(new Uint8Array(ch.buffer), nameBytes);
-
-            offset += 30 + nameBytes.length + data.length;
-          });
+  /* 懒加载：只有访客真的选了 AI 放大并按下「启用」，才去下那 25MB。 */
+  function srEnsure(onStatus) {
+    if (sr.session) return Promise.resolve(sr.session);
+    if (sr.loading) return sr.loading;
+    var u = srUrls();
+    if (!u) return Promise.reject(new Error("找不到 AI 模型资源路径"));
+    var say = function (t) { if (onStatus) onStatus(t); };
+    sr.loading = import(u.ort).then(function (ort) {
+      ort.env.logLevel = "error";
+      /* GitHub Pages 不发 COOP/COEP，多线程 wasm 起不来；显式钉成单线程，免得
+         ORT 先尝试 spawn 线程池再静默退回。 */
+      ort.env.wasm.numThreads = 1;
+      ort.env.wasm.wasmPaths = u.wasm;
+      sr.ort = ort;
+      say("正在检测图形加速…");
+      return srProviders().then(function (eps) {
+        sr.ep = eps[0];
+        say("正在加载模型…");
+        return ort.InferenceSession.create(u.model, {
+          executionProviders: eps,
+          graphOptimizationLevel: "all"
         });
       });
+    }).then(function (s) {
+      sr.session = s;
+      sr.loading = null;
+      return s;
+    }).catch(function (e) {
+      sr.loading = null;
+      sr.error = e;
+      throw e;
     });
-    return chain.then(function () {
-      var cdSize = central.reduce(function (n, p) { return n + p.length; }, 0);
-      var eo = new DataView(new ArrayBuffer(22));
-      eo.setUint32(0, 0x06054b50, true);
-      eo.setUint16(8, entries.length, true);
-      eo.setUint16(10, entries.length, true);
-      eo.setUint32(12, cdSize, true);
-      eo.setUint32(16, offset, true);
-      return new Blob(parts.concat(central, [new Uint8Array(eo.buffer)]), { type: "application/zip" });
-    });
+    return sr.loading;
   }
 
-  /* ---------- Helpers ---------- */
-  function humanSize(n) {
-    if (n >= 1048576) return (n / 1048576).toFixed(2) + " MB";
-    if (n >= 1024) return Math.round(n / 1024) + " KB";
-    return n + " B";
+  /* 核心窗口的起点。末块回退对齐而不是截断 —— 截断会让补齐后的边长不等于 CTX，而
+     模型只吃固定边长。回退只是让末块与前一权重叠，两者算的是同一个函数，结果相同。 */
+
+  async function srUpscale(src, onProgress, token) {
+    var W = src.width || src.naturalWidth, H = src.height || src.naturalHeight;
+    var OW = W * SR.SCALE, OH = H * SR.SCALE;
+    var flat = document.createElement("canvas");
+    flat.width = W; flat.height = H;
+    flat.getContext("2d").drawImage(src, 0, 0, W, H);
+    var sd = flat.getContext("2d").getImageData(0, 0, W, H).data;
+
+    var out = new Uint8ClampedArray(OW * OH * 4);
+    var T = SR.CTX, T2 = T * T;
+    var plane = new Float32Array(3 * T2);
+    var OS = T * SR.SCALE, OT2 = OS * OS, crop = SR.MARGIN * SR.SCALE;
+    var ys = Pixora.sr.starts(H, SR.CORE), xs = Pixora.sr.starts(W, SR.CORE);
+    var total = ys.length * xs.length, n = 0;
+
+    for (var iy = 0; iy < ys.length; iy++) {
+      for (var ix = 0; ix < xs.length; ix++) {
+        if (token && token.cancelled) throw new Error("已取消");
+        var y0 = ys[iy], x0 = xs[ix];
+        var ch = Math.min(SR.CORE, H - y0), cw = Math.min(SR.CORE, W - x0);
+        /* 补齐：核心外面垫 MARGIN 像素，出界处用边缘像素复制。索引直接钳到
+           [0, W-1] 就同时完成了「取真像素」和「贴边复制」两件事。 */
+        for (var py = 0; py < T; py++) {
+          var sy = y0 - SR.MARGIN + py;
+          if (sy < 0) sy = 0; else if (sy >= H) sy = H - 1;
+          var row = sy * W, prow = py * T;
+          for (var px = 0; px < T; px++) {
+            var sx = x0 - SR.MARGIN + px;
+            if (sx < 0) sx = 0; else if (sx >= W) sx = W - 1;
+            var si = (row + sx) * 4, di = prow + px;
+            plane[di] = sd[si] / 255;
+            plane[T2 + di] = sd[si + 1] / 255;
+            plane[2 * T2 + di] = sd[si + 2] / 255;
+          }
+        }
+        var t0 = performance.now();
+        var feeds = {};
+        feeds[sr.session.inputNames[0]] = new sr.ort.Tensor("float32", plane, [1, 3, T, T]);
+        var res = await sr.session.run(feeds);
+        if (n === 0) srPerTile = Math.max(120, performance.now() - t0);
+        var o = res[sr.session.outputNames[0]].data;
+        /* Uint8ClampedArray 的赋值规则是「四舍五入，逢半取偶」，与 Python 侧
+           np.rint 完全一致，所以这里直接写浮点值即可，不需要 Math.round。 */
+        for (var y = 0; y < ch * SR.SCALE; y++) {
+          var drow = ((y0 * SR.SCALE + y) * OW + x0 * SR.SCALE) * 4;
+          var srow = (crop + y) * OS + crop;
+          for (var x = 0; x < cw * SR.SCALE; x++) {
+            var d2 = drow + x * 4, s2 = srow + x;
+            out[d2] = o[s2] * 255;
+            out[d2 + 1] = o[OT2 + s2] * 255;
+            out[d2 + 2] = o[2 * OT2 + s2] * 255;
+            out[d2 + 3] = 255;
+          }
+        }
+        n++;
+        if (onProgress) onProgress(n, total);
+        /* 让出主线程：一是让进度条真的画得出来，二是让「取消」点得到。 */
+        await new Promise(function (r) { setTimeout(r, 0); });
+      }
+    }
+
+    var canvas = document.createElement("canvas");
+    canvas.width = OW; canvas.height = OH;
+    canvas.getContext("2d").putImageData(new ImageData(out, OW, OH), 0, 0);
+    return canvas;
   }
+
+  /* ---------- ZIP (store or deflate, no dependencies) ---------- */
+  /* ZIP 打包同样交给内核。条目从 blob 换成裸字节 —— 内核不认识 Blob。 */
+  function buildZip(entries) {
+    return Pixora.zip.build(entries.map(function (e) {
+      return { name: e.name, data: e.blob };
+    })).then(function (blob) { return blob; });
+  }
+
+
+  function humanSize(n) { return Pixora.humanSize(n); }
+
   function srcExt(file) {
     var m = /\.([a-z0-9]+)$/i.exec(file.name || "");
     if (m) return m[1].toUpperCase();
@@ -709,7 +791,8 @@
     /* Only stamp the dimensions when they actually changed. In convert mode the
        numbers would just echo the source size and read as though the image had
        been resized, which is the confusion this whole change is about. */
-    var tag = resizeOn() ? "_" + w + "x" + h : "";
+    var tag = aiOn() ? "_" + (state.aiScale === 2 ? "2x" : "4x")
+            : resizeOn() ? "_" + w + "x" + h : "";
     return (base || "image") + tag + "." + FORMATS[fmt].ext;
   }
   function download(url, filename) {
@@ -786,10 +869,29 @@
 
   /* ---------- Batch processing ---------- */
   var busy = false;
+  var aiToken = null;
+
+  /* 一条产线：普通模式是 canvas 重采样；AI 模式先分块超分出 4 倍，再按需降采样
+     并铺底色。两者出口都是 canvas，后面的编码、结果卡、打包完全共用。 */
+  function produce(bmp, sw, sh, size, mode, flatten, background, onProgress, token) {
+    if (!aiOn()) return Promise.resolve(render(bmp, size.w, size.h, mode, flatten, background));
+    if (sw * sh > SR.MAX_IN) {
+      return Promise.reject(new Error("超过 AI 放大上限 " +
+        Math.round(SR.MAX_IN / 10000) + " 万像素（当前 " + sw + "×" + sh +
+        "），请先裁切或缩小"));
+    }
+    return srUpscale(bmp, onProgress, token).then(function (big) {
+      /* 4 倍且不需要铺底时，big 就是要的东西，别再整张拷一遍。 */
+      if (!flatten && size.w === big.width && size.h === big.height) return big;
+      return render(big, size.w, size.h, "stretch", flatten, background);
+    });
+  }
+
   function handleFiles(files, isRerun) {
     var imgs = Array.prototype.filter.call(files, function (f) { return f && /^image\//.test(f.type); });
     if (!imgs.length) { statusEl.textContent = "没有识别到图片文件"; return Promise.resolve(); }
     if (busy) { statusEl.textContent = "正在处理，请稍候…"; return Promise.resolve(); }
+    if (aiOn() && !srReady()) { statusEl.textContent = "AI 模型还没启用，请先点上面的「启用 AI 放大」"; return Promise.resolve(); }
     busy = true;
     lastFiles = imgs;
 
@@ -798,6 +900,10 @@
     var background = state.background;
     var fmt = state.format, quality = state.quality, mode = state.mode, auto = state.auto;
     var done = 0, failed = 0;
+    var ai = aiOn();
+    aiToken = ai ? { cancelled: false } : null;
+    if (ai && aiProg) { aiProg.hidden = false; showAiProgress(0, 0, 0); }
+    if (aiCancel) aiCancel.hidden = !ai;
 
     if (isRerun) {
       made.forEach(function (m) { URL.revokeObjectURL(m.url); });
@@ -809,31 +915,40 @@
     var chain = Promise.resolve();
     imgs.forEach(function (f, i) {
       chain = chain.then(function () {
-        statusEl.textContent = "正在转换 " + (i + 1) + " / " + imgs.length + "：" + f.name;
+        statusEl.textContent = "正在" + (ai ? "放大" : "转换") + " " + (i + 1) + " / " + imgs.length + "：" + f.name;
         var card = addCard(f.name, srcExt(f) + " · " + humanSize(f.size));
         return decodeImage(f).then(function (bmp) {
-          var size = computeSize(bmp.width || bmp.naturalWidth, bmp.height || bmp.naturalHeight);
-          var canvas = render(bmp, size.w, size.h, mode, flatten, background);
-          return encode(canvas, fmt, quality).then(function (blob) {
-            var url = URL.createObjectURL(blob);
-            var filename = outName(f.name, size.w, size.h, fmt);
-            finishCard(card, url, blob, size.w, size.h, filename, srcExt(f), f.size);
-            made.push({ name: filename, url: url, blob: blob });
-            session.count++; session.src += f.size; session.out += blob.size;
-            if (auto) download(url, filename);
-            done++;
-            if (bmp.close) bmp.close();
-            if (bmp.__revoke) URL.revokeObjectURL(bmp.__revoke);
+          var sw = bmp.width || bmp.naturalWidth, sh = bmp.height || bmp.naturalHeight;
+          var size = computeSize(sw, sh);
+          return produce(bmp, sw, sh, size, mode, flatten, background,
+            ai ? aiProgress : null, aiToken).then(function (canvas) {
+            return encode(canvas, fmt, quality).then(function (blob) {
+              var url = URL.createObjectURL(blob);
+              var filename = outName(f.name, size.w, size.h, fmt);
+              finishCard(card, url, blob, size.w, size.h, filename,
+                ai ? srcExt(f) + " " + sw + "×" + sh : srcExt(f), f.size);
+              made.push({ name: filename, url: url, blob: blob });
+              session.count++; session.src += f.size; session.out += blob.size;
+              if (auto) download(url, filename);
+              done++;
+              if (bmp.close) bmp.close();
+              if (bmp.__revoke) URL.revokeObjectURL(bmp.__revoke);
+            });
           });
         }).catch(function (err) {
           failed++;
-          failCard(card, "无法转换：" + (err && err.message ? err.message : err));
+          var cancelled = aiToken && aiToken.cancelled;
+          failCard(card, cancelled ? "已取消" : "无法" + (ai ? "放大" : "转换") + "：" +
+            (err && err.message ? err.message : err));
         });
       });
     });
 
     return chain.then(function () {
       busy = false;
+      aiToken = null;
+      if (aiProg) aiProg.hidden = true;
+      if (aiCancel) { aiCancel.hidden = true; aiCancel.disabled = false; }
       syncActions();
       renderStat();
       statusEl.textContent = "完成 " + done + " / " + imgs.length + " 张" +
@@ -894,9 +1009,12 @@
     modeTabs.addEventListener("click", function (e) {
       var b = e.target.closest && e.target.closest(".seg-btn");
       if (!b) return;
-      var want = b.dataset.mode === "resize";
-      if (want === resizeOn()) return;
-      state.resize = want;
+      var m = b.dataset.mode;
+      /* 三个档位互斥，在这里一次写死，别处只读 aiOn()/resizeOn()。 */
+      var wantAi = m === "ai", wantResize = m === "resize";
+      if (wantAi === aiOn() && wantResize === resizeOn()) return;
+      state.ai = wantAi;
+      state.resize = wantResize;
       /* Coming back into resize mode with the ratio locked, drop any height left
          over from a previous stretch so the field reads "自动" again. */
       if (state.resize && state.lock) state.height = null;
@@ -905,13 +1023,78 @@
     });
   }
 
-  $("#wpresets").addEventListener("click", function (e) {
-    var b = e.target.closest(".chip"); if (!b) return;
-    state.width = Number(b.dataset.w);
-    state.scale = null;
-    if (state.lock) state.height = null;
-    syncUI(); save();
-  });
+  /* ---------- AI 放大 wiring ----------
+     模型 25MB，不该因为有人点了一下标签就偷偷下走。所以先给一块说明，按了
+     「启用」才真的开始加载，加载进度直接显示在按钮旁边。 */
+  function showAiProgress(n, total, pct) {
+    if (aiBar) aiBar.style.width = pct + "%";
+    if (aiProg) aiProg.setAttribute("aria-valuenow", String(pct));
+    if (aiProgText) {
+      if (!total) aiProgText.textContent = n || "";
+      else {
+        var left = Math.max(0, Math.round((srPerTile * (total - n)) / 1000));
+        aiProgText.textContent = "已处理 " + n + " / " + total + " 块 · " +
+          (n >= total ? "即将完成" : "约剩 " + left + " 秒");
+      }
+    }
+  }
+  function aiProgress(n, total) { showAiProgress(n, total, Math.round((n / total) * 100)); }
+  function setAiStatus(text) {
+    if (aiProgText) aiProgText.textContent = text;
+  }
+
+  if (aiEnable) {
+    aiEnable.addEventListener("click", function () {
+      if (sr.loading) return;
+      aiEnable.disabled = true;
+      if (aiProg) aiProg.hidden = false;
+      if (aiBar) aiBar.style.width = "0%";
+      setAiStatus("准备中…");
+      srEnsure(function (t) { setAiStatus(t); }).then(function () {
+        aiEnable.disabled = false;
+        if (aiProg) aiProg.hidden = true;
+        syncUI();
+        setIdle("AI 模型已就绪（" + (sr.ep === "webgpu" ? "GPU 加速" : "CPU 计算") +
+          "）· 拖入图片即可");
+      }).catch(function (e) {
+        aiEnable.disabled = false;
+        if (aiBar) aiBar.style.width = "0%";
+        setAiStatus("加载失败：" + (e && e.message ? e.message : e) +
+          " · 请检查网络后重试");
+      });
+    });
+  }
+
+  if (aiRow) {
+    aiRow.addEventListener("click", function (e) {
+      var b = e.target.closest && e.target.closest(".chip");
+      if (!b) return;
+      state.aiScale = Number(b.dataset.scale) === 2 ? 2 : 4;
+      syncUI(); save();
+    });
+  }
+
+  if (aiCancel) {
+    aiCancel.addEventListener("click", function () {
+      if (!aiToken) return;
+      aiToken.cancelled = true;
+      aiCancel.disabled = true;
+      statusEl.textContent = "正在取消…";
+    });
+  }
+
+  /* 文档页 / 404 / 编辑器页没有工具箱，这块得跟着一起缺。少了这个判断，
+     main.js 会在那些页面抛 TypeError，把后面整段 Boot 全带掉。 */
+  var wpresetsBox = $("#wpresets");
+  if (wpresetsBox) {
+    wpresetsBox.addEventListener("click", function (e) {
+      var b = e.target.closest(".chip"); if (!b) return;
+      state.width = Number(b.dataset.w);
+      state.scale = null;
+      if (state.lock) state.height = null;
+      syncUI(); save();
+    });
+  }
   if (spresets) spresets.addEventListener("click", function (e) {
     var b = e.target.closest(".chip"); if (!b) return;
     var s = Number(b.dataset.scale);
@@ -959,6 +1142,7 @@
      still claiming the image size is being left alone. */
   var idleBase = "已就绪 · 拖入图片即可";
   function statusTail() {
+    if (aiOn()) return "，全部在本地完成 · AI 超分，图片不上传";
     return "，全部在本地完成" + (resizeOn() ? "" : " · 尺寸保持原样");
   }
   function setIdle(base) {
