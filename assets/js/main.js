@@ -89,17 +89,38 @@
   var navDrop = $(".nav-drop");
   if (navDrop) {
     var hoverOpen = window.matchMedia && window.matchMedia("(hover: hover) and (min-width: 901px)");
-    var openDrop = function () { navDrop.open = true; };
-    var closeDrop = function () { navDrop.open = false; };
+    var closeTimer = null;
+    var openDrop = function () {
+      if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
+      navDrop.open = true;
+    };
+    var closeDrop = function () {
+      if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
+      navDrop.open = false;
+    };
+    /* The panel hangs from the header's bottom edge, so the trigger's own box
+       ends a few pixels above it. Without a grace period the pointer crossing
+       that sliver lands on .nav — outside <details> — and fires mouseleave
+       mid-travel, snapping the panel shut exactly as the pointer reaches it.
+       Wait a beat; re-entering cancels the close. */
+    var scheduleClose = function () {
+      if (closeTimer) clearTimeout(closeTimer);
+      closeTimer = setTimeout(function () { closeTimer = null; navDrop.open = false; }, 200);
+    };
     if (hoverOpen && hoverOpen.matches) {
       navDrop.addEventListener("mouseenter", openDrop);
-      navDrop.addEventListener("mouseleave", closeDrop);
-      /* Hovering already opened the panel, so the pointer click that follows
-         would toggle it straight back shut. Let hover own the state on a mouse
-         device and leave the native toggle to the keyboard, which has no hover
-         to rely on — a keyboard activation reports detail === 0. */
+      navDrop.addEventListener("mouseleave", scheduleClose);
+      /* Hover already opens the panel, so a pointer click on the trigger should
+         do the useful thing rather than re-toggle it shut: follow the item to the
+         conversion page it stands for. Keyboard activation reports detail === 0
+         and keeps the native toggle, so the panel stays reachable without a
+         pointer. */
       navDrop.querySelector("summary").addEventListener("click", function (e) {
-        if (e.detail > 0) e.preventDefault();
+        if (e.detail > 0) {
+          e.preventDefault();
+          var href = navDrop.getAttribute("data-href");
+          if (href) location.assign(href);
+        }
       });
     }
     document.addEventListener("click", function (e) {

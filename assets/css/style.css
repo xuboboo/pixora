@@ -221,6 +221,17 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 2.5rem 0; }
   border-top: 0; box-shadow: var(--shadow-lg);
   z-index: 90;
 }
+/* The panel is anchored to the header's bottom edge, so the trigger's own box
+   ends ~11px above it. Crossing that sliver lands on .nav — outside <details> —
+   and fires mouseleave mid-travel, which snapped the panel shut exactly as the
+   pointer reached it. This invisible bridge keeps the pointer inside the panel's
+   box all the way down. Desktop only: inside the ≤900px drawer the panel is
+   static, so there is no gap to bridge. */
+@media (hover: hover) and (min-width: 901px) {
+  .nav-panel::before {
+    content: ""; position: absolute; left: 0; right: 0; top: -13px; height: 13px;
+  }
+}
 .nav-panel-head {
   display: flex; align-items: baseline; justify-content: space-between;
   gap: 16px; flex-wrap: wrap; margin-bottom: 14px;

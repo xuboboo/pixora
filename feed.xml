@@ -6,13 +6,21 @@
     <description>Pixora 免费在线图片工具箱的版本更新与功能发布。</description>
     <language>zh-CN</language>
     <copyright>MIT License · Pixora contributors</copyright>
-    <lastBuildDate>Tue, 13 Oct 2026 15:45:00 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 13 Oct 2026 16:00:00 +0800</lastBuildDate>
     <atom:link href="https://xuboboo.github.io/pixora/feed.xml" rel="self" type="application/rss+xml"/>
     <image>
       <url>https://xuboboo.github.io/pixora/assets/img/logo.svg</url>
       <title>Pixora</title>
       <link>https://xuboboo.github.io/pixora/</link>
     </image>
+    <item>
+      <title>Pixora 1.2.4 发布：修复导航「格式转换」鼠标移入即关闭，点击现在会跳转</title>
+      <link>https://xuboboo.github.io/pixora/convert/</link>
+      <guid isPermaLink="false">https://xuboboo.github.io/pixora/#release-1-2-4</guid>
+      <pubDate>Tue, 13 Oct 2026 16:00:00 +0800</pubDate>
+      <description><![CDATA[页头「格式转换」此前有两个问题：鼠标想移到展开的卡片上时它自己会关掉，点下去也只是把卡片开开合合、不跳转。关闭的原因是面板锚定在页头下边缘，触发区盒子在它上方约 11px 处结束，指针穿过这条缝时已经离开了 <details>，mouseleave 在途中就触发。现在面板上方加了一条不可见的过渡带，关闭也加了 200ms 宽限。点击则直接前往该导航项代表的页面（转换总览）。]]></description>
+      <category>Release</category>
+    </item>
     <item>
       <title>Pixora 1.2.3 发布：首页预览卡改为演示默认的格式转换，RSS 补上漏发的两个版本</title>
       <link>https://xuboboo.github.io/pixora/#tool</link>

@@ -212,7 +212,7 @@ ${items}
 
   return `<nav class="nav" id="nav" aria-label="主导航">
   <a href="${p}#tool">在线工具</a>
-  <details class="nav-drop">
+  <details class="nav-drop" data-href="${c}">
     <summary>
       <span>格式转换</span>
       <svg class="nav-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
