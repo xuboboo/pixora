@@ -24,7 +24,7 @@ const BODY = `
 
       <div class="editor" id="editor">
         <div class="editor-bar">
-          <button class="btn btn-sm" id="ed-open" type="button">打开图片</button>
+          <button class="btn btn-ghost btn-sm" id="ed-open" type="button">打开图片</button>
           <input type="file" id="ed-file" accept="image/*" hidden>
           <span class="editor-bar-sep" aria-hidden="true"></span>
           <button class="icon-btn" id="ed-undo" type="button" aria-label="撤销" disabled>
@@ -46,7 +46,7 @@ const BODY = `
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
           </button>
           <button class="btn btn-ghost btn-sm" id="ed-fit" type="button">适配</button>
-          <button class="btn btn-sm" id="ed-export-open" type="button" disabled>导出</button>
+          <button class="btn btn-ghost btn-sm" id="ed-export-open" type="button" disabled>导出</button>
         </div>
 
         <div class="editor-body">
@@ -103,7 +103,7 @@ const BODY = `
               <div class="sliders" id="ed-adjust"></div>
               <div class="panel-actions">
                 <button class="btn btn-ghost btn-sm" id="ed-adj-reset" type="button">还原</button>
-                <button class="btn btn-sm" id="ed-adj-apply" type="button" disabled>应用</button>
+                <button class="btn btn-primary btn-sm" id="ed-adj-apply" type="button" disabled>应用</button>
               </div>
             </section>
 
@@ -143,7 +143,7 @@ const BODY = `
             <label id="ed-q-wrap">质量 <output id="ed-qv">92</output>%
               <input type="range" id="ed-q" min="50" max="100" value="92">
             </label>
-            <button class="btn btn-sm" id="ed-download" type="button">下载图片</button>
+            <button class="btn btn-primary btn-sm" id="ed-download" type="button">下载图片</button>
             <button class="btn btn-ghost btn-sm" id="ed-export-close" type="button">收起</button>
           </div>
           <p class="editor-export-note" id="ed-export-note"></p>

@@ -255,15 +255,28 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 2.5rem 0; }
 .nav .nav-panel-cols a[aria-current="page"] { color: var(--brand-ink); font-weight: 700; }
 
 /* ---------- 5. Buttons ---------- */
+/* 基类必须自带中性外形。曾经这里只写 border: 1px solid transparent，于是漏写变体的
+   按钮渲染出来是一行没有任何外形、漂在底板上的文字 —— 站上有 5 个按钮这样，
+   包括 AI 门控里唯一的行动按钮「启用 AI 放大」。背景、边框、文字色三样缺一不可。 */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   padding: .72rem 1.25rem; border-radius: 11px; font-weight: 600; font-size: .95rem;
-  border: 1px solid transparent; cursor: pointer; white-space: nowrap;
+  border: 1px solid var(--border); cursor: pointer; white-space: nowrap;
+  background: var(--surface); color: var(--text);
   transition: transform .16s var(--ease), box-shadow .2s var(--ease), background .2s var(--ease), border-color .2s var(--ease);
 }
-.btn:hover { text-decoration: none; transform: translateY(-1px); }
+.btn:hover { text-decoration: none; transform: translateY(-1px); border-color: var(--border-strong); }
 .btn:active { transform: translateY(0); }
-.btn-primary { background: linear-gradient(135deg, var(--brand-fill), var(--brand-fill-2)); color: #fff; box-shadow: var(--shadow-brand); }
+/* 禁用态单独写：编辑器里「导出」「应用」初始就是 disabled，没有这条会顶着一张
+   可点的脸。opacity 只压暗、不改变盒模型，免得面板高度跳。
+   color 必须一起压掉 —— `.btn-primary` 的 color:#fff  specificity(0,1,0) 高于本
+   规则的 background(0,2,0) 之外没人管，若只改 background 会得到白字叠白底。 */
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: .5; cursor: not-allowed; transform: none; filter: none;
+  border-color: var(--border); background: var(--surface); color: var(--muted);
+}
+.btn-primary { background: linear-gradient(135deg, var(--brand-fill), var(--brand-fill-2)); color: #fff; border-color: transparent; box-shadow: var(--shadow-brand); }
 .btn-primary:hover { filter: brightness(1.06); }
 .btn-ghost { background: var(--surface); border-color: var(--border); color: var(--text); }
 .btn-ghost:hover { border-color: var(--border-strong); background: var(--surface-2); }
