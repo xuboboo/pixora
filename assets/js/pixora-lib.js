@@ -44,11 +44,13 @@
 
   /* 一次从 4000 直接缩到 400 会严重混叠，所以按 2 的因子逐级往下走，最后再落一次。
      返回的是「中间要经过哪些尺寸」，不含起点、也不含终点 —— 终点由调用方指定。
-     stop = max(2*maxOut, 4)：缩到接近目标的两倍以内就不必再折半了，再折只是浪费。 */
-  function resizeLadder(sw, sh, maxOut) {
+     stop = max(2*target, 4)：缩到接近目标的两倍以内就不必再折半了，再折只是浪费，
+     最后那一跳交给调用方的 drawImage。target 传目标的最长边（Math.max(dw, dh)）；
+     目标比源大时返回空数组。 */
+  function resizeLadder(sw, sh, target) {
     var out = [];
     var w = sw, h = sh;
-    var stop = Math.max(2 * maxOut, 4);
+    var stop = Math.max(2 * target, 4);
     while (Math.max(w, h) > stop && Math.max(w, h) > 4) {
       w = Math.max(1, Math.floor(w / 2));
       h = Math.max(1, Math.floor(h / 2));

@@ -154,9 +154,18 @@ Pixora 的前提是**图片不上传**，因此不会为了凑格式数量而引
 
 ## 技术栈
 
-Pixora 刻意保持极简 —— **没有 `package.json`，没有构建步骤，没有 npm 依赖**。
+Pixora 刻意保持极简 —— **没有构建步骤，没有 npm 依赖**。
 第三方的东西只有 AI 推理用到的 ONNX Runtime WebAssembly 与模型文件，两者都自托管在
 `assets/` 下，不连任何 CDN。
+
+`package.json` 是唯一多出来的文件，而且**只是打包元信息**：没有 `dependencies`、
+没有 `devDependencies`、没有任何编译/打包脚本（`test` 只是转发给一个零依赖的
+`node tools/*.mjs`）。它的存在纯粹为了让别的工具能按包名引用这个内核：
+
+```js
+const Pixora = require("pixora");      // CJS
+import { pixels } from "pixora";       // ESM，有完整类型声明
+```
 
 - **标记**：语义化 HTML5（`header` / `nav` / `main` / `section` / `article` / `footer`）
 - **样式**：原生 CSS3 —— 自定义属性（Design Tokens）、`color-mix()`、Grid、`clamp()` 流体排版、`prefers-color-scheme` / `prefers-reduced-motion`
@@ -172,6 +181,7 @@ Pixora 刻意保持极简 —— **没有 `package.json`，没有构建步骤，
 ```
 pixora/
 ├── index.html                     # 单页官网 + 在线工具（格式转换 / 调整尺寸 / AI 放大）
+├── package.json                   # 打包元信息：零依赖、零脚本，只为让别的工具能 require("pixora")
 ├── 404.html                       # 品牌化 404（生成产物，勿手改）
 ├── editor/index.html              # 在线修图编辑器（生成产物，勿手改）
 ├── convert/                       # 格式转换落地页矩阵（生成产物，勿手改）
@@ -182,11 +192,14 @@ pixora/
 │   ├── gen-convert-pages.mjs      # 落地页 + 总览页 + 404 页 + sitemap.xml 生成器
 │   ├── gen-editor-page.mjs        # 在线修图编辑器页生成器
 │   ├── gen-doc-pages.mjs          # 5 个项目文档页（由 md / LICENSE / CHANGELOG.md 生成）
-│   └── test-lib.mjs               # 图像内核单测（49 项）
+│   ├── test-lib.mjs               # 图像内核单测（59 项：期望值 + CJS/ESM/类型/package.json 对齐）
+│   └── test-package.mjs           # 封装冒烟（28 项：从外部消费者视角跑三条引入路径）
 ├── assets/
 │   ├── css/style.css              # 设计系统（Design Tokens + 组件）
 │   ├── js/
 │   │   ├── pixora-lib.js          # 图像能力内核（UMD、零 DOM 依赖，可被其他工具复用）
+│   │   ├── pixora-lib.mjs         # ESM 入口（转发到上面那一份，无构建）
+│   │   ├── pixora-lib.d.ts        # TypeScript 类型声明
 │   │   ├── main.js                # 主题、导航、动效、首页工具箱图像引擎
 │   │   └── editor.js              # 在线修图编辑器
 │   ├── ort/                       # 自托管 ONNX Runtime WebAssembly
@@ -203,7 +216,7 @@ pixora/
 │       ├── icon-maskable-512.png  # PWA 自适应图标
 │       └── og.png                 # 1200×630 社交分享图
 ├── docs/
-│   ├── api.md                     # 图像内核 API（浏览器 / Node / ESM 三种引入）
+│   ├── api.md                     # 图像内核 API（浏览器 / Node / ESM / TS 四种引入）
 │   ├── ai-upscale.md              # Real-ESRGAN 分块推理的感受野标定过程
 │   ├── convertio-逆向分析报告.md        # 竞品逆向分析（1.1.0 格式矩阵的参考依据）
 │   └── 竞品入口与信息架构逆向分析.md    # iLoveIMG / Convertio / CloudConvert 入口对比（1.2.0 依据）
@@ -262,8 +275,13 @@ const Pixora = require("./assets/js/pixora-lib.js");
 const ladder = Pixora.resize.ladder(4000, 3000, 1200);
 ```
 
-完整签名、行为细节与基准向量见 [`docs/api.md`](docs/api.md)；
-内核单测 `node tools/test-lib.mjs`（49 项）。
+完整签名、行为细节与基准向量见 [`docs/api.md`](docs/api.md)。
+其他工具要用它，`npm install file:../pixora` 之后 `require("pixora")` 或
+`import { pixels } from "pixora"`（带类型声明）；不想引入依赖就把单个
+`assets/js/pixora-lib.js` 拷走 —— 零依赖、不碰 DOM，页面自己就是这么用的。
+
+测试两条：内核单测 `npm test`（59 项），封装冒烟 `npm run test:package`
+（28 项，从外部消费者视角把 CJS / ESM / 深路径三条路各跑一遍真实操作）。
 
 ## 部署形态与路径前缀
 
@@ -402,11 +420,14 @@ npx serve .
 - 无障碍与国际化改进
 - 性能与算法优化
 
-改内核请先跑单测：
+改内核请先跑单测，两条一起 —— 第一条盯内核自身，第二条从「装了 `pixora` 包的外部工具」视角验证 `exports` 解析：
 
 ```bash
-node tools/test-lib.mjs
+npm test                # 内核 59 项
+npm run test:package    # 封装 28 项
 ```
+
+（等价于直接 `node tools/test-lib.mjs` 与 `node tools/test-package.mjs`。）
 
 参与本项目即表示你同意遵守 [行为准则](CODE_OF_CONDUCT.md)。
 发现安全问题时，请按 [安全政策](SECURITY.md) 私下报告，不要开公开 Issue。

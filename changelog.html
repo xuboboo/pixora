@@ -167,7 +167,7 @@
 <ul><li><strong>在线修图编辑器</strong>（<code>/editor/</code>）</li><li>移动 / 裁剪 / 画笔 / 橡皮 / 形状 / 文字 / 取色共 7 种工具</li><li>亮度、对比度、饱和度、色温、模糊、锐化、暗角 7 项实时调整，9 个滤镜预设</li><li>旋转 90°、水平/垂直翻转、画布尺寸、撤销重做（按画布面积自动收窄历史深度）</li><li>拖放与粘贴导入，PNG / JPG / WEBP 导出，JPEG 自动铺白底</li><li>验收 65 项端到端，全部通过</li><li><strong>四个项目文档页本地化</strong></li><li>MIT 许可证 / 贡献指南 / 行为准则 / 安全政策原本跳到 GitHub，现在站内渲染</li><li>404 页的对应链接一并改本地；转换总览页与 35 个转换页的页脚链接同步修正</li></ul>
 <h3 id="重构">重构</h3>
 <ul><li><strong>抽出图像内核 <code>assets/js/pixora-lib.js</code></strong></li><li>浏览器 <code>&lt;script&gt;</code>、Node <code>require</code>、ESM 三种方式都能引入；<strong>不碰 DOM</strong>，只吃普通</li></ul>
-<p>    对象和数字，所以同一份实现能被任意页面和其他工具共用   - 收录：降采样阶梯、24 位 BMP 编码、ZIP 打包与 CRC32、超分分块表、完整像素调整链   - 首页工具与编辑器原先各抄了一份像素链，现在全部委托内核，删掉重复实现与漂移面   - 内核单测 49 项通过（<code>node tools/test-lib.mjs</code>），浏览器适配层见 <a href="./docs/api.md"><code>docs/api.md</code></a></p>
+<p>    对象和数字，所以同一份实现能被任意页面和其他工具共用   - 收录：降采样阶梯、24 位 BMP 编码、ZIP 打包与 CRC32、超分分块表、完整像素调整链   - 首页工具与编辑器原先各抄了一份像素链，现在全部委托内核，删掉重复实现与漂移面   - 内核单测 59 项通过（<code>node tools/test-lib.mjs</code>），浏览器适配层见 <a href="./docs/api.md"><code>docs/api.md</code></a>   - 补齐对外封装：<code>package.json</code>（无依赖、<code>exports</code> 四条件）、ESM 入口 <code>pixora-lib.mjs</code>、     类型声明 <code>pixora-lib.d.ts</code>，<code>npm install file:</code> 或拷单文件即可在别的工具里用   - 封装冒烟 28 项（<code>tools/test-package.mjs</code>）从外部消费者视角验证 CJS / ESM / 深路径三条引入</p>
 <ul><li><strong>首页文案</strong>：Hero、特性卡与徽标反映已上线的 AI 放大与在线修图；AI 生图以</li></ul>
 <p>  「规划中」卡片诚实预留，不作虚假承诺</p>
 <h3 id="修复">修复</h3>
@@ -185,7 +185,7 @@
 <p>  图）。改为编辑器页面单独收紧</p>
 <ul><li><code>convert/index.html</code> 与 <code>404.html</code> 的页脚用了 <code>../../</code> 前缀，12 条断链</li><li>sitemap 漏掉 <code>editor/</code> 与 5 个新页面（37 → 43 条）</li></ul>
 <h3 id="验收">验收</h3>
-<ul><li>编辑器 65 项端到端全部通过，无页面错误</li><li>AI 放大 23 项全部通过</li><li>内核单测 49 项全部通过</li><li><code>linkint</code> / <code>links</code> / <code>verify-pages</code> / <code>mkmodes</code> / <code>small</code> / <code>small2</code> / <code>final</code> 全部通过</li></ul>
+<ul><li>编辑器 65 项端到端全部通过，无页面错误</li><li>AI 放大 23 项全部通过</li><li>内核单测 59 项 + 封装冒烟 28 项全部通过</li><li><code>linkint</code> / <code>links</code> / <code>verify-pages</code> / <code>mkmodes</code> / <code>small</code> / <code>small2</code> / <code>final</code> 全部通过</li></ul>
 <h2 id="1-2-4-2026-10-13"><a href="https://github.com/xuboboo/pixora/releases/tag/v1.2.4" target="_blank" rel="noopener">1.2.4</a> — 2026-10-13</h2>
 <p>导航可用性修复。用户反馈：页头「格式转换」点下去只是把卡片开开合合、不跳转， 而鼠标想移到卡片上时它又会自己关掉。</p>
 <h3 id="修复">修复</h3>

@@ -4,6 +4,7 @@
    页面审计只能证明「页面用对了」，证不了「库本身对」。这里用独立的参考值钉住它。 */
 import { createRequire } from "node:module";
 import zlib from "node:zlib";
+import fs from "node:fs";
 const require = createRequire(import.meta.url);
 const P = require("../assets/js/pixora-lib.js");
 
@@ -180,6 +181,46 @@ const check = (name, ok, detail) => {
     P.humanSize(1024) === "1 KB" && P.humanSize(1048576) === "1.00 MB");
   check("stamp 是 yyyymmdd-hhmmss", /^\d{8}-\d{6}$/.test(P.stamp()), P.stamp());
   check("version 暴露了库版本", typeof P.version === "string" && P.version.length > 0, P.version);
+}
+
+/* ---------- 8. 封装一致性：CJS / ESM / 类型 / package.json 四方对齐 ----------
+   内核会被三个入口消费：页面 <script>（全局 Pixora）、Node require、ESM import。
+   后两个是手写的转发层，没有构建步骤保证它们跟上内核 —— 加了顶层导出却忘了在
+   pixora-lib.mjs 补一行，就会出现「require 有、import 没有」的半身不遂。
+   这一类漂移在页面上完全看不出来（页面走全局），所以必须在这里钉住。 */
+{
+  const topKeys = Object.keys(P).sort();
+
+  const esm = await import("../assets/js/pixora-lib.mjs");
+  const esmKeys = Object.keys(esm).filter((k) => k !== "default").sort();
+  check("ESM 入口的具名导出与实现逐项一致",
+    JSON.stringify(esmKeys) === JSON.stringify(topKeys),
+    `实现 [${topKeys}] vs ESM [${esmKeys}]`);
+
+  check("ESM 的 default 就是实现本身", esm.default === P);
+  check("ESM 具名导出与 default 指向同一对象",
+    esm.pixels === P.pixels && esm.sr === P.sr && esm.version === P.version);
+
+  const dts = fs.readFileSync(new URL("../assets/js/pixora-lib.d.ts", import.meta.url), "utf8");
+  const missing = topKeys.filter((k) =>
+    !new RegExp("export const " + k + "\\b").test(dts) &&
+    !new RegExp("\\b" + k + ":").test(dts)
+  );
+  check("类型声明覆盖每个顶层导出", missing.length === 0, `缺 ${missing.join(", ")}`);
+  /* 这两个是踩过坑的签名，写成字面量钉住：encode.bmp 返回 ArrayBuffer 而非 Blob，
+     sharpen/vignette 的 amount 是 0..1 而非百分比。 */
+  check("类型声明里 bmp 返回 ArrayBuffer", /bmp\(img: BMPImage\): ArrayBuffer/.test(dts));
+  check("类型声明标注了 amount 的量纲", /amount 是 0\.\.1/.test(dts));
+
+  const pkg = JSON.parse(fs.readFileSync(new URL("../package.json", import.meta.url), "utf8"));
+  check("package.json 版本与内核一致", pkg.version === P.version, `${pkg.version} vs ${P.version}`);
+  check("package.json 没有依赖", !pkg.dependencies && !pkg.devDependencies);
+  check("package.json 的 main/exports 指向真实文件", (() => {
+    const files = [pkg.main, pkg.exports["."].require, pkg.exports["."].import, pkg.types];
+    return files.every((f) => fs.existsSync(new URL("../" + f.replace("./", ""), import.meta.url)));
+  })());
+  check("engines.node 与 CompressionStream 的最低要求一致",
+    String(pkg.engines?.node || "") === ">=18", pkg.engines?.node);
 }
 
 console.log(`\n${pass} / ${pass + fail} 通过`);

@@ -30,13 +30,74 @@ const Pixora = require("./assets/js/pixora-lib.js");
 
 ### ESM
 
-库本身是 UMD，不提供 `export`。要用 `import` 就套一层：
+库提供真正的 ESM 入口，直接用 `import`，不需要 `createRequire`：
 
 ```js
 // my-tool.mjs
-import { createRequire } from "node:module";
-const require = createRequire(import.meta.url);
-const Pixora = require("./assets/js/pixora-lib.js");
+import Pixora, { pixels, sr, zip, encode, resize } from "pixora";
+pixels.adjust(imgData.data, w, h, { blur: 20 });
+```
+
+具名导出的集合与 CJS 侧完全一致（`tools/test-lib.mjs` 会逐项断言），所以
+`import { pixels }` 和 `require("pixora").pixels` 拿到的是同一个对象。
+注意 `encode.bmp()` 返回 **`ArrayBuffer`**，要 Blob 得自己套 `new Blob([buf])`。
+
+### TypeScript
+
+带类型声明 `assets/js/pixora-lib.d.ts`，`package.json` 的 `types` 已指好：
+
+```ts
+import Pixora, { pixels, type AdjustOptions } from "pixora";
+
+const opts: AdjustOptions = { brightness: 30, blur: 20 };
+const out: Uint8ClampedArray = pixels.adjust(imgData.data, w, h, opts);
+```
+
+两个容易搞错的量纲在类型注释里写明了：`sharpen` / `vignette` 的 amount 是 **0..1
+不是百分比**；`resize.ladder(sw, sh, target)` 的 `target` 是**目标最长边**，返回的
+末级通常仍大于 target —— 最后一跳归调用方。
+
+---
+
+## 在别的工具里用
+
+三种装法，按你的工具是什么形态挑：
+
+**① 按包名引用（推荐，其他 Node 项目）**
+
+```bash
+npm install file:../pixora      # 相对路径，本地开发
+# 或 npm link ../pixora
+```
+
+```js
+const Pixora = require("pixora");                       // CJS
+import { pixels } from "pixora";                        // ESM
+```
+
+`package.json` 的 `exports` 已配好四种条件（`types` / `import` / `require` /
+`default`），深路径 `pixora/pixora-lib.js` 也留着没封。
+
+**② 单文件拷贝（其他工具不想引入依赖时）**
+
+内核只有 `assets/js/pixora-lib.js` 一个文件、零依赖，直接拷走就能用。
+页面就是这么干的（`<script>` 标签），代价是得自己跟更新。
+
+**③ 裸路径 require（一次性脚本）**
+
+```js
+const Pixora = require("E:/ps/pixora/assets/js/pixora-lib.js");
+```
+
+管用，但绕过了 `exports`，将来加了 ESM 专属行为时它拿不到。
+
+三种方式的共同底线：`tools/test-package.mjs` 会造一个临时 `node_modules`、
+用 junction 把本仓库链进去，从「外部消费者」的视角把三条路径各跑一遍真实操作
+（像素调整、BMP 编码、ZIP 打包后用 Node 自己解回来验证）。任何一条通了另一条
+不通，这个测试就红。
+
+```bash
+node tools/test-package.mjs
 ```
 
 ---
@@ -47,7 +108,7 @@ const Pixora = require("./assets/js/pixora-lib.js");
 | --- | --- | --- |
 | — | `clamp(v, lo, hi)` / `clamp255(v)` | 数值夹取 |
 | — | `humanSize(n)` / `pad2(n)` / `stamp()` | 体积格式化、时间戳 |
-| `resize` | `ladder(sw, sh, maxOut)` | 降采样中间尺寸阶梯 |
+| `resize` | `ladder(sw, sh, target)` | 降采样中间尺寸阶梯 |
 | `encode` | `bmp({w, h, data})` | 24 位 BMP 编码 |
 | `zip` | `build(entries)` / `crc32(bytes)` | ZIP 打包 / CRC32 |
 | `sr` | `starts(total)` / `tiles(w, h)` | 超分分块表 |
@@ -66,7 +127,9 @@ Pixora.resize.ladder(4000, 3000, 400)
 一次从 4000 直接缩到 400 会严重混叠。这个函数给出「中间该经过哪些尺寸」，每级约为上级
 的一半，缩到接近目标的两倍以内就停。返回**不含起点也不含终点** —— 终点由你指定。
 
-`maxOut` 传目标的最长边（`Math.max(dw, dh)`）。目标比源大时返回空数组。
+`target` 传目标的最长边（`Math.max(dw, dh)`）。**注意最后一级通常仍大于 target**：
+`ladder(4000, 3000, 1200)` 只有一级 `[{2000,1500}]`，从 2000 到 1200 的那一跳得你自己
+画（`imageSmoothingQuality = "high"`）。目标比源大时返回空数组。
 
 ## 2. BMP 编码
 
@@ -170,8 +233,13 @@ Pixora.pixels.vignette(px, w, h, 0.6)  // 强度 0..1，0 时无操作
 分块表覆盖性、ZIP 魔数与 CRC）。改动内核先跑它，改期望值前先确认是内核错了：
 
 ```
-node tools/test-lib.mjs
+node tools/test-lib.mjs        # 内核 59 项：期望值 + CJS/ESM/类型/package.json 四方对齐
+node tools/test-package.mjs    # 封装 28 项：从外部消费者视角跑三条引入路径
 ```
+
+前者管「库本身对不对」，后者管「封装漏没漏」—— 后者从临时沙箱里 `require("pixora")`，
+所以 `package.json` 的 `exports` 写错、ESM 入口少导出一项，都会在这里红，
+而那类问题在页面上完全看不出来（页面走 `window.Pixora`，绕过了 exports）。
 
 页面级的端到端回归（编辑器 65 项、AI 放大 23 项，后者含与 Python 原生 ONNX Runtime
 的逐像素比对）在**仓库同级的 `_audit/` 目录**，没有纳入版本库 —— 它写死了开发机上的

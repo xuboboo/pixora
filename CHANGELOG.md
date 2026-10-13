@@ -33,7 +33,10 @@
     对象和数字，所以同一份实现能被任意页面和其他工具共用
   - 收录：降采样阶梯、24 位 BMP 编码、ZIP 打包与 CRC32、超分分块表、完整像素调整链
   - 首页工具与编辑器原先各抄了一份像素链，现在全部委托内核，删掉重复实现与漂移面
-  - 内核单测 49 项通过（`node tools/test-lib.mjs`），浏览器适配层见 [`docs/api.md`](./docs/api.md)
+  - 内核单测 59 项通过（`node tools/test-lib.mjs`），浏览器适配层见 [`docs/api.md`](./docs/api.md)
+  - 补齐对外封装：`package.json`（无依赖、`exports` 四条件）、ESM 入口 `pixora-lib.mjs`、
+    类型声明 `pixora-lib.d.ts`，`npm install file:` 或拷单文件即可在别的工具里用
+  - 封装冒烟 28 项（`tools/test-package.mjs`）从外部消费者视角验证 CJS / ESM / 深路径三条引入
 - **首页文案**：Hero、特性卡与徽标反映已上线的 AI 放大与在线修图；AI 生图以
   「规划中」卡片诚实预留，不作虚假承诺
 
@@ -59,7 +62,7 @@
 
 - 编辑器 65 项端到端全部通过，无页面错误
 - AI 放大 23 项全部通过
-- 内核单测 49 项全部通过
+- 内核单测 59 项 + 封装冒烟 28 项全部通过
 - `linkint` / `links` / `verify-pages` / `mkmodes` / `small` / `small2` / `final` 全部通过
 
 ## [1.2.4] — 2026-10-13
