@@ -301,6 +301,16 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 2.5rem 0; }
 .hero-badges { display: flex; flex-wrap: wrap; gap: 8px 18px; list-style: none; padding: 0; margin: 0; color: var(--muted); font-size: .9rem; }
 .hero-badges li { display: inline-flex; align-items: center; gap: 7px; }
 .hero-badges svg { width: 16px; height: 16px; color: var(--ok); flex: none; }
+/* 还没上线的能力：不给绿勾（那表示「已经有了」），改用虚线 pill + 弱化文字，
+   和下面 features 区的「AI 生图 · 规划中」卡片同一个基调 —— 先把坑位和规矩讲清楚，
+   不悄悄变卦。上线那天把这个类删掉、并进普通徽标即可。 */
+.hero-badges .badge-planned {
+  gap: 5px; padding: 2px 10px;
+  border: 1px dashed var(--border-strong); border-radius: 999px;
+  font-size: .8rem; color: var(--muted);
+  background: color-mix(in srgb, var(--brand-soft) 55%, transparent);
+}
+.hero-badges .badge-planned svg { width: 13px; height: 13px; color: var(--muted); }
 
 /* ---------- 6b. Hero preview card ----------
    This used to be three flat gradient rectangles, which read as placeholder
