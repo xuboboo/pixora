@@ -22,6 +22,14 @@ const ROOT = "E:\\ps\\pixora";
 const SITE = "https://xuboboo.github.io/pixora";
 const OUT = path.join(ROOT, "convert");
 
+/* Site-root-absolute prefix, e.g. "/pixora/". Only 404.html needs it: GitHub
+   Pages serves that file for any unmatched path while leaving the address bar
+   on the *requested* URL, so a relative prefix there resolves against a
+   directory that may not even exist. A <base> tag would fix the assets but
+   silently repoint the `#main` skip link at the homepage, so an explicit
+   absolute prefix is the safer of the two. */
+const BASE = new URL(SITE + "/").pathname;
+
 /* ---------------------------------------------------------------- metadata */
 
 const F = {
@@ -126,11 +134,16 @@ function faqFor(from, to) {
 
 /* --------------------------------------------------------------- HTML parts */
 
-const HEAD_ICONS = `
-<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
-<link rel="icon" href="../../assets/img/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="apple-touch-icon" href="../../assets/img/apple-touch-icon.png" sizes="180x180">
-<link rel="manifest" href="../../site.webmanifest">
+/* Parameterised by the page's root prefix. It used to be a constant hard-coded
+   to "../../", which was correct for /convert/<slug>/ but wrong for the hub at
+   /convert/ — there the favicon, apple-touch-icon and web manifest all pointed
+   one level above the site root and 404'd. Nothing caught it because the link
+   audit only walked <a href>, never <link href>. */
+const headIcons = (p) => `
+<link rel="icon" href="${p}assets/img/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="${p}assets/img/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="${p}assets/img/apple-touch-icon.png" sizes="180x180">
+<link rel="manifest" href="${p}site.webmanifest">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Pixora">
@@ -167,8 +180,9 @@ const THEME_BOOT = `<script>
    /convert/convert/png-to-jpg/). */
 const LOC = {
   root: { up: "", conv: "convert/" },              // /index.html
-  hub: { up: "../", conv: "./" },                  // /convert/index.html
+  hub:  { up: "../", conv: "./" },                 // /convert/index.html
   slug: { up: "../../", conv: "../../convert/" },  // /convert/<slug>/index.html
+  abs:  { up: BASE, conv: BASE + "convert/" },     // /404.html — served at any path
 };
 
 function nav(loc, current) {
@@ -216,11 +230,11 @@ ${indent(cols, 8)}
 /* The homepage format index. Same reasoning as nav(): index.html carries a
    hand-written section head, but the 35 links themselves must be generated or
    they will drift from the pages that actually exist. */
-function formatIndex() {
+function formatIndex(prefix = "convert/") {
   return `<div class="fmt-index">
 ${OUTPUTS.map((to) => {
   const items = INPUTS.filter((f) => f !== to)
-    .map((f) => indent(`<li><a href="convert/${f}-to-${to}/">${F[f].label} 转 ${F[to].label}</a></li>`, 6))
+    .map((f) => indent(`<li><a href="${prefix}${f}-to-${to}/">${F[f].label} 转 ${F[to].label}</a></li>`, 6))
     .join("\n");
   return `  <div class="fmt-index-col">
     <h3>转 ${F[to].label}<span>${INPUTS.length - 1} 种</span></h3>
@@ -546,7 +560,7 @@ function page(from, to) {
 <link rel="canonical" href="${url}">
 <link rel="alternate" hreflang="zh-CN" href="${url}">
 <link rel="alternate" hreflang="x-default" href="${url}">
-${HEAD_ICONS}
+${headIcons(LOC.slug.up)}
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Pixora">
@@ -568,8 +582,8 @@ ${HEAD_ICONS}
 
 ${THEME_BOOT}
 
-<link rel="preload" href="../../assets/img/logo.svg" as="image" type="image/svg+xml">
-<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="preload" href="${LOC.slug.up}assets/img/logo.svg" as="image" type="image/svg+xml">
+<link rel="stylesheet" href="${LOC.slug.up}assets/css/style.css">
 
 <script type="speculationrules">
 {
@@ -707,7 +721,7 @@ ${TOOL(from, to)}
 
 ${footer("slug")}
 
-<script src="../../assets/js/main.js" defer></script>
+<script src="${LOC.slug.up}assets/js/main.js" defer></script>
 </body>
 </html>
 `;
@@ -785,7 +799,7 @@ function hub() {
 <link rel="canonical" href="${url}">
 <link rel="alternate" hreflang="zh-CN" href="${url}">
 <link rel="alternate" hreflang="x-default" href="${url}">
-${HEAD_ICONS}
+${headIcons(LOC.hub.up)}
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Pixora">
@@ -807,8 +821,8 @@ ${HEAD_ICONS}
 
 ${THEME_BOOT}
 
-<link rel="preload" href="../assets/img/logo.svg" as="image" type="image/svg+xml">
-<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="preload" href="${LOC.hub.up}assets/img/logo.svg" as="image" type="image/svg+xml">
+<link rel="stylesheet" href="${LOC.hub.up}assets/css/style.css">
 
 <script type="speculationrules">
 {
@@ -880,7 +894,146 @@ ${header("hub", null)}
 
 ${footer("hub")}
 
-<script src="../assets/js/main.js" defer></script>
+<script src="${LOC.hub.up}assets/js/main.js" defer></script>
+</body>
+</html>
+`;
+}
+
+/* --------------------------------------------------------------- 404 page
+   GitHub Pages serves this file for every unmatched path, so it is the last
+   thing a lost visitor sees. The whole point of the v1.2.0 work was that
+   people could not find the conversion they wanted, so a dead end here would
+   undo it: the page therefore carries the same 35-link format index as the
+   homepage, plus the eight pairs people actually look for.
+
+   Paths are site-root-absolute (LOC.abs) rather than relative, because the
+   address bar keeps the *requested* URL — a relative `assets/…` would resolve
+   against a directory that may not exist. It is noindex,follow: the page
+   itself must never rank, but its links should still be crawled. */
+function notFound() {
+  const url = `${SITE}/404.html`;
+  const title = "页面不存在（404）— Pixora 在线图片工具箱";
+  const description =
+    "这个地址在 Pixora 上不存在。下面是全部 35 种图片格式转换组合的入口，以及最常用的几个转换，找到你要的那一个即可。";
+
+  const popular = [
+    ["png", "jpg"], ["jpg", "png"], ["png", "webp"], ["webp", "png"],
+    ["png", "ico"], ["jpg", "webp"], ["svg", "png"], ["gif", "png"],
+  ];
+
+  const popularHtml = popular
+    .map(([f, t]) => `        <li><a href="${BASE}convert/${f}-to-${t}/">${F[f].label} 转 ${F[t].label}</a></li>`)
+    .join("\n");
+
+  return `<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<title>${esc(title)}</title>
+<meta name="description" content="${esc(description)}">
+<meta name="author" content="Pixora contributors">
+<meta name="robots" content="noindex, follow">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#080c16" media="(prefers-color-scheme: dark)">
+<meta name="format-detection" content="telephone=no">
+<meta name="generator" content="Handcrafted HTML, CSS and JavaScript — no build step">
+${headIcons(BASE)}
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pixora">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:title" content="${esc(title)}">
+<meta property="og:description" content="${esc(description)}">
+<meta property="og:url" content="${url}">
+<meta property="og:image" content="${SITE}/assets/img/og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${esc(title)}">
+<meta name="twitter:description" content="${esc(description)}">
+<meta name="twitter:image" content="${SITE}/assets/img/og.png">
+
+${THEME_BOOT}
+
+<link rel="stylesheet" href="${BASE}assets/css/style.css">
+
+<script type="application/ld+json">
+${JSON.stringify(
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: "页面不存在",
+    description,
+    isPartOf: { "@id": `${SITE}/#website` },
+    inLanguage: "zh-CN",
+  },
+  null,
+  2
+)}
+</script>
+</head>
+<body>
+<a class="skip-link" href="#main">跳到主要内容</a>
+
+${header("abs", null)}
+
+<main id="main">
+
+  <section class="section" aria-labelledby="page-title">
+    <div class="container">
+      <div class="nf-hero">
+        <p class="nf-code" aria-hidden="true">404</p>
+        <div class="section-head">
+          <span class="eyebrow">地址不存在</span>
+          <h1 id="page-title">这个页面不存在</h1>
+          <p>你要找的地址在 Pixora 上找不到 —— 可能是链接过期，也可能是拼写有出入。<b id="nf-path" class="nf-path" hidden></b></p>
+        </div>
+        <div class="nf-actions">
+          <a class="btn btn-primary" href="${BASE}#tool">打开图片工具箱</a>
+          <a class="btn btn-ghost" href="${BASE}">回到首页</a>
+          <a class="btn btn-ghost" href="${BASE}convert/">全部格式转换</a>
+        </div>
+      </div>
+
+      <div class="nf-block reveal">
+        <h2 class="nf-h2">最常用的几个转换</h2>
+        <ul class="nf-popular">
+${popularHtml}
+        </ul>
+      </div>
+
+      <div class="nf-block reveal">
+        <h2 class="nf-h2">全部 ${INPUTS.length * (OUTPUTS.length - 1)} 种转换组合</h2>
+        <p class="nf-note">按输出格式分成五组，每一条点进去都是一个已经预设好输出格式的转换页，不需要再选一次。</p>
+${indent(formatIndex(BASE + "convert/"), 8)}
+      </div>
+    </div>
+  </section>
+
+</main>
+
+${footer("abs")}
+
+<script src="${BASE}assets/js/main.js" defer></script>
+<script>
+/* Show what was actually requested. Runs after main.js so it can stay a plain
+   inline enhancement — the page reads fine without it. */
+(function () {
+  var el = document.getElementById("nf-path");
+  if (!el) return;
+  var p = location.pathname + location.search;
+  if (p.length > 120) p = p.slice(0, 117) + "…";
+  el.textContent = p;
+  el.hidden = false;
+})();
+</script>
 </body>
 </html>
 `;
@@ -906,6 +1059,7 @@ for (const [from, to] of pairs) {
 
 fs.mkdirSync(OUT, { recursive: true });
 fs.writeFileSync(path.join(OUT, "index.html"), hub(), "utf8");
+fs.writeFileSync(path.join(ROOT, "404.html"), notFound(), "utf8");
 
 /* ------------------------------------------------------------- sitemap.xml */
 

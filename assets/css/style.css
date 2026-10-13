@@ -428,6 +428,38 @@ a.card p { margin: 0; }
 }
 .fmt-index-col a:hover::after { opacity: 1; transform: translateX(2px); }
 
+/* ---------- 7e. 404 page ----------
+   The page GitHub Pages serves for any unmatched path. Kept deliberately close
+   to the homepage in structure: a lost visitor should land somewhere that still
+   shows the full conversion matrix rather than a dead end. */
+.nf-hero { text-align: center; padding: 8px 0 4px; }
+.nf-code {
+  margin: 0 0 -14px; font-size: clamp(88px, 20vw, 168px); font-weight: 800;
+  line-height: 1; letter-spacing: -.04em;
+  background: linear-gradient(180deg, var(--brand) 0%, var(--brand-soft) 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  user-select: none;
+}
+.nf-hero .section-head { margin-bottom: 22px; }
+.nf-path {
+  display: inline-block; margin-top: 10px; padding: 3px 10px;
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: 7px;
+  font-family: var(--mono); font-size: .85rem; font-weight: 600;
+  color: var(--text-2); word-break: break-all; max-width: 100%;
+}
+.nf-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.nf-block { margin-top: 52px; }
+.nf-h2 { font-size: 1.25rem; margin: 0 0 8px; }
+.nf-note { color: var(--muted); font-size: .92rem; margin: 0 0 20px; }
+.nf-popular { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+.nf-popular a {
+  display: inline-flex; align-items: center; min-height: 40px; padding: .5rem 1rem;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 999px;
+  font-size: .9rem; font-weight: 600; color: var(--text-2); box-shadow: var(--shadow-xs);
+  transition: background .16s var(--ease), color .16s var(--ease), border-color .16s var(--ease);
+}
+.nf-popular a:hover { background: var(--brand-soft); border-color: var(--brand); color: var(--brand-ink); text-decoration: none; }
+
 /* ---------- 8. Steps ---------- */
 .steps { counter-reset: step; display: grid; gap: 18px; grid-template-columns: repeat(3, minmax(0,1fr)); }
 .step { position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 26px 22px 22px; box-shadow: var(--shadow-sm); }
@@ -686,6 +718,7 @@ table.cmp .col-us { background: color-mix(in srgb, var(--brand) 6%, transparent)
   .tool-options { grid-template-columns: 1fr; }
   .header-actions .btn span { display: none; }
   .tool-head .tag { display: none; }
+  .nf-block { margin-top: 40px; }
 }
 
 /* 420 — small phones: tighten the chrome, stop wasting horizontal space. */
@@ -709,6 +742,9 @@ table.cmp .col-us { background: color-mix(in srgb, var(--brand) 6%, transparent)
   .tool-bar-actions { display: grid; grid-template-columns: 1fr 1fr; }
   .tool-bar-actions .btn { width: 100%; }
   .tool-bar-actions .btn:only-child { grid-column: 1 / -1; }
+  .nf-code { margin-bottom: -8px; }
+  .nf-actions { flex-direction: column; }
+  .nf-actions .btn { width: 100%; }
 }
 
 /* 380 and below — two columns at 320px leaves ~110px per track. Trimming the
@@ -736,6 +772,7 @@ table.cmp .col-us { background: color-mix(in srgb, var(--brand) 6%, transparent)
   .nav-drop > summary { min-height: 44px; }
   .nav .nav-panel-cols a { min-height: 44px; }
   .fmt-index-col a { min-height: 44px; }
+  .nf-popular a { min-height: 44px; }
   .chip { min-height: 44px; padding-inline: 1.05rem; }
   .quick-convert a { min-height: 44px; padding-inline: 1rem; }
   .field .switch-row { min-height: 44px; }
