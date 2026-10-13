@@ -52,6 +52,25 @@
 <meta name="twitter:image" content="https://xuboboo.github.io/pixora/assets/img/og.png">
 <meta name="twitter:image:alt" content="Pixora 在线图片工具箱界面预览">
 
+<!-- ===================== Theme bootstrap ===================== -->
+<!-- Runs before the stylesheet so the very first paint already carries the
+     correct theme (no white flash for dark-mode visitors) and so CSS can tell
+     whether scripting is available — the `js` class gates the reveal
+     animation, keeping the content visible when JS never runs. -->
+<script>
+(function () {
+  var d = document.documentElement;
+  d.classList.add("js");
+  try {
+    var t = localStorage.getItem("pixora-theme");
+    if (t !== "dark" && t !== "light") {
+      t = (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
+    }
+    d.setAttribute("data-theme", t);
+  } catch (e) {}
+})();
+</script>
+
 <!-- ===================== Performance hints ===================== -->
 <link rel="preload" href="assets/img/logo.svg" as="image" type="image/svg+xml">
 <link rel="stylesheet" href="assets/css/style.css">
@@ -310,12 +329,12 @@
         <div class="tool-options">
           <div class="field">
             <label>常用宽度</label>
-            <div class="presets" id="wpresets">
-              <button class="chip on" type="button" data-w="400">400</button>
-              <button class="chip" type="button" data-w="600">600</button>
-              <button class="chip" type="button" data-w="800">800</button>
-              <button class="chip" type="button" data-w="1200">1200</button>
-              <button class="chip" type="button" data-w="1920">1920</button>
+            <div class="presets" id="wpresets" role="group" aria-label="常用宽度">
+              <button class="chip on" type="button" data-w="400" aria-pressed="true">400</button>
+              <button class="chip" type="button" data-w="600" aria-pressed="false">600</button>
+              <button class="chip" type="button" data-w="800" aria-pressed="false">800</button>
+              <button class="chip" type="button" data-w="1200" aria-pressed="false">1200</button>
+              <button class="chip" type="button" data-w="1920" aria-pressed="false">1920</button>
             </div>
           </div>
           <div class="field">

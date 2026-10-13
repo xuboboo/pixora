@@ -14,8 +14,14 @@
   var root = document.documentElement;
   function applyTheme(t) {
     root.setAttribute("data-theme", t);
-    var m = $('meta[name="theme-color"]');
-    if (m) m.setAttribute("content", t === "dark" ? "#080c16" : "#ffffff");
+    /* The two <meta name="theme-color"> tags are media-scoped for the
+       no-JS/first-paint case; once JS knows the real theme it owns the value,
+       so drop the media condition — otherwise a manual toggle away from the
+       OS preference leaves the browser chrome on the wrong colour. */
+    $$('meta[name="theme-color"]').forEach(function (m) {
+      m.removeAttribute("media");
+      m.setAttribute("content", t === "dark" ? "#080c16" : "#ffffff");
+    });
     $$("[data-theme-toggle]").forEach(function (b) {
       b.setAttribute("aria-label", t === "dark" ? "切换到浅色模式" : "切换到深色模式");
       b.setAttribute("aria-pressed", String(t === "dark"));
@@ -25,7 +31,9 @@
     var saved = null;
     try { saved = localStorage.getItem(THEME_KEY); } catch (e) {}
     var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-    applyTheme(saved || (prefersDark ? "dark" : "light"));
+    /* Same validation the inline bootstrap uses, so a corrupted localStorage
+       entry can never leave the page on an unknown theme. */
+    applyTheme(saved === "dark" || saved === "light" ? saved : (prefersDark ? "dark" : "light"));
   }
   $$("[data-theme-toggle]").forEach(function (b) {
     b.addEventListener("click", function () {
@@ -112,7 +120,10 @@
     autoEl.checked = state.auto;
     qwrap.style.display = state.format === "png" ? "none" : "block";
     $$("#wpresets .chip").forEach(function (b) {
-      b.classList.toggle("on", Number(b.dataset.w) === Number(state.width));
+      var on = Number(b.dataset.w) === Number(state.width);
+      b.classList.toggle("on", on);
+      /* The active preset is visual only otherwise — mirror it for AT. */
+      b.setAttribute("aria-pressed", String(on));
     });
   }
 
