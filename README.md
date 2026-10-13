@@ -85,8 +85,10 @@ pixora/
 ├── 8f3a1c9e7b2d4f60a5c8e1b93d7f2046.txt  # IndexNow 密钥
 ├── .well-known/security.txt       # 安全联系信息
 ├── .nojekyll                      # 关闭 GitHub Pages 的 Jekyll 处理
-├── LICENSE                        # MIT
+├── LICENSE                        # MIT 许可证
 ├── CONTRIBUTING.md                # 贡献指南
+├── CODE_OF_CONDUCT.md             # 贡献者公约 · 行为准则
+├── SECURITY.md                    # 安全政策与漏洞报告流程
 └── CHANGELOG.md                   # 更新日志
 ```
 
@@ -180,6 +182,9 @@ npx serve .
 - 新的图片处理能力（裁剪、旋转、水印、压缩）
 - 无障碍与国际化改进
 - 性能与算法优化
+
+参与本项目即表示你同意遵守 [行为准则](CODE_OF_CONDUCT.md)。
+发现安全问题时，请按 [安全政策](SECURITY.md) 私下报告，不要开公开 Issue。
 
 ## 许可证
 
