@@ -299,10 +299,25 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 2.5rem 0; }
   color: var(--ok); background: color-mix(in srgb, var(--ok) 12%, transparent);
   padding: .22rem .55rem; border-radius: 999px;
 }
+/* Equal columns: the two panes are the same pixel size now, and showing the
+   output narrower would imply a downscale that no longer happens. The ↓96%
+   badge carries the file-size story on its own. */
 .hp-body {
-  display: grid; grid-template-columns: 1.32fr auto 1fr; gap: 12px;
+  display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px;
   align-items: start; padding: 16px 16px 14px;
 }
+/* A miniature of the real mode switch, so the preview shows the same default the
+   tool opens with rather than a resize that no longer happens by default. */
+.hp-modes {
+  display: flex; gap: 3px; margin: 14px 16px 0; padding: 3px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); width: max-content;
+}
+.hp-mode {
+  padding: .3rem .7rem; border-radius: 7px;
+  font-size: .75rem; font-weight: 700; color: var(--muted);
+}
+.hp-mode.on { background: var(--surface); color: var(--brand-ink); box-shadow: var(--shadow-xs); }
 .hp-pane { min-width: 0; }
 .hp-label {
   display: inline-block; margin-bottom: 7px;
@@ -331,13 +346,12 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 2.5rem 0; }
 .hp-log b { color: var(--text); }
 .hp-log b.ok { color: var(--ok); }
 
-/* Stacked, the "after" pane would sit at the same width as the "before" and the
-   shrink would stop reading; cap it and turn the arrow to point down. */
+/* Stacked, the arrow turns to point down. The panes stay the same width — they
+   are the same pixel dimensions, so narrowing the output would misrepresent it. */
 @media (max-width: 560px) {
   .hp-body { grid-template-columns: 1fr; gap: 10px; }
   .hp-arrow { padding: 2px 0; }
   .hp-arrow svg { transform: rotate(90deg); }
-  .hp-pane--after .hp-frame { max-width: 64%; }
 }
 
 /* ---------- 7. Cards ---------- */

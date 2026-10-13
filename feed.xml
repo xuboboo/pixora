@@ -6,13 +6,37 @@
     <description>Pixora 免费在线图片工具箱的版本更新与功能发布。</description>
     <language>zh-CN</language>
     <copyright>MIT License · Pixora contributors</copyright>
-    <lastBuildDate>Tue, 13 Oct 2026 14:30:00 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 13 Oct 2026 15:45:00 +0800</lastBuildDate>
     <atom:link href="https://xuboboo.github.io/pixora/feed.xml" rel="self" type="application/rss+xml"/>
     <image>
       <url>https://xuboboo.github.io/pixora/assets/img/logo.svg</url>
       <title>Pixora</title>
       <link>https://xuboboo.github.io/pixora/</link>
     </image>
+    <item>
+      <title>Pixora 1.2.3 发布：首页预览卡改为演示默认的格式转换，RSS 补上漏发的两个版本</title>
+      <link>https://xuboboo.github.io/pixora/#tool</link>
+      <guid isPermaLink="false">https://xuboboo.github.io/pixora/#release-1-2-3</guid>
+      <pubDate>Tue, 13 Oct 2026 15:45:00 +0800</pubDate>
+      <description><![CDATA[1.2.2 把工具默认模式改成「格式转换」之后，首页首屏的预览卡还在演示缩放流程——第一眼看到的和打开后看到的是两回事。现在预览卡演示纯格式转换：1448×1086 进、1448×1086 出，PNG 2.4 MB 压到 WEBP 96 KB，并补上模式切换的缩略。两栏也改为等宽，不再用更窄的输出栏暗示被缩小。同时把 RSS 补上 1.2.1 与 1.2.2 两个此前漏发的条目，并新增跨文件一致性检查，覆盖版本号、订阅源、站点地图与图标引用这类「既不断链、也不报错」的漂移。]]></description>
+      <category>Release</category>
+    </item>
+    <item>
+      <title>Pixora 1.2.2 发布：格式转换不再改动图片尺寸，与「调整尺寸」拆成两个独立模式</title>
+      <link>https://xuboboo.github.io/pixora/#tool</link>
+      <guid isPermaLink="false">https://xuboboo.github.io/pixora/#release-1-2-2</guid>
+      <pubDate>Tue, 13 Oct 2026 15:30:00 +0800</pubDate>
+      <description><![CDATA[修复一个严重缺陷：格式转换页会顺带把图片缩到 400px 宽——尺寸控件与格式控件此前共用一组状态，而宽度默认值是 400，一张 1200×800 的照片在 PNG 转 JPG 页面上会变成 400×267。现在两者是彼此独立的模式：默认「格式转换」只换格式、保持原始尺寸，需要改宽高时再切到「调整尺寸」。35 个格式专属页只提供格式转换，尺寸控件整组不出现。]]></description>
+      <category>Release</category>
+    </item>
+    <item>
+      <title>Pixora 1.2.1 发布：补上品牌化 404 页，修复总览页站点图标与 PWA 清单 404</title>
+      <link>https://xuboboo.github.io/pixora/convert/</link>
+      <guid isPermaLink="false">https://xuboboo.github.io/pixora/#release-1-2-1</guid>
+      <pubDate>Tue, 13 Oct 2026 15:00:00 +0800</pubDate>
+      <description><![CDATA[新增品牌化 404 页：未匹配地址不再交给默认错误页，而是带着与首页相同的 35 条格式索引与 8 个热门转换入口出现。同时修复总览页的 favicon、apple-touch-icon 与 Web App 清单因路径前缀多退一级而全部 404 的问题，并把内链审计从「只查链接」扩展为「链接 + 静态资源」，新增解析器自检与数字声明守卫。]]></description>
+      <category>Release</category>
+    </item>
     <item>
       <title>Pixora 1.2.0 发布：格式转换入口提到页头，新增按比例缩放与不放大</title>
       <link>https://xuboboo.github.io/pixora/#conversions</link>

@@ -142,7 +142,7 @@
       "applicationSubCategory": "Image Editing",
       "operatingSystem": "Any modern web browser",
       "browserRequirements": "Requires Canvas 2D and createImageBitmap support",
-      "softwareVersion": "1.2.2",
+      "softwareVersion": "1.2.3",
       "isAccessibleForFree": true,
       "license": "https://opensource.org/licenses/MIT",
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY", "availability": "https://schema.org/InStock" },
@@ -392,6 +392,13 @@
           <span class="hp-tag">本地运行</span>
         </div>
 
+        <!-- Mirrors the real mode switch, because the default mode is the whole
+             point: converting a format leaves the dimensions alone. -->
+        <div class="hp-modes">
+          <span class="hp-mode on">格式转换</span>
+          <span class="hp-mode">调整尺寸</span>
+        </div>
+
         <div class="hp-body">
           <div class="hp-pane hp-pane--before">
             <span class="hp-label">原图</span>
@@ -411,13 +418,13 @@
               <svg class="hp-art" viewBox="0 0 400 300"><use href="#hpScene"/></svg>
               <span class="hp-delta">↓96%</span>
             </div>
-            <p class="hp-meta">400 × 300 · PNG<br><b>86 KB</b></p>
+            <p class="hp-meta">1448 × 1086 · WEBP<br><b>96 KB</b></p>
           </div>
         </div>
 
         <div class="hp-log">
-          <div><span>&gt;</span> 目标宽度 <b>400</b>（高度自动）</div>
-          <div><span>&gt;</span> 输出 <b class="ok">PNG 无损</b> · 保留透明通道</div>
+          <div><span>&gt;</span> 尺寸 <b class="ok">保持原样</b> · 1448 × 1086</div>
+          <div><span>&gt;</span> 输出 <b class="ok">WEBP</b> · 质量 82 · 保留透明通道</div>
           <div><span>&gt;</span> 批量 3 张 · 全程本地处理</div>
           <div><span>&gt;</span> 上传字节数 <b class="ok">0</b></div>
         </div>
