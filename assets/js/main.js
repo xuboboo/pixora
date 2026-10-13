@@ -80,6 +80,40 @@
     });
   }
 
+  /* ---------- Nav mega-menu ----------
+     <details> gives us open/close, keyboard support and Escape for free. What
+     it does not give is hover-to-open on a mouse, or closing when you click
+     somewhere else — those are the two behaviours a desktop nav needs, so they
+     are added here. On a coarse pointer the panel stays click-only, which is
+     what a tap expects. */
+  var navDrop = $(".nav-drop");
+  if (navDrop) {
+    var hoverOpen = window.matchMedia && window.matchMedia("(hover: hover) and (min-width: 901px)");
+    var openDrop = function () { navDrop.open = true; };
+    var closeDrop = function () { navDrop.open = false; };
+    if (hoverOpen && hoverOpen.matches) {
+      navDrop.addEventListener("mouseenter", openDrop);
+      navDrop.addEventListener("mouseleave", closeDrop);
+      /* Hovering already opened the panel, so the pointer click that follows
+         would toggle it straight back shut. Let hover own the state on a mouse
+         device and leave the native toggle to the keyboard, which has no hover
+         to rely on — a keyboard activation reports detail === 0. */
+      navDrop.querySelector("summary").addEventListener("click", function (e) {
+        if (e.detail > 0) e.preventDefault();
+      });
+    }
+    document.addEventListener("click", function (e) {
+      if (navDrop.open && !navDrop.contains(e.target)) closeDrop();
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && navDrop.open) { closeDrop(); navDrop.querySelector("summary").focus(); }
+    });
+    /* Following a link should not leave the panel hanging open behind it. */
+    navDrop.addEventListener("click", function (e) {
+      if (e.target.closest && e.target.closest("a")) closeDrop();
+    });
+  }
+
   /* ---------- Reveal on scroll ---------- */
   var revealables = $$(".reveal");
   if ("IntersectionObserver" in window && revealables.length) {
@@ -115,6 +149,7 @@
   var fmtEl = $("#format"), qEl = $("#q"), qvEl = $("#qv"), qwrap = $("#qwrap"), autoEl = $("#auto");
   var bgEl = $("#bgcolor"), bgVal = $("#bgval"), bgRow = $("#bgrow"), fmtHint = $("#fmthint");
   var modeHint = $("#modehint");
+  var spresets = $("#spresets"), noupEl = $("#noup"), statEl = $("#stat");
   var zipBtn = $("#zip"), againBtn = $("#again"), clearBtn = $("#clear");
 
   /* ---------- Format registry ----------
@@ -193,7 +228,13 @@
   var LS = "pixora-tool-v2";
   var state = {
     width: 400, height: null, lock: true, mode: "contain",
-    format: "png", quality: 92, background: "#ffffff", auto: false
+    format: "png", quality: 92, background: "#ffffff", auto: false,
+    /* scale: null means "use 目标宽度"; a fraction means "scale every image from
+       its own pixel size". A batch can mix dimensions, so a percentage has to be
+       resolved per image rather than baked into one width up front.
+       noUpscale: never enlarge past the source, which is what iloveimg offers as
+       "如果像素较小则不放大" and what stops a thumbnail being blown up to mush. */
+    scale: null, noUpscale: false
   };
 
   function save() { try { localStorage.setItem(LS, JSON.stringify(state)); } catch (e) {} }
@@ -240,6 +281,10 @@
     if (q.mode && MODES[q.mode]) { state.mode = q.mode; touched = true; }
     n = parseInt(q.w, 10);
     if (n > 0) { state.width = n; touched = true; }
+    /* ?scale=50 is the percentage equivalent of ?w=, for links that scale rather
+       than target a fixed width. */
+    n = parseInt(q.scale, 10);
+    if (n > 0 && n <= 400) { state.scale = n / 100; touched = true; }
     n = parseInt(q.q, 10);
     if (n >= 50 && n <= 100) { state.quality = n; touched = true; }
     if (touched) save();
@@ -274,15 +319,25 @@
     if (!wEl) return;
     var d = def();
     buildPresets();
-    wEl.value = state.width;
-    hEl.value = state.height == null ? "" : state.height;
-    hEl.disabled = state.lock;
-    hEl.placeholder = state.lock ? "自动" : "高度";
+    /* Percentage mode resolves per image, so a single pixel number would be a
+       lie. Blank the inputs and say why instead of showing a stale value. */
+    if (state.scale) {
+      wEl.value = ""; wEl.placeholder = "按原图";
+      hEl.value = ""; hEl.placeholder = "自动";
+    } else {
+      wEl.value = state.width;
+      wEl.placeholder = "";
+      hEl.value = state.height == null ? "" : state.height;
+      hEl.placeholder = state.lock ? "自动" : "高度";
+    }
+    wEl.disabled = !!state.scale;
+    hEl.disabled = state.lock || !!state.scale;
     lockEl.checked = state.lock;
     modeEl.value = state.mode;
     if (fmtEl) fmtEl.value = state.format;
     qEl.value = state.quality; qvEl.textContent = state.quality;
     autoEl.checked = state.auto;
+    if (noupEl) noupEl.checked = state.noUpscale;
     if (qwrap) qwrap.hidden = !d.quality;
     if (bgEl) bgEl.value = state.background;
     if (bgVal) bgVal.textContent = String(state.background).toUpperCase();
@@ -292,18 +347,37 @@
     if (fmtHint) fmtHint.textContent = d.hint;
     if (modeHint) modeHint.textContent = MODES[state.mode] || MODES.contain;
     $$("#wpresets .chip").forEach(function (b) {
-      var on = Number(b.dataset.w) === Number(state.width);
+      var on = !state.scale && Number(b.dataset.w) === Number(state.width);
       b.classList.toggle("on", on);
       /* The active preset is visual only otherwise — mirror it for AT. */
       b.setAttribute("aria-pressed", String(on));
     });
+    if (spresets) {
+      $$(".chip", spresets).forEach(function (b) {
+        var on = state.scale !== null && Number(b.dataset.scale) === Number(state.scale);
+        b.classList.toggle("on", on);
+        b.setAttribute("aria-pressed", String(on));
+      });
+    }
   }
 
   function computeSize(sw, sh) {
-    var w = state.width || sw;
-    var h = (state.lock || state.height == null) ? Math.round(w * sh / sw) : state.height;
+    var w, h;
+    if (state.scale) {
+      w = sw * state.scale;
+      h = sh * state.scale;
+    } else {
+      w = state.width || sw;
+      h = (state.lock || state.height == null) ? Math.round(w * sh / sw) : state.height;
+    }
     w = Math.max(1, Math.round(w));
     h = Math.max(1, Math.round(h));
+    /* Clamp per axis rather than by area: with the ratio locked both axes exceed
+       together, and in stretch mode each one is judged on its own. */
+    if (state.noUpscale) {
+      if (w > sw) w = sw;
+      if (h > sh) h = sh;
+    }
     /* ICO entries top out at 256px per side by definition. */
     if (state.format === "ico") {
       var longest = Math.max(w, h);
@@ -574,6 +648,26 @@
   var made = [];          // { name, url, blob } for the current batch
   var lastFiles = null;   // so settings can be re-applied without re-dropping
 
+  /* Session totals. convertio advertises a global counter ("我们已转换 34.8 亿
+     个文件"), which a tool that never sees a server cannot honestly claim. The
+     numbers Pixora does have are real, and they are the ones that matter here:
+     how much this batch actually saved. */
+  var session = { count: 0, src: 0, out: 0 };
+  function renderStat() {
+    if (!statEl) return;
+    if (!session.count) { statEl.hidden = true; statEl.textContent = ""; return; }
+    var saved = session.src - session.out;
+    var pct = session.src > 0 ? Math.round((saved / session.src) * 100) : 0;
+    statEl.hidden = false;
+    statEl.innerHTML = "本次已处理 <b>" + session.count + "</b> 张 · 原始 <b>" +
+      humanSize(session.src) + "</b> → 输出 <b>" + humanSize(session.out) + "</b>" +
+      (saved > 0 ? ' · 减少 <b class="ok">' + pct + "%</b>" : "");
+  }
+  function resetSession() {
+    session = { count: 0, src: 0, out: 0 };
+    renderStat();
+  }
+
   function addCard(name, from) {
     var el = document.createElement("div");
     el.className = "result";
@@ -629,6 +723,7 @@
       made.forEach(function (m) { URL.revokeObjectURL(m.url); });
       made = [];
       results.innerHTML = "";
+      resetSession();
     }
 
     var chain = Promise.resolve();
@@ -644,6 +739,7 @@
             var filename = outName(f.name, size.w, size.h, fmt);
             finishCard(card, url, blob, size.w, size.h, filename, srcExt(f), f.size);
             made.push({ name: filename, url: url, blob: blob });
+            session.count++; session.src += f.size; session.out += blob.size;
             if (auto) download(url, filename);
             done++;
             if (bmp.close) bmp.close();
@@ -659,6 +755,7 @@
     return chain.then(function () {
       busy = false;
       syncActions();
+      renderStat();
       statusEl.textContent = "完成 " + done + " / " + imgs.length + " 张" +
         (failed ? "，失败 " + failed + " 张" : "") +
         (auto ? "，已自动下载" : "，点结果下方链接下载");
@@ -692,6 +789,9 @@
   /* ---------- Settings wiring ---------- */
   wEl.addEventListener("input", function () {
     state.width = Math.max(1, parseInt(wEl.value || "0", 10) || 0);
+    /* Typing a pixel width is an explicit exit from percentage mode; the two
+       controls would otherwise disagree about which one is in charge. */
+    state.scale = null;
     if (state.lock) state.height = null;
     syncUI(); save();
   });
@@ -709,10 +809,21 @@
   qEl.addEventListener("input", function () { state.quality = parseInt(qEl.value, 10); qvEl.textContent = state.quality; save(); });
   if (bgEl) bgEl.addEventListener("input", function () { state.background = bgEl.value; syncUI(); save(); });
   autoEl.addEventListener("change", function () { state.auto = autoEl.checked; save(); });
+  if (noupEl) noupEl.addEventListener("change", function () { state.noUpscale = noupEl.checked; save(); });
   $("#wpresets").addEventListener("click", function (e) {
     var b = e.target.closest(".chip"); if (!b) return;
     state.width = Number(b.dataset.w);
+    state.scale = null;
     if (state.lock) state.height = null;
+    syncUI(); save();
+  });
+  if (spresets) spresets.addEventListener("click", function (e) {
+    var b = e.target.closest(".chip"); if (!b) return;
+    var s = Number(b.dataset.scale);
+    /* Tapping the active percentage turns it off and hands control back to the
+       width field — otherwise there would be no way out of percentage mode. */
+    state.scale = (state.scale !== null && Number(state.scale) === s) ? null : s;
+    if (state.scale) state.height = null;
     syncUI(); save();
   });
 
@@ -720,6 +831,7 @@
     made.forEach(function (m) { URL.revokeObjectURL(m.url); });
     made = []; lastFiles = null;
     results.innerHTML = "";
+    resetSession();
     syncActions();
     statusEl.textContent = "已清空";
   });

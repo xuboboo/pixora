@@ -218,8 +218,81 @@
 
     <nav class="nav" id="nav" aria-label="主导航">
       <a href="../../#tool">在线工具</a>
-      <a href="../../#features">功能</a>
-      <a href="../../#formats">格式</a>
+      <details class="nav-drop">
+        <summary>
+          <span>格式转换</span>
+          <svg class="nav-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </summary>
+        <div class="nav-panel">
+          <div class="nav-panel-head">
+            <strong>按目标格式转换</strong>
+            <a href="../../convert/">全部 35 种组合 →</a>
+          </div>
+          <div class="nav-panel-cols">
+            <div class="nav-col">
+              <span class="nav-col-title">转 PNG</span>
+              <ul>
+                <li><a href="../../convert/jpg-to-png/">JPG 转 PNG</a></li>
+                <li><a href="../../convert/webp-to-png/">WEBP 转 PNG</a></li>
+                <li><a href="../../convert/gif-to-png/">GIF 转 PNG</a></li>
+                <li><a href="../../convert/bmp-to-png/">BMP 转 PNG</a></li>
+                <li><a href="../../convert/avif-to-png/">AVIF 转 PNG</a></li>
+                <li><a href="../../convert/svg-to-png/">SVG 转 PNG</a></li>
+                <li><a href="../../convert/ico-to-png/">ICO 转 PNG</a></li>
+              </ul>
+            </div>
+            <div class="nav-col">
+              <span class="nav-col-title">转 JPG</span>
+              <ul>
+                <li><a href="../../convert/png-to-jpg/">PNG 转 JPG</a></li>
+                <li><a href="../../convert/webp-to-jpg/">WEBP 转 JPG</a></li>
+                <li><a href="../../convert/gif-to-jpg/">GIF 转 JPG</a></li>
+                <li><a href="../../convert/bmp-to-jpg/">BMP 转 JPG</a></li>
+                <li><a href="../../convert/avif-to-jpg/">AVIF 转 JPG</a></li>
+                <li><a href="../../convert/svg-to-jpg/">SVG 转 JPG</a></li>
+                <li><a href="../../convert/ico-to-jpg/">ICO 转 JPG</a></li>
+              </ul>
+            </div>
+            <div class="nav-col">
+              <span class="nav-col-title">转 WEBP</span>
+              <ul>
+                <li><a href="../../convert/png-to-webp/">PNG 转 WEBP</a></li>
+                <li><a href="../../convert/jpg-to-webp/">JPG 转 WEBP</a></li>
+                <li><a href="../../convert/gif-to-webp/">GIF 转 WEBP</a></li>
+                <li><a href="../../convert/bmp-to-webp/">BMP 转 WEBP</a></li>
+                <li><a href="../../convert/avif-to-webp/">AVIF 转 WEBP</a></li>
+                <li><a href="../../convert/svg-to-webp/">SVG 转 WEBP</a></li>
+                <li><a href="../../convert/ico-to-webp/">ICO 转 WEBP</a></li>
+              </ul>
+            </div>
+            <div class="nav-col">
+              <span class="nav-col-title">转 BMP</span>
+              <ul>
+                <li><a href="../../convert/png-to-bmp/">PNG 转 BMP</a></li>
+                <li><a href="../../convert/jpg-to-bmp/">JPG 转 BMP</a></li>
+                <li><a href="../../convert/webp-to-bmp/">WEBP 转 BMP</a></li>
+                <li><a href="../../convert/gif-to-bmp/">GIF 转 BMP</a></li>
+                <li><a href="../../convert/avif-to-bmp/">AVIF 转 BMP</a></li>
+                <li><a href="../../convert/svg-to-bmp/">SVG 转 BMP</a></li>
+                <li><a href="../../convert/ico-to-bmp/">ICO 转 BMP</a></li>
+              </ul>
+            </div>
+            <div class="nav-col">
+              <span class="nav-col-title">转 ICO</span>
+              <ul>
+                <li><a href="../../convert/png-to-ico/">PNG 转 ICO</a></li>
+                <li><a href="../../convert/jpg-to-ico/">JPG 转 ICO</a></li>
+                <li><a href="../../convert/webp-to-ico/" aria-current="page">WEBP 转 ICO</a></li>
+                <li><a href="../../convert/gif-to-ico/">GIF 转 ICO</a></li>
+                <li><a href="../../convert/bmp-to-ico/">BMP 转 ICO</a></li>
+                <li><a href="../../convert/avif-to-ico/">AVIF 转 ICO</a></li>
+                <li><a href="../../convert/svg-to-ico/">SVG 转 ICO</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </details>
+      <a href="../../#formats">支持的格式</a>
       <a href="../../#how">工作流</a>
       <a href="../../#compare">对比</a>
       <a href="../../#faq">常见问题</a>
@@ -329,11 +402,24 @@
             </div>
           </div>
           <div class="field">
+            <label id="spresets-label">按原图比例</label>
+            <div class="presets" id="spresets" role="group" aria-labelledby="spresets-label">
+              <button class="chip" type="button" data-scale="0.25" aria-pressed="false">25%</button>
+              <button class="chip" type="button" data-scale="0.5" aria-pressed="false">50%</button>
+              <button class="chip" type="button" data-scale="0.75" aria-pressed="false">75%</button>
+              <button class="chip" type="button" data-scale="1" aria-pressed="false">100%</button>
+            </div>
+          </div>
+          <div class="field">
             <label id="switches-label">处理选项</label>
             <div class="switch-stack" role="group" aria-labelledby="switches-label">
               <label class="switch-row">
                 <span class="switch"><input type="checkbox" id="lock" checked><span class="track"></span></span>
                 锁定宽高比
+              </label>
+              <label class="switch-row">
+                <span class="switch"><input type="checkbox" id="noup"><span class="track"></span></span>
+                不放大
               </label>
               <label class="switch-row">
                 <span class="switch"><input type="checkbox" id="auto"><span class="track"></span></span>
@@ -351,6 +437,8 @@
             <button class="btn btn-ghost btn-sm" id="clear" type="button">清空结果</button>
           </div>
         </div>
+
+        <p class="tool-stat" id="stat" hidden></p>
 
         <div class="results" id="results"></div>
       </div>

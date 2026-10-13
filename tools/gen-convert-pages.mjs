@@ -150,8 +150,101 @@ const THEME_BOOT = `<script>
 })();
 </script>`;
 
-function header(depth) {
-  const p = depth === 0 ? "" : "../../";
+/* ------------------------------------------------------------ shared header
+   The header nav lives in one place because it is duplicated across index.html
+   and all 36 generated pages. Reverse-engineering iloveimg and convertio showed
+   both keep the whole format matrix one interaction away from the header
+   (iloveimg: direct tool links plus a categorised "more tools" panel;
+   convertio: a "转换" dropdown of format families). Pixora had a flat anchor
+   list with no route to the landing pages at all — which is exactly why they
+   were undiscoverable. <details> keeps the panel native, keyboard-operable and
+   visible to crawlers. */
+/* Where a page sits relative to the site root. Two prefixes are needed, because
+   a page's distance from the root and its distance from /convert/ are not the
+   same thing: the hub lives in /convert/ yet links to its siblings by bare slug.
+   Collapsing both into a single "depth" number is exactly what produced a page
+   of dead links on the hub (nav emitted `convert/png-to-jpg/`, which resolved to
+   /convert/convert/png-to-jpg/). */
+const LOC = {
+  root: { up: "", conv: "convert/" },              // /index.html
+  hub: { up: "../", conv: "./" },                  // /convert/index.html
+  slug: { up: "../../", conv: "../../convert/" },  // /convert/<slug>/index.html
+};
+
+function nav(loc, current) {
+  const { up: p, conv: c } = LOC[loc];
+  const cols = OUTPUTS.map((to) => {
+    const items = INPUTS.filter((f) => f !== to)
+      .map((f) => {
+        const slug = `${f}-to-${to}`;
+        const cur = slug === current ? ' aria-current="page"' : "";
+        return indent(`<li><a href="${c}${slug}/"${cur}>${F[f].label} 转 ${F[to].label}</a></li>`, 4);
+      })
+      .join("\n");
+    return `<div class="nav-col">
+  <span class="nav-col-title">转 ${F[to].label}</span>
+  <ul>
+${items}
+  </ul>
+</div>`;
+  }).join("\n");
+
+  return `<nav class="nav" id="nav" aria-label="主导航">
+  <a href="${p}#tool">在线工具</a>
+  <details class="nav-drop">
+    <summary>
+      <span>格式转换</span>
+      <svg class="nav-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </summary>
+    <div class="nav-panel">
+      <div class="nav-panel-head">
+        <strong>按目标格式转换</strong>
+        <a href="${c}">全部 35 种组合 →</a>
+      </div>
+      <div class="nav-panel-cols">
+${indent(cols, 8)}
+      </div>
+    </div>
+  </details>
+  <a href="${p}#formats">支持的格式</a>
+  <a href="${p}#how">工作流</a>
+  <a href="${p}#compare">对比</a>
+  <a href="${p}#faq">常见问题</a>
+</nav>`;
+}
+
+/* The homepage format index. Same reasoning as nav(): index.html carries a
+   hand-written section head, but the 35 links themselves must be generated or
+   they will drift from the pages that actually exist. */
+function formatIndex() {
+  return `<div class="fmt-index">
+${OUTPUTS.map((to) => {
+  const items = INPUTS.filter((f) => f !== to)
+    .map((f) => indent(`<li><a href="convert/${f}-to-${to}/">${F[f].label} 转 ${F[to].label}</a></li>`, 6))
+    .join("\n");
+  return `  <div class="fmt-index-col">
+    <h3>转 ${F[to].label}<span>${INPUTS.length - 1} 种</span></h3>
+    <ul>
+${items}
+    </ul>
+  </div>`;
+}).join("\n")}
+</div>`;
+}
+
+/* Indent a multi-line HTML fragment as a block. Template-literal interpolation
+   only indents the first line, so every nested fragment has to be re-indented
+   explicitly or the output drifts a level deeper per nesting step. */
+function indent(html, n) {
+  const pad = " ".repeat(n);
+  return String(html)
+    .split("\n")
+    .map((l) => (l.trim() ? pad + l : l))
+    .join("\n");
+}
+
+function header(loc, current) {
+  const p = LOC[loc].up;
   return `<header class="site-header">
   <div class="container header-inner">
     <a class="brand" href="${p}" aria-label="Pixora 首页">
@@ -159,14 +252,7 @@ function header(depth) {
       <span>Pixora</span>
     </a>
 
-    <nav class="nav" id="nav" aria-label="主导航">
-      <a href="${p}#tool">在线工具</a>
-      <a href="${p}#features">功能</a>
-      <a href="${p}#formats">格式</a>
-      <a href="${p}#how">工作流</a>
-      <a href="${p}#compare">对比</a>
-      <a href="${p}#faq">常见问题</a>
-    </nav>
+${indent(nav(loc, current), 4)}
 
     <div class="header-actions">
       <button class="icon-btn" data-theme-toggle type="button" aria-label="切换主题" aria-pressed="false">
@@ -255,11 +341,24 @@ const TOOL = (from, to) => `      <div class="tool reveal">
             </div>
           </div>
           <div class="field">
+            <label id="spresets-label">按原图比例</label>
+            <div class="presets" id="spresets" role="group" aria-labelledby="spresets-label">
+              <button class="chip" type="button" data-scale="0.25" aria-pressed="false">25%</button>
+              <button class="chip" type="button" data-scale="0.5" aria-pressed="false">50%</button>
+              <button class="chip" type="button" data-scale="0.75" aria-pressed="false">75%</button>
+              <button class="chip" type="button" data-scale="1" aria-pressed="false">100%</button>
+            </div>
+          </div>
+          <div class="field">
             <label id="switches-label">处理选项</label>
             <div class="switch-stack" role="group" aria-labelledby="switches-label">
               <label class="switch-row">
                 <span class="switch"><input type="checkbox" id="lock" checked><span class="track"></span></span>
                 锁定宽高比
+              </label>
+              <label class="switch-row">
+                <span class="switch"><input type="checkbox" id="noup"><span class="track"></span></span>
+                不放大
               </label>
               <label class="switch-row">
                 <span class="switch"><input type="checkbox" id="auto"><span class="track"></span></span>
@@ -278,11 +377,13 @@ const TOOL = (from, to) => `      <div class="tool reveal">
           </div>
         </div>
 
+        <p class="tool-stat" id="stat" hidden></p>
+
         <div class="results" id="results"></div>
       </div>`;
 
-function footer(depth) {
-  const p = depth === 0 ? "" : "../../";
+function footer(loc) {
+  const p = LOC[loc].up;
   return `<footer class="site-footer" aria-labelledby="footer-title">
   <div class="container">
     <h2 id="footer-title" class="visually-hidden" style="position:absolute;left:-9999px">页脚导航</h2>
@@ -484,7 +585,7 @@ ${JSON.stringify(ld, null, 2)}
 <body>
 <a class="skip-link" href="#main">跳到主要内容</a>
 
-${header(1)}
+${header("slug", slug)}
 
 <main id="main">
 
@@ -604,7 +705,7 @@ ${TOOL(from, to)}
 
 </main>
 
-${footer(1)}
+${footer("slug")}
 
 <script src="../../assets/js/main.js" defer></script>
 </body>
@@ -723,7 +824,7 @@ ${JSON.stringify(ld, null, 2)}
 <body>
 <a class="skip-link" href="#main">跳到主要内容</a>
 
-${header(0)}
+${header("hub", null)}
 
 <main id="main">
 
@@ -777,7 +878,7 @@ ${header(0)}
 
 </main>
 
-${footer(0)}
+${footer("hub")}
 
 <script src="../assets/js/main.js" defer></script>
 </body>
@@ -831,6 +932,31 @@ ${urls.map((u) => `  <url>
 `;
 fs.writeFileSync(path.join(ROOT, "sitemap.xml"), sitemap, "utf8");
 
+/* --------------------------------------------------- index.html sync blocks */
+/* index.html is hand-written apart from two generated blocks: the header nav
+   and the 35-link format index. Both are the same data the landing pages are
+   built from, and without this sync they would drift the moment either copy is
+   edited — drift is how the landing pages became unreachable in the first place. */
+const indexPath = path.join(ROOT, "index.html");
+let indexHtml = fs.readFileSync(indexPath, "utf8");
+const syncBlocks = [
+  { label: "导航", start: "<!-- NAV:START", end: "<!-- NAV:END -->", indent: 4, html: nav("root", null) },
+  { label: "格式索引", start: "<!-- FMTINDEX:START", end: "<!-- FMTINDEX:END -->", indent: 6, html: formatIndex() },
+];
+
+for (const b of syncBlocks) {
+  const iStart = indexHtml.indexOf(b.start);
+  const iEnd = indexHtml.indexOf(b.end);
+  if (iStart < 0 || iEnd < 0) {
+    throw new Error(`index.html 缺少 ${b.start} / ${b.end} 标记，无法同步${b.label}`);
+  }
+  const bodyStart = indexHtml.indexOf("\n", iStart) + 1;
+  const block = indent(b.html, b.indent);
+  indexHtml = indexHtml.slice(0, bodyStart) + block + "\n" + " ".repeat(b.indent) + indexHtml.slice(iEnd);
+}
+fs.writeFileSync(indexPath, indexHtml, "utf8");
+
 console.log(`生成落地页 ${count} 个 + 汇总页 1 个`);
 console.log(`sitemap.xml 条目 ${urls.length} 条`);
+console.log(`index.html 导航与格式索引已同步`);
 console.log(`输出目录 ${OUT}`);

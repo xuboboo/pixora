@@ -6,13 +6,21 @@
     <description>Pixora 免费在线图片工具箱的版本更新与功能发布。</description>
     <language>zh-CN</language>
     <copyright>MIT License · Pixora contributors</copyright>
-    <lastBuildDate>Tue, 13 Oct 2026 12:45:00 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 13 Oct 2026 14:30:00 +0800</lastBuildDate>
     <atom:link href="https://xuboboo.github.io/pixora/feed.xml" rel="self" type="application/rss+xml"/>
     <image>
       <url>https://xuboboo.github.io/pixora/assets/img/logo.svg</url>
       <title>Pixora</title>
       <link>https://xuboboo.github.io/pixora/</link>
     </image>
+    <item>
+      <title>Pixora 1.2.0 发布：格式转换入口提到页头，新增按比例缩放与不放大</title>
+      <link>https://xuboboo.github.io/pixora/#conversions</link>
+      <guid isPermaLink="false">https://xuboboo.github.io/pixora/#release-1-2-0</guid>
+      <pubDate>Tue, 13 Oct 2026 14:30:00 +0800</pubDate>
+      <description><![CDATA[全站页头新增「格式转换」菜单，按输出格式分 5 组列出全部 35 个转换页；首页把 6 张卡片升级为 35 条链接的完整索引。工具侧新增按原图比例缩放（25% / 50% / 75% / 100%，批量时按每张图自身像素换算）与「不放大」开关，并加入本次会话统计。同时修复总览页 35 条导航链接全部指向错误路径的问题。]]></description>
+      <category>Release</category>
+    </item>
     <item>
       <title>Pixora 1.1.0 发布：在浏览器里完成图片格式转换，支持 PNG / JPG / WEBP / BMP / ICO</title>
       <link>https://xuboboo.github.io/pixora/#formats</link>
