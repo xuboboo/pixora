@@ -4,7 +4,7 @@
 
 # Pixora
 
-**浏览器里的免费图片工具箱。按宽度等比缩放，一键导出 PNG。**
+**浏览器里的免费图片工具箱。按宽度等比缩放，一步完成格式转换。**
 
 无需注册 · 无使用限制 · 图片绝不上传 · MIT 开源
 
@@ -14,7 +14,7 @@
 [![Lighthouse](https://img.shields.io/badge/lighthouse-100%2F100-16a34a?style=flat-square)](#性能与-seo)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-4d6bfe?style=flat-square)](CONTRIBUTING.md)
 
-[在线体验](https://xuboboo.github.io/pixora/) · [功能](#功能特性) · [技术栈](#技术栈) · [SEO 策略](#性能与-seo) · [本地运行](#本地运行) · [贡献](#参与贡献)
+[在线体验](https://xuboboo.github.io/pixora/) · [功能](#功能特性) · [格式](#支持的格式) · [技术栈](#技术栈) · [SEO 策略](#性能与-seo) · [本地运行](#本地运行) · [贡献](#参与贡献)
 
 </div>
 
@@ -24,24 +24,64 @@
 
 Pixora 把「打开在线 PS → 上传图片 → 文件 → 导出为 PNG → 手动填宽度 → 保存」这一串操作，压缩成**一次拖拽**。
 
-你只需要拖入图片、选一个宽度（比如 400 或 600），高度会**自动按原图比例**换算，然后直接下载无损 PNG。整个过程在浏览器内完成，**图片不会上传到任何服务器**。
+你只需要拖入图片、选一个宽度（比如 400 或 600），高度会**自动按原图比例**换算，然后直接下载。
+
+想转格式也一样简单 —— 把输出格式从 PNG 换成 JPG / WEBP / BMP / ICO 即可，
+浏览器支持时还会自动多出 AVIF。整个过程在浏览器内完成，**图片不会上传到任何服务器**。
 
 它不做臃肿的全能编辑器 —— 只把最高频的「改尺寸 + 转格式 + 导出」做到一步到位。
+
+> **和 Convertio 这类在线转换器的区别**：Convertio 把文件上传到服务器转换，再下载回来。
+> Pixora 用的是浏览器自带的图像编解码能力，**文件从头到尾没有离开你的设备** ——
+> 因此没有上传等待、没有排队、没有文件保留策略、断网后依然可用。
 
 ## 功能特性
 
 | 能力 | 说明 |
 | --- | --- |
 | **按宽度等比缩放** | 指定宽度（400 / 600 / 自定义），高度自动按原图比例计算，永不变形 |
+| **格式转换** | 输出 PNG / JPG / WEBP / BMP / ICO，浏览器支持时自动多出 AVIF，非无损格式可调质量 |
 | **批量处理** | 一次拖入多张图片，统一套用设置，逐张输出结果与下载链接 |
-| **格式自由** | 导出 PNG（无损）/ JPG / WEBP，非 PNG 可调质量滑块 |
+| **打包下载 ZIP** | 批量结果一键打包，ZIP 结构由页面内手写实现，不依赖任何压缩库 |
+| **透明背景处理** | 目标格式不支持透明（JPG / BMP）时，可指定背景填充色，避免出现黑块 |
 | **三种缩放模式** | 等比适应（不变形）、拉伸填满、等比填充（居中裁剪） |
+| **体积变化提示** | 每张结果卡片显示相对原图的体积变化，如 `↓29%` / `↑679%` |
+| **设置重转** | 改完设置不必重新拖图，直接对已有结果按新设置重跑 |
 | **隐私优先** | 解码 / 缩放 / 编码全部在本地完成，无上传、无存储、无追踪 |
 | **零依赖** | 纯手写 HTML / CSS / JavaScript，无框架、无构建、无第三方库 |
 | **专业级画质** | 分步降采样 + 高质量重采样，大幅缩小时依旧锐利 |
 | **离线可用** | 页面加载后断网也能继续处理 |
 | **明暗双主题** | 跟随系统偏好，也可手动切换并记忆 |
 | **粘贴即用** | 支持 `Ctrl` + `V` 直接粘贴剪贴板截图 |
+| **全设备适配** | 320px 手机到 2560px 宽屏共 18 个断点零横向溢出，触摸目标 ≥44px |
+
+## 支持的格式
+
+### 输出格式
+
+| 格式 | 透明通道 | 质量滑块 | 编码方式 | 适用场景 |
+| --- | :---: | :---: | --- | --- |
+| **PNG** | ✅ | — | Canvas `toBlob` | 无损压缩、截图、需要反复编辑的素材 |
+| **JPG** | ❌ | ✅ | Canvas `toBlob` | 照片类图片，兼容性最好、体积小 |
+| **WEBP** | ✅ | ✅ | Canvas `toBlob` | 比 JPG 再小约 25%，现代浏览器全支持 |
+| **AVIF** | ✅ | ✅ | Canvas `toBlob`（条件可用） | 同画质体积最小；多数浏览器只能解码、不能编码，故做运行时探测 |
+| **BMP** | ❌ | — | **页面内手写编码器** | 无压缩位图，任何软件都能打开，体积明显偏大 |
+| **ICO** | ✅ | — | **页面内手写编码器** | 网站图标，最长边自动限制 256px，预设自动切为图标尺寸 |
+
+> 下拉框里出现哪些格式，由**运行时能力探测**决定：页面会实际编码一遍并校验返回 blob 的 MIME，
+> 只有真正可用的才列出来。宁可少列，也不给一个点了会失败的选项。
+
+### 输入格式
+
+凡是浏览器能解码的图片都能拖进来：PNG、JPG、WEBP、GIF、BMP、AVIF、SVG、ICO 等。
+转换全程不联网。
+
+### 为什么只有这几种
+
+另外一百多种格式（HEIC、CR2、NEF、PSD、AI、EPS…）都要靠服务端解码器。
+Pixora 的前提是**图片不上传**，因此不会为了凑格式数量而引入服务器 ——
+这也是它与 Convertio 这类上传式转换器最本质的区别。
+
 
 ## 截图
 
@@ -57,11 +97,19 @@ Pixora 刻意保持极简 —— **没有 `package.json`，没有构建步骤，
 - **样式**：原生 CSS3 —— 自定义属性（Design Tokens）、`color-mix()`、Grid、`clamp()` 流体排版、`prefers-color-scheme` / `prefers-reduced-motion`
 - **脚本**：原生 ES2017+（`async/await`、`createImageBitmap`、`IntersectionObserver`），无任何运行时依赖
 - **图像引擎**：`createImageBitmap` → `OffscreenCanvas`/`Canvas` → 分步降采样 → `toBlob` 编码
+- **自研编码器**：BMP（BITMAPFILEHEADER + 24-bit BGR 自底向上 + 4 字节行对齐）、
+  ICO（ICONDIR + 内嵌 PNG）、ZIP（Local File Header + Central Directory + EOCD，CRC32 查表，
+  优先 `CompressionStream("deflate-raw")`，不可用时降级为 store 模式）
 - **托管**：GitHub Pages（静态，无需服务器）
 
 ```
 pixora/
 ├── index.html                     # 单页官网 + 在线工具
+├── convert/                       # 格式转换落地页矩阵（生成产物，勿手改）
+│   ├── index.html                 # 全部格式转换总览
+│   └── <from>-to-<to>/index.html  # 35 个转换页，每个都内嵌可用的转换器
+├── tools/
+│   └── gen-convert-pages.mjs      # 落地页 + sitemap.xml 生成器
 ├── assets/
 │   ├── css/style.css              # 设计系统（Design Tokens + 组件）
 │   ├── js/main.js                 # 主题、导航、动效、图像引擎
@@ -77,11 +125,13 @@ pixora/
 │       ├── icon-maskable-512.png  # PWA 自适应图标
 │       └── og.png                 # 1200×630 社交分享图
 ├── robots.txt                     # 抓取策略（含 AI 爬虫显式放行）
-├── sitemap.xml                    # 站点地图（含 image / hreflang 命名空间）
+├── sitemap.xml                    # 站点地图（由生成器写入，37 条）
 ├── site.webmanifest               # PWA 清单
 ├── feed.xml                       # RSS 2.0 订阅
 ├── llms.txt                       # 面向大模型的可读站点摘要
 ├── humans.txt                     # 站点与作者信息
+├── docs/
+│   └── convertio-逆向分析报告.md   # 竞品逆向分析（1.1.0 格式矩阵的参考依据）
 ├── 8f3a1c9e7b2d4f60a5c8e1b93d7f2046.txt  # IndexNow 密钥
 ├── .well-known/security.txt       # 安全联系信息
 ├── .nojekyll                      # 关闭 GitHub Pages 的 Jekyll 处理
@@ -90,6 +140,13 @@ pixora/
 ├── CODE_OF_CONDUCT.md             # 贡献者公约 · 行为准则
 ├── SECURITY.md                    # 安全政策与漏洞报告流程
 └── CHANGELOG.md                   # 更新日志
+```
+
+`convert/` 与 `sitemap.xml` 是生成产物。改内容请改 `tools/gen-convert-pages.mjs`，
+然后运行：
+
+```bash
+node tools/gen-convert-pages.mjs
 ```
 
 ## 性能与 SEO
@@ -109,10 +166,10 @@ Pixora 的 SEO 不是「加几个 meta 标签」，而是**从渲染路径到结
 
 单个 `@graph` 中互相引用，语义完整、无重复：
 
-- `WebSite` → `Organization` → `WebPage` → `SoftwareApplication`
+- `WebSite` → `Organization` → `WebPage` → `SoftwareApplication`（`featureList` 7 项）
 - `ImageObject`（OG 图，含 `width`/`height`/`caption`）
-- `HowTo`（三步工作流，可直接竞争富结果）
-- `FAQPage`（问答富结果）
+- `HowTo`（三步工作流：拖入 → 选格式与宽度 → 下载或打包，可直接竞争富结果）
+- `FAQPage`（7 条问答富结果，与页面可见文案一一对应）
 
 > 刻意**不写** `aggregateRating`：没有真实评价就不编造评分，避免被判定为垃圾结构化数据。
 
@@ -129,7 +186,25 @@ Pixora 的 SEO 不是「加几个 meta 标签」，而是**从渲染路径到结
 - **`.well-known/security.txt`** —— 安全研究者联系规范
 - **流体排版 `clamp()`**、`content-visibility` 友好结构、无渲染阻塞资源
 
-### 5. 性能预算
+### 5. 格式长尾页矩阵
+
+对 [Convertio](https://convertio.co/zh/image-converter/) 的逆向分析显示，它真正的护城河不是转换器，
+而是 **116 个按格式拆分的落地页** —— 覆盖「png 转 jpg」「webp 转 png」这类长尾查询。
+
+Pixora 复刻了这个结构，但只列**真正能完成的组合**：8 种可解码输入 × 5 种可编码输出，
+去掉 5 组同格式自转，共 **35 个转换页 + 1 个总览页**。
+
+与「门页」的区别在于每一页都是**能用的**：
+
+- 页面内嵌完整转换器，通过 `<html data-convert-to="jpeg">` 预配置输出格式
+- 深链同样可用：`/?to=jpg&w=800` 会带着格式与宽度进入工具
+- 每页有独立的 `title` / `description` / `canonical`（36 个页面全部唯一，已脚本校验）
+- 每页带 `FAQPage` + `HowTo` + `BreadcrumbList`，且 schema 条目数与页面可见条目数一致
+- 相关转换区块按「同输入」「同输出」两个方向互链，任意两页最多两跳可达
+
+> Convertio 的结构化数据只有 `Product` + `AggregateRating`，缺 `FAQPage` / `HowTo` / `SoftwareApplication` —— 这是 Pixora 明确领先的地方。
+
+### 6. 性能预算
 
 | 指标 | 目标 | 实现方式 |
 | --- | --- | --- |
@@ -175,11 +250,17 @@ npx serve .
 
 核心依赖 `createImageBitmap`、`Canvas 2D`、`toBlob`、CSS 自定义属性。
 
+**格式支持差异**：PNG / JPG / BMP / ICO 在所有目标浏览器上都可导出（BMP、ICO 由页面内编码器生成，
+不依赖浏览器）。WEBP 编码需要 Chrome 32+ / Firefox 96+ / Safari 16+。
+**AVIF 编码**支持度远低于解码支持度 —— 多数浏览器能显示 AVIF 但无法导出 AVIF，
+因此 Pixora 对 AVIF 采用运行时探测而非无条件列出。
+
 ## 参与贡献
 
 欢迎任何形式的贡献 —— 见 [CONTRIBUTING.md](CONTRIBUTING.md)。特别欢迎：
 
 - 新的图片处理能力（裁剪、旋转、水印、压缩）
+- 更多**端上可实现的格式编码器**（如 QOI、TGA、PPM）
 - 无障碍与国际化改进
 - 性能与算法优化
 

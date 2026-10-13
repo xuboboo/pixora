@@ -84,6 +84,7 @@ html[data-theme="dark"] {
 
 /* ---------- 2. Reset ---------- */
 *, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
@@ -101,7 +102,11 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
+  /* Kill the grey flash on tap; focus-visible supplies the real affordance. */
+  -webkit-tap-highlight-color: transparent;
 }
+/* Removes the double-tap-to-zoom delay on touch without disabling pinch zoom. */
+a, button, input, select, summary, label, [role="button"] { touch-action: manipulation; }
 img, svg, video { max-width: 100%; display: block; }
 a { color: var(--brand-ink); text-decoration: none; }
 a:hover { text-decoration: underline; text-underline-offset: 3px; }
@@ -128,7 +133,12 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 2.5rem 0; }
 .skip-link:focus { left: 0; }
 
 /* ---------- 3. Layout ---------- */
-.container { width: 100%; max-width: var(--container); margin-inline: auto; padding-inline: 20px; }
+/* Padding also has to respect the notch / rounded corners in landscape. */
+.container {
+  width: 100%; max-width: var(--container); margin-inline: auto;
+  padding-left: max(20px, env(safe-area-inset-left));
+  padding-right: max(20px, env(safe-area-inset-right));
+}
 .section { padding: clamp(56px, 8vw, 104px) 0; }
 .section--soft { background: var(--bg-soft); }
 .section-head { max-width: 720px; margin: 0 auto clamp(32px, 4vw, 56px); text-align: center; }
@@ -226,6 +236,44 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 2.5rem 0; }
 .card h3 { margin-bottom: .35em; }
 .card p { color: var(--muted); font-size: .94rem; margin: 0; }
 
+/* ---------- 7b. Format cards ---------- */
+.fmt-grid { gap: 18px; }
+.fmt-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 13px; }
+.fmt-tag {
+  font-family: var(--mono); font-weight: 700; font-size: .95rem; letter-spacing: .04em;
+  color: #fff; background: linear-gradient(135deg, var(--brand-fill), var(--brand-fill-2));
+  padding: .3rem .72rem; border-radius: 9px;
+}
+.fmt-badge {
+  font-size: .78rem; font-weight: 700; letter-spacing: .04em;
+  color: var(--brand-ink); background: var(--brand-soft);
+  padding: .24rem .62rem; border-radius: 999px;
+}
+.fmt-meta { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 6px; }
+.fmt-meta li { font-size: .84rem; color: var(--text-2); display: flex; gap: 9px; align-items: baseline; }
+.fmt-meta li::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--brand); flex: none; }
+.fmt-notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(258px, 1fr)); gap: 22px; margin-top: 34px; }
+.fmt-notes > div { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 22px 24px; box-shadow: var(--shadow-xs); }
+.fmt-notes h3 { font-size: 1rem; margin-bottom: .5em; }
+.fmt-notes p { color: var(--muted); font-size: .93rem; margin: 0; }
+
+/* ---------- 7c. Breadcrumb + linked cards (format landing pages) ---------- */
+.breadcrumb {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  font-size: .86rem; color: var(--muted); margin-bottom: 20px;
+}
+.breadcrumb a { color: var(--muted); }
+.breadcrumb a:hover { color: var(--brand-ink); }
+.breadcrumb [aria-current] { color: var(--text-2); font-weight: 600; }
+.breadcrumb [aria-hidden] { opacity: .4; }
+
+/* Whole cards act as links on the hub and "related conversions" grids, so the
+   anchor has to inherit card typography instead of link styling. */
+a.card { display: block; color: inherit; text-decoration: none; }
+a.card p { margin: 0; }
+.fmt-meta a { color: var(--brand-ink); font-weight: 600; }
+.fmt-meta a:hover { text-decoration: underline; }
+
 /* ---------- 8. Steps ---------- */
 .steps { counter-reset: step; display: grid; gap: 18px; grid-template-columns: repeat(3, minmax(0,1fr)); }
 .step { position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 26px 22px 22px; box-shadow: var(--shadow-sm); }
@@ -240,8 +288,12 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 2.5rem 0; }
 .step p { color: var(--muted); font-size: .94rem; margin: 0; }
 
 /* ---------- 9. Comparison table ---------- */
-.table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow-sm); }
-table.cmp { width: 100%; border-collapse: collapse; min-width: 640px; }
+.table-wrap {
+  overflow-x: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain;
+  border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow-sm);
+}
+.table-hint { display: none; }
+table.cmp { width: 100%; border-collapse: collapse; min-width: 840px; }
 table.cmp th, table.cmp td { padding: 15px 18px; text-align: left; border-bottom: 1px solid var(--border); font-size: .94rem; }
 table.cmp thead th { background: var(--surface-2); font-size: .86rem; letter-spacing: .02em; color: var(--text-2); }
 table.cmp tbody tr:last-child td { border-bottom: 0; }
@@ -295,22 +347,26 @@ table.cmp .col-us { background: color-mix(in srgb, var(--brand) 6%, transparent)
 .footer-brand p { color: var(--muted); font-size: .92rem; max-width: 32em; }
 .footer-social { display: flex; gap: 10px; margin-top: 14px; }
 .footer-col h4 { font-size: .82rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; font-weight: 700; }
-.footer-col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; }
-.footer-col a { color: var(--text-2); font-size: .93rem; }
+.footer-col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+/* A column of text links is still a list of tap targets — WCAG 2.5.8 wants
+   24x24 minimum, so give each row a real box instead of a bare text run. */
+.footer-col a { color: var(--text-2); font-size: .93rem; display: inline-flex; align-items: center; min-height: 30px; }
 .footer-col a:hover { color: var(--brand-ink); }
 .footer-bottom {
   margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--border);
   display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; justify-content: space-between;
   color: var(--muted); font-size: .87rem;
+  padding-bottom: env(safe-area-inset-bottom);
 }
-.footer-bottom nav { display: flex; flex-wrap: wrap; gap: 16px; }
+.footer-bottom nav { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.footer-bottom nav a { display: inline-flex; align-items: center; min-height: 28px; }
 
 /* ---------- 13. Tool widget ---------- */
 .tool { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); padding: clamp(18px, 3vw, 28px); }
 .tool-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
 .tool-head .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--danger); box-shadow: 18px 0 0 var(--warn), 36px 0 0 var(--ok); margin-right: 40px; flex: none; }
 .tool-head strong { font-size: .95rem; }
-.tool-head .tag { margin-left: auto; font-size: .74rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ok); background: color-mix(in srgb, var(--ok) 12%, transparent); padding: .28rem .6rem; border-radius: 999px; }
+.tool-head .tag { margin-left: auto; font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ok); background: color-mix(in srgb, var(--ok) 12%, transparent); padding: .28rem .6rem; border-radius: 999px; white-space: nowrap; }
 .drop {
   border: 2px dashed var(--border-strong); border-radius: var(--radius-lg); background: var(--surface-2);
   padding: clamp(24px, 5vw, 42px) 18px; text-align: center; cursor: pointer; transition: .2s var(--ease);
@@ -319,7 +375,9 @@ table.cmp .col-us { background: color-mix(in srgb, var(--brand) 6%, transparent)
 .drop .big { font-size: 1.9rem; }
 .drop h3 { margin: 10px 0 4px; font-size: 1.05rem; }
 .drop small { color: var(--muted); }
-.tool-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; margin-top: 18px; align-items: start; }
+/* Two columns on phones and tablets, one row of four from 860px up. auto-fit
+   used to leave an orphaned fourth field on its own row at tablet widths. */
+.tool-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 18px; align-items: start; }
 .tool-options { display: grid; grid-template-columns: 1.35fr 1fr; gap: 16px; margin-top: 16px; align-items: start; }
 /* The toggle group mirrors the chip row's height so both columns of
    .tool-options share one optical baseline instead of drifting apart. */
@@ -330,6 +388,15 @@ table.cmp .col-us { background: color-mix(in srgb, var(--brand) 6%, transparent)
   background: var(--surface); transition: .18s var(--ease);
 }
 .field input:focus, .field select:focus { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); outline: none; }
+.field-hint { margin: 7px 0 0; font-size: .78rem; line-height: 1.55; color: var(--muted); }
+.tool-row { margin-top: 16px; }
+.field input[type="range"] { width: 100%; accent-color: var(--brand); height: 24px; }
+.bg-picker { display: flex; align-items: center; gap: 12px; }
+.bg-picker input[type="color"] {
+  width: 54px; height: 40px; padding: 3px; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); background: var(--surface); cursor: pointer;
+}
+.bg-picker output { font-family: var(--mono); font-size: .84rem; color: var(--muted); letter-spacing: .04em; }
 .presets { display: flex; flex-wrap: wrap; gap: 6px; }
 .chip { border: 1px solid var(--border); background: var(--surface); border-radius: 999px; padding: .32rem .8rem; font-size: .84rem; cursor: pointer; transition: .15s var(--ease); }
 .chip:hover { border-color: var(--brand); color: var(--brand-ink); }
@@ -353,7 +420,8 @@ table.cmp .col-us { background: color-mix(in srgb, var(--brand) 6%, transparent)
    track — otherwise keyboard users get no focus indication at all. */
 .switch input:focus-visible + .track { box-shadow: 0 0 0 3px var(--brand-ring); }
 .tool-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; justify-content: space-between; margin-top: 18px; }
-.status { color: var(--muted); font-size: .88rem; }
+.tool-bar-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.status { color: var(--muted); font-size: .88rem; flex: 1 1 12em; min-width: 0; }
 .results { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; margin-top: 16px; }
 .result { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--surface); }
 .result .thumb {
@@ -365,7 +433,12 @@ table.cmp .col-us { background: color-mix(in srgb, var(--brand) 6%, transparent)
 .result .thumb img { max-width: 100%; max-height: 100%; }
 .result .meta { padding: 10px 12px; font-size: .82rem; }
 .result .nm { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.result .dl { display: inline-block; margin-top: 6px; font-weight: 600; }
+.result .sz { color: var(--muted); font-size: .78rem; line-height: 1.6; margin-top: 2px; }
+.result .dl { display: inline-flex; align-items: center; min-height: 28px; margin-top: 4px; font-weight: 600; font-size: .84rem; }
+.spin { color: var(--muted); font-size: .78rem; }
+.delta { font-weight: 700; }
+.delta.down { color: var(--ok); }
+.delta.up { color: var(--warn); }
 .badge-ok { color: var(--ok); font-weight: 700; }
 .badge-err { color: var(--danger); font-weight: 700; }
 
@@ -377,24 +450,87 @@ table.cmp .col-us { background: color-mix(in srgb, var(--brand) 6%, transparent)
 .js .reveal.in { opacity: 1; transform: none; }
 
 /* ---------- 15. Responsive ---------- */
+/* 960 — tablet landscape and below: multi-column grids collapse. */
 @media (max-width: 960px) {
   .hero-grid { grid-template-columns: 1fr; gap: 34px; }
   .grid-3, .steps { grid-template-columns: 1fr 1fr; }
   .footer-grid { grid-template-columns: 1fr 1fr; }
   .tool-options { grid-template-columns: 1fr; }
 }
-@media (max-width: 720px) {
-  .nav {    position: fixed; inset: var(--header-h) 0 auto 0;
+
+/* 860 — the header runs out of room here (brand + 6 nav items + 2 actions),
+   so the drawer takes over well before the grids need to collapse. */
+@media (max-width: 860px) {
+  .nav {
+    position: fixed; inset: var(--header-h) 0 auto 0;
     flex-direction: column; align-items: stretch; gap: 2px;
     background: var(--bg); border-bottom: 1px solid var(--border);
-    padding: 12px 20px 18px; margin: 0; display: none;
-    box-shadow: var(--shadow-md);
+    padding: 12px max(20px, env(safe-area-inset-right)) 18px max(20px, env(safe-area-inset-left));
+    margin: 0; display: none; box-shadow: var(--shadow-md);
+    max-height: calc(100dvh - var(--header-h)); overflow-y: auto;
+    overscroll-behavior: contain;
   }
   .nav.open { display: flex; }
   .nav a { padding: .7rem .6rem; }
   .nav-toggle { display: inline-grid; }
+  .table-hint { display: block; text-align: center; color: var(--muted); font-size: .82rem; margin: 0 0 10px; }
+  .tool-controls { margin-top: 16px; }
+}
+
+/* 720 — phones: everything to a single column. */
+@media (max-width: 720px) {
   .grid-3, .grid-2, .steps, .footer-grid { grid-template-columns: 1fr; }
   .header-actions .btn span { display: none; }
+  .tool-head .tag { display: none; }
+}
+
+/* 420 — small phones: tighten the chrome, stop wasting horizontal space. */
+@media (max-width: 420px) {
+  .container {
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+  .section { padding: clamp(44px, 11vw, 64px) 0; }
+  .tool { border-radius: var(--radius-lg); }
+  .card, .step { padding: 20px; }
+  .fmt-notes > div { padding: 18px 20px; }
+  .tool-bar { flex-direction: column; align-items: stretch; }
+  /* The status carries flex-basis 12em for the wrapping row layout; in a
+     column it would become a 192px-tall empty box. */
+  .status { flex: 0 0 auto; }
+  .tool-bar-actions { display: grid; grid-template-columns: 1fr 1fr; }
+  .tool-bar-actions .btn { width: 100%; }
+  .tool-bar-actions .btn:only-child { grid-column: 1 / -1; }
+}
+
+/* 860 and up — the four tool fields fit on one row again. */
+@media (min-width: 860px) {
+  .tool-controls { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* ---------- 16. Pointer adaptation ---------- */
+/* A coarse pointer gets real 44x44 targets (WCAG 2.5.5); a mouse keeps the
+   tighter, more desktop-like proportions. */
+@media (pointer: coarse) {
+  .icon-btn { width: 44px; height: 44px; }
+  .icon-btn svg { width: 20px; height: 20px; }
+  .brand { min-height: 44px; }
+  .nav a { min-height: 44px; display: inline-flex; align-items: center; }
+  .chip { min-height: 44px; padding-inline: 1.05rem; }
+  .field .switch-row { min-height: 44px; }
+  .btn { min-height: 46px; }
+  .btn-sm { min-height: 44px; padding-inline: 1.05rem; }
+  .footer-col a { min-height: 40px; }
+  .footer-bottom nav a { min-height: 36px; }
+  .result .dl { min-height: 40px; }
+  .faq summary { padding: 16px 0; }
+  .bg-picker input[type="color"] { width: 60px; height: 46px; }
+}
+/* Touch devices latch :hover after a tap, leaving cards stuck in the lifted
+   state until you tap something else. */
+@media (hover: none) {
+  .card:hover { transform: none; box-shadow: var(--shadow-sm); border-color: var(--border); }
+  .btn:hover, .icon-btn:hover { transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -402,7 +538,7 @@ table.cmp .col-us { background: color-mix(in srgb, var(--brand) 6%, transparent)
   * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
 }
 @media print {
-  .site-header, .cta-band, .tool, .footer-social { display: none; }
+  .site-header, .cta-band, .tool, .footer-social, .table-hint { display: none; }
   .js .reveal { opacity: 1 !important; transform: none !important; }
   body { color: #000; background: #fff; }
 }

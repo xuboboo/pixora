@@ -6,13 +6,21 @@
     <description>Pixora 免费在线图片工具箱的版本更新与功能发布。</description>
     <language>zh-CN</language>
     <copyright>MIT License · Pixora contributors</copyright>
-    <lastBuildDate>Tue, 13 Oct 2026 11:00:00 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 13 Oct 2026 12:45:00 +0800</lastBuildDate>
     <atom:link href="https://xuboboo.github.io/pixora/feed.xml" rel="self" type="application/rss+xml"/>
     <image>
       <url>https://xuboboo.github.io/pixora/assets/img/logo.svg</url>
       <title>Pixora</title>
       <link>https://xuboboo.github.io/pixora/</link>
     </image>
+    <item>
+      <title>Pixora 1.1.0 发布：在浏览器里完成图片格式转换，支持 PNG / JPG / WEBP / BMP / ICO</title>
+      <link>https://xuboboo.github.io/pixora/#formats</link>
+      <guid isPermaLink="false">https://xuboboo.github.io/pixora/#release-1-1-0</guid>
+      <pubDate>Tue, 13 Oct 2026 12:45:00 +0800</pubDate>
+      <description><![CDATA[新增端上格式转换引擎：输出格式从 3 种扩展到 6 种，BMP 与 ICO 由页面内手写编码器生成，AVIF 采用运行时能力探测；支持透明背景填充、体积变化提示、一键打包 ZIP。同时完成 18 个断点的全设备适配。图片依然不上传，全程本地处理。]]></description>
+      <category>Release</category>
+    </item>
     <item>
       <title>Pixora 1.0.0 发布：一步完成图片按宽度等比缩放与 PNG 导出</title>
       <link>https://xuboboo.github.io/pixora/</link>

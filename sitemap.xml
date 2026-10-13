@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset
-  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-  xmlns:xhtml="http://www.w3.org/1999/xhtml"
-  xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-                      http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://xuboboo.github.io/pixora/</loc>
     <lastmod>2026-10-13</lastmod>
@@ -13,14 +9,293 @@
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/"/>
-    <image:image>
-      <image:loc>https://xuboboo.github.io/pixora/assets/img/og.png</image:loc>
-      <image:title>Pixora 在线图片工具箱界面预览</image:title>
-      <image:caption>按宽度等比缩放并一键导出 PNG 的浏览器端图片工具</image:caption>
-    </image:image>
-    <image:image>
-      <image:loc>https://xuboboo.github.io/pixora/assets/img/logo.svg</image:loc>
-      <image:title>Pixora logo</image:title>
-    </image:image>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/png-to-jpg/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/png-to-jpg/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/png-to-jpg/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/png-to-webp/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/png-to-webp/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/png-to-webp/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/png-to-bmp/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/png-to-bmp/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/png-to-bmp/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/png-to-ico/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/png-to-ico/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/png-to-ico/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/jpg-to-png/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/jpg-to-png/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/jpg-to-png/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/jpg-to-webp/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/jpg-to-webp/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/jpg-to-webp/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/jpg-to-bmp/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/jpg-to-bmp/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/jpg-to-bmp/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/jpg-to-ico/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/jpg-to-ico/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/jpg-to-ico/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/webp-to-png/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/webp-to-png/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/webp-to-png/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/webp-to-jpg/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/webp-to-jpg/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/webp-to-jpg/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/webp-to-bmp/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/webp-to-bmp/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/webp-to-bmp/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/webp-to-ico/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/webp-to-ico/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/webp-to-ico/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/gif-to-png/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/gif-to-png/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/gif-to-png/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/gif-to-jpg/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/gif-to-jpg/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/gif-to-jpg/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/gif-to-webp/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/gif-to-webp/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/gif-to-webp/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/gif-to-bmp/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/gif-to-bmp/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/gif-to-bmp/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/gif-to-ico/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/gif-to-ico/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/gif-to-ico/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/bmp-to-png/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/bmp-to-png/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/bmp-to-png/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/bmp-to-jpg/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/bmp-to-jpg/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/bmp-to-jpg/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/bmp-to-webp/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/bmp-to-webp/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/bmp-to-webp/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/bmp-to-ico/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/bmp-to-ico/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/bmp-to-ico/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/avif-to-png/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/avif-to-png/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/avif-to-png/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/avif-to-jpg/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/avif-to-jpg/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/avif-to-jpg/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/avif-to-webp/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/avif-to-webp/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/avif-to-webp/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/avif-to-bmp/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/avif-to-bmp/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/avif-to-bmp/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/avif-to-ico/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/avif-to-ico/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/avif-to-ico/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/svg-to-png/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/svg-to-png/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/svg-to-png/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/svg-to-jpg/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/svg-to-jpg/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/svg-to-jpg/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/svg-to-webp/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/svg-to-webp/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/svg-to-webp/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/svg-to-bmp/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/svg-to-bmp/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/svg-to-bmp/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/svg-to-ico/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/svg-to-ico/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/svg-to-ico/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/ico-to-png/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/ico-to-png/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/ico-to-png/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/ico-to-jpg/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/ico-to-jpg/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/ico-to-jpg/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/ico-to-webp/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/ico-to-webp/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/ico-to-webp/"/>
+  </url>
+  <url>
+    <loc>https://xuboboo.github.io/pixora/convert/ico-to-bmp/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://xuboboo.github.io/pixora/convert/ico-to-bmp/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xuboboo.github.io/pixora/convert/ico-to-bmp/"/>
   </url>
 </urlset>
