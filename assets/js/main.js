@@ -346,15 +346,17 @@
     if (!want || available.indexOf(want) < 0) want = pageTo;
     if (want && available.indexOf(want) >= 0) { state.format = want; touched = true; }
     if (q.mode && MODES[q.mode]) { state.mode = q.mode; touched = true; }
-    /* Dimension parameters only apply in the full toolbox. A landing page's
-       contract is "只换格式", so honouring ?w= there would give one page two
-       contradictory meanings. Passing them also implies the resize mode, since
-       asking for a width is asking to resize. */
+    /* 尺寸参数只作用于完整工具箱。落地页的契约是「只换格式」，在那儿尊重 ?w=
+       等于给同一页两种互相矛盾的含义。带上它们同时也意味着进入缩放模式 ——
+       问宽度就是在要求缩放。
+       这里必须顺手清掉 state.ai：三个模式互斥而 AI 优先（见 resizeOn()），
+       若访客上次开着 AI 放大，只置 state.resize 会被 ai 压住，链接的一半意图
+       就被静默吃掉了。带参链接是明确请求，应当赢过 localStorage 的遗留状态。 */
     if (CAN_RESIZE) {
       n = parseInt(q.w, 10);
-      if (n > 0) { state.width = n; state.resize = true; touched = true; }
+      if (n > 0) { state.width = n; state.resize = true; state.ai = false; touched = true; }
       n = parseInt(q.scale, 10);
-      if (n > 0 && n <= 400) { state.scale = n / 100; state.resize = true; touched = true; }
+      if (n > 0 && n <= 400) { state.scale = n / 100; state.resize = true; state.ai = false; touched = true; }
     }
     n = parseInt(q.q, 10);
     if (n >= 50 && n <= 100) { state.quality = n; touched = true; }

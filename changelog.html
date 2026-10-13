@@ -159,7 +159,7 @@
 
       <article class="prose reveal">
 <p>本项目遵循 <a href="https://semver.org/lang/zh-CN/" target="_blank" rel="noopener">语义化版本</a>， 变更记录参考 <a href="https://keepachangelog.com/zh-CN/1.1.0/" target="_blank" rel="noopener">Keep a Changelog</a>。</p>
-<h2 id="1-3-0-2026-10-13">[1.3.0] — 2026-10-13</h2>
+<h2 id="1-3-0-2026-10-13"><a href="https://github.com/xuboboo/pixora/releases/tag/v1.3.0" target="_blank" rel="noopener">1.3.0</a> — 2026-10-13</h2>
 <p>一次能力扩展：站点从「格式转换 + 等比缩放」长成「转换 + 缩放 + AI 放大 + 在线修图」 四件事。同时把散落三份的图像实现收拢成一个内核，其他工具可以直接调用。</p>
 <h3 id="新增">新增</h3>
 <ul><li><strong>AI 超分放大</strong></li><li>首页工具箱新增「AI 放大」模式，用 <strong>Real-ESRGAN x4v3</strong> 在浏览器本地推理，单张最高</li></ul>
@@ -186,7 +186,7 @@
 <ul><li><code>convert/index.html</code> 与 <code>404.html</code> 的页脚用了 <code>../../</code> 前缀，12 条断链</li><li>sitemap 漏掉 <code>editor/</code> 与 5 个新页面（37 → 43 条）</li></ul>
 <h3 id="验收">验收</h3>
 <ul><li>编辑器 65 项端到端全部通过，无页面错误</li><li>AI 放大 23 项全部通过</li><li>内核单测 49 项全部通过</li><li><code>linkint</code> / <code>links</code> / <code>verify-pages</code> / <code>mkmodes</code> / <code>small</code> / <code>small2</code> / <code>final</code> 全部通过</li></ul>
-<h2 id="1-2-4-2026-10-13">[1.2.4] — 2026-10-13</h2>
+<h2 id="1-2-4-2026-10-13"><a href="https://github.com/xuboboo/pixora/releases/tag/v1.2.4" target="_blank" rel="noopener">1.2.4</a> — 2026-10-13</h2>
 <p>导航可用性修复。用户反馈：页头「格式转换」点下去只是把卡片开开合合、不跳转， 而鼠标想移到卡片上时它又会自己关掉。</p>
 <h3 id="修复">修复</h3>
 <ul><li><strong>鼠标移入卡片时面板自动关闭</strong></li><li>面板锚定在页头的下边缘，而触发区自身的盒子在它上方约 11px 处结束。指针穿过这</li></ul>
@@ -200,7 +200,7 @@
 <p>  链接可达性、跨文件一致性（18 项）、模式分离、工具能力、深链、404、   窄屏与列数（320–1200px）</p>
 <ul><li>顺带修正两个审计脚本中已过时的断言（点击展开 → 点击跳转；窄屏列数与触摸端</li></ul>
 <p>  44px 触摸目标导致的「单行」误判）</p>
-<h2 id="1-2-3-2026-10-13">[1.2.3] — 2026-10-13</h2>
+<h2 id="1-2-3-2026-10-13"><a href="https://github.com/xuboboo/pixora/releases/tag/v1.2.3" target="_blank" rel="noopener">1.2.3</a> — 2026-10-13</h2>
 <p>收尾版本。1.2.2 把工具默认模式改成「格式转换」之后，首页首屏的预览卡还在演示缩放流程， 和工具实际打开时的样子对不上；同时发现 RSS 订阅停在 1.2.0，两次发布都没进源。 这一版把这些收干净，并补上能自动发现同类漂移的检查。</p>
 <h3 id="修复">修复</h3>
 <ul><li><strong>首页 Hero 预览卡与默认模式不一致</strong></li><li>预览卡此前演示的是「目标宽度 400（高度自动）」，前后对比为 1448×1086 → 400×300，</li></ul>
@@ -214,7 +214,7 @@
 <h3 id="验收">验收</h3>
 <ul><li>一致性检查全部通过（18 项）</li><li>18 设备审计：0 项不合格、全部 0px 溢出、最小字号 12px</li><li>既有全部套件复跑通过：可达性、链接与资源完整性、导航宽度与交互、落地页矩阵、</li></ul>
 <p>  工具能力、模式分离、深链、404 页</p>
-<h2 id="1-2-2-2026-10-13">[1.2.2] — 2026-10-13</h2>
+<h2 id="1-2-2-2026-10-13"><a href="https://github.com/xuboboo/pixora/releases/tag/v1.2.2" target="_blank" rel="noopener">1.2.2</a> — 2026-10-13</h2>
 <p>严重缺陷修复。用户反馈「<strong>这个格式转换工具有严重 bug，你只是转换格式，不需要你调整宽高</strong>」—— 属实：<code>state.width</code> 默认值是 400，而尺寸控件与格式控件共用同一组状态，于是<strong>每一个格式转换页 都会把图片缩到 400px 宽</strong>。一张 1200×800 的照片在 <code>/convert/png-to-jpg/</code> 上得到的是 400×267。</p>
 <p>格式转换与调整尺寸是两种不同的意图，此前被混在一起，而缩放那一方还赢了默认值。 此版本把两者拆成显式模式。</p>
 <h3 id="修复">修复</h3>
@@ -234,7 +234,7 @@
 <h3 id="验收">验收</h3>
 <ul><li>落地页 1200×800 → <strong>1200×800</strong>（此前 400×267），三个不同目标格式逐一验证</li><li>落地页忽略 <code>?w=600</code> 与 <code>?scale=50</code>，仍输出 1200×800</li><li>首页默认同样保持 1200×800；切到「调整尺寸」后 400 宽 → 400×267，比例 50% → 600×400</li><li>模式记忆：刷新后保留；访问落地页后回首页仍保留用户的选择</li><li>转换模式下 ICO 仍遵守 256px 上限（256×171）</li><li>落地页与首页在 390px 下均 0px 横向溢出</li><li>既有全部套件复跑通过：可达性、链接与资源完整性、导航宽度与交互、落地页矩阵、</li></ul>
 <p>  工具能力、深链、404 页</p>
-<h2 id="1-2-1-2026-10-13">[1.2.1] — 2026-10-13</h2>
+<h2 id="1-2-1-2026-10-13"><a href="https://github.com/xuboboo/pixora/releases/tag/v1.2.1" target="_blank" rel="noopener">1.2.1</a> — 2026-10-13</h2>
 <p>修复版本。1.2.0 上线后做了一轮「按项目自身定位反查缺口」的审计，发现两处真实缺陷： 总览页的站点图标与 Web App 清单全部 404，以及站点<strong>没有 404 页</strong>——用户一旦走错地址 就被交给 GitHub 的默认页，等于把 1.2.0 刚解决的「找不到入口」问题以更严重的形式重演一遍。</p>
 <h3 id="修复">修复</h3>
 <ul><li><strong>总览页 <code>/convert/</code> 的 favicon、apple-touch-icon 与 web manifest 全部 404</strong></li><li>这三个 <code>&lt;link&gt;</code> 的前缀被硬编码为 <code>../../</code>，从 <code>/convert/</code> 解析后落到站点根<strong>之外</strong></li><li>同一页的样式表与 logo 用的是 <code>../</code>，是对的——所以肉眼与截图都看不出异常</li><li>根因：<code>HEAD_ICONS</code> 是一个硬编码前缀的常量，对 <code>/convert/&lt;slug&gt;/</code> 正确、对 <code>/convert/</code> 错误。</li></ul>
@@ -251,7 +251,7 @@
 <ul><li>解析器自检 <strong>10/10</strong>（含 3 个历史 bug 反例）</li><li>38 个页面：<strong>2 187 条</strong>内部链接 + <strong>266 条</strong>资源引用，0 断链、0 越界</li><li>404 页在 3 种未匹配路径（同级 / 深层嵌套 / 伪文件名）下渲染：状态码 404、样式生效、</li></ul>
 <p>  无断图、无失败子资源、无页面错误、0px 横向溢出；390px 与 320px 同样 0px 溢出</p>
 <ul><li>生成器幂等性复验通过（连续两次运行输出一致）</li><li>既有 5 组套件全部复跑通过，无回归</li></ul>
-<h2 id="1-2-0-2026-10-13">[1.2.0] — 2026-10-13</h2>
+<h2 id="1-2-0-2026-10-13"><a href="https://github.com/xuboboo/pixora/releases/tag/v1.2.0" target="_blank" rel="noopener">1.2.0</a> — 2026-10-13</h2>
 <p>可发现性与工具能力版本。1.1.0 上线了 36 个格式转换页，但入口只放在页面中段和页脚， 用户反馈「<strong>找不到入口</strong>」。此版本参考对 <a href="https://www.iloveimg.com/zh-cn" target="_blank" rel="noopener">iLoveIMG</a>、 <a href="https://convertio.co/zh/" target="_blank" rel="noopener">Convertio</a>、<a href="https://cloudconvert.com/" target="_blank" rel="noopener">CloudConvert</a> 三家的 入口与信息架构逆向分析（见 <a href="docs/竞品入口与信息架构逆向分析.md"><code>docs/竞品入口与信息架构逆向分析.md</code></a>）， 把格式矩阵提到距页面顶部一次交互的位置，并补齐两项竞品都有而 Pixora 缺失的缩放能力。</p>
 <h3 id="新增">新增</h3>
 <ul><li><strong>导航「格式转换」巨型菜单</strong></li><li>主导航新增 <code>&lt;details&gt;</code> 巨型菜单，按<strong>输出格式</strong>分 5 组（转 PNG / JPG / WEBP / BMP / ICO），</li></ul>
@@ -275,7 +275,7 @@
 <p>    实际解析为 <code>/convert/convert/png-to-jpg/</code>   - 根因是把「距站点根的距离」和「距 <code>/convert/</code> 的距离」压缩成了一个 <code>depth</code> 数字，     而这两者对总览页并不相等   - 改为显式的三态位置表（<code>root</code> / <code>hub</code> / <code>slug</code>），各自独立给出两个前缀   - 该问题在「链接是否存在」的检查下不可见，需校验<strong>解析后的目标是否真实存在</strong>才会暴露</p>
 <h3 id="验收">验收</h3>
 <ul><li>全站内链可达性：37 个页面 × 35 个转换目标，<strong>导航内可达 35/35</strong></li><li>内链完整性：37 个页面共 <strong>2 138 条</strong>内部链接全部指向真实存在的文件，0 断链</li><li>首屏可见的转换入口：<strong>32 个</strong>（此前为 0）</li><li>18 设备溢出审计：首页与落地页均 0px 溢出，最小字号 12px</li><li>端到端转换：PNG / JPG / WEBP / BMP / ICO 全部通过；比例缩放与不放大行为逐项验证通过</li><li>落地页矩阵：36 个文件 title / description / canonical 全唯一，JSON-LD 全可解析</li></ul>
-<h2 id="1-1-0-2026-10-13">[1.1.0] — 2026-10-13</h2>
+<h2 id="1-1-0-2026-10-13"><a href="https://github.com/xuboboo/pixora/releases/tag/v1.1.0" target="_blank" rel="noopener">1.1.0</a> — 2026-10-13</h2>
 <p>格式转换版本。在原有「按宽度等比缩放」之上，加入一套<strong>完全在浏览器内运行</strong>的图片格式转换引擎， 并把官网文案、结构化数据、对比表与 FAQ 全部对齐到新能力。此版本的格式矩阵参考了对 <a href="https://convertio.co/zh/image-converter/" target="_blank" rel="noopener">Convertio 图片转换器</a> 的逆向分析结论（见 <a href="docs/convertio-逆向分析报告.md"><code>docs/convertio-逆向分析报告.md</code></a>）， 但实现路径完全不同：Convertio 是服务端转换，Pixora 是端上转换。</p>
 <h3 id="新增">新增</h3>
 <ul><li><strong>图片格式转换引擎</strong></li><li>输出格式从 3 种扩展到 <strong>6 种</strong>：PNG / JPG / WEBP / AVIF / BMP / ICO</li><li><strong>运行时能力探测</strong>：启动时用 Canvas 实际编码一遍并校验返回 blob 的 MIME，</li></ul>
@@ -293,7 +293,7 @@
 <ul><li>BMP 为无压缩位图，体积通常是原图的数十倍，仅建议用于特定兼容场景；</li></ul>
 <p>  结果卡片会用 <code>↑6944%</code> 这类标记提示体积膨胀。</p>
 <ul><li>转换仍是<strong>端上</strong>完成，不做任何上传。这也是与 Convertio 最本质的区别。</li></ul>
-<h2 id="1-0-1-2026-10-13">[1.0.1] — 2026-10-13</h2>
+<h2 id="1-0-1-2026-10-13"><a href="https://github.com/xuboboo/pixora/releases/tag/v1.0.1" target="_blank" rel="noopener">1.0.1</a> — 2026-10-13</h2>
 <p>细节打磨版本。修复「处理选项」开关渲染错位，并统一了一批对齐、对比度与可访问性问题。</p>
 <h3 id="修复">修复</h3>
 <ul><li><strong>「处理选项」开关与文字重叠</strong>（严重）</li><li>根因是 CSS 优先级冲突：开关行本身是 <code>&lt;label&gt;</code>，被 <code>.field label { display: block }</code>（0,1,1）</li></ul>
@@ -303,7 +303,7 @@
 <ul><li>暗色模式下 CTA 横幅内的白色主按钮文字用了浅蓝 <code>--brand-ink</code>，对比度不足，改用 <code>--brand-fill</code>。</li></ul>
 <h3 id="改进">改进</h3>
 <ul><li>消除主题闪烁：<code>&lt;head&gt;</code> 内联引导脚本在样式表之前确定主题，深色用户不再先看到白屏。</li><li>无脚本兜底：进场动画改为 <code>.js .reveal</code>，脚本不可用时内容正常可见，而不是整页空白。</li><li>打印时强制显示 <code>.reveal</code> 元素。</li><li><code>theme-color</code> 在手动切换主题后会移除 <code>media</code> 条件，浏览器 UI 颜色不再与页面主题脱节。</li><li>「常用宽度」与「处理选项」两列统一基线：预设行与开关组等高居中。</li></ul>
-<h2 id="1-0-0-2026-10-13">[1.0.0] — 2026-10-13</h2>
+<h2 id="1-0-0-2026-10-13"><a href="https://github.com/xuboboo/pixora/releases/tag/v1.0.0" target="_blank" rel="noopener">1.0.0</a> — 2026-10-13</h2>
 <p>首个正式版本。Pixora 从一个「减少在线 PS 导出步骤」的实际需求出发，被重新设计为一个 零依赖、隐私优先、SEO 完备的浏览器端图片工具站点。</p>
 <h3 id="新增">新增</h3>
 <ul><li><strong>图像引擎</strong></li><li>按宽度等比缩放：高度自动按原图比例计算（等价于 Photoshop「存储为 Web」的锁定比例）</li><li>三种缩放模式：等比适应（不变形）、拉伸填满、等比填充（居中裁剪）</li><li>分步降采样算法（逐级减半），大幅缩小时保持锐利</li><li>支持导出 PNG（无损）/ JPG / WEBP，非 PNG 可调质量</li><li>自动处理 EXIF 方向（<code>imageOrientation: &quot;from-image&quot;</code>）</li><li>输出文件名自动带上尺寸，如 <code>驱动发布图_400x300.png</code></li></ul>
@@ -313,7 +313,6 @@
 <ul><li><strong>SEO 与可发现性</strong></li><li>JSON-LD <code>@graph</code>：<code>WebSite</code> / <code>Organization</code> / <code>WebPage</code> / <code>ImageObject</code> / <code>SoftwareApplication</code> / <code>HowTo</code> / <code>FAQPage</code></li><li>Open Graph + Twitter Card 完整字段</li><li><code>canonical</code> 与 <code>hreflang</code>（<code>zh-CN</code> / <code>x-default</code>）</li><li><code>robots.txt</code>（显式放行 AI 爬虫）、<code>sitemap.xml</code>（含 image / xhtml 命名空间）</li><li><strong>Speculation Rules API</strong> 声明式预渲染 / 预取</li><li>PWA 清单、<code>llms.txt</code>、<code>feed.xml</code>（RSS 2.0）、<code>humans.txt</code>、<code>.well-known/security.txt</code></li><li>IndexNow 密钥文件，支持 Bing / Yandex 即时索引</li><li>零第三方请求，无渲染阻塞脚本</li></ul>
 <h3 id="说明">说明</h3>
 <ul><li>首个版本不包含图层级编辑能力。若需要精细修图，建议搭配 Photopea 等完整编辑器使用。</li><li>结构化数据刻意不含 <code>aggregateRating</code>，以避免标注虚假评价。</li></ul>
-<p>[1.3.0]: https://github.com/xuboboo/pixora/releases/tag/v1.3.0 [1.2.4]: https://github.com/xuboboo/pixora/releases/tag/v1.2.4 [1.2.3]: https://github.com/xuboboo/pixora/releases/tag/v1.2.3 [1.2.2]: https://github.com/xuboboo/pixora/releases/tag/v1.2.2 [1.2.1]: https://github.com/xuboboo/pixora/releases/tag/v1.2.1 [1.2.0]: https://github.com/xuboboo/pixora/releases/tag/v1.2.0 [1.1.0]: https://github.com/xuboboo/pixora/releases/tag/v1.1.0 [1.0.1]: https://github.com/xuboboo/pixora/releases/tag/v1.0.1 [1.0.0]: https://github.com/xuboboo/pixora/releases/tag/v1.0.0</p>
       </article>
 
       <p class="doc-src">本篇内容同时维护在仓库的 <code>CHANGELOG.md</code> 中，
@@ -324,7 +323,7 @@
 
 <footer class="site-footer" aria-labelledby="footer-title">
   <div class="container">
-    <h2 id="footer-title" class="visually-hidden" style="position:absolute;left:-9999px">页脚导航</h2>
+    <h2 id="footer-title" class="visually-hidden">页脚导航</h2>
     <div class="footer-grid">
       <div class="footer-brand">
         <a class="brand" href="./" aria-label="Pixora 首页">

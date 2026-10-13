@@ -91,7 +91,7 @@ export function footer(rel) {
   const R = rel || "./";
   return `<footer class="site-footer" aria-labelledby="footer-title">
   <div class="container">
-    <h2 id="footer-title" class="visually-hidden" style="position:absolute;left:-9999px">页脚导航</h2>
+    <h2 id="footer-title" class="visually-hidden">页脚导航</h2>
     <div class="footer-grid">
       <div class="footer-brand">
         <a class="brand" href="${R}" aria-label="Pixora 首页">

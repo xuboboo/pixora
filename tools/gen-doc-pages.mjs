@@ -13,14 +13,35 @@ import { SITE, esc, icons, THEME_BOOT, header, footer } from "./shell.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
+/* 链接引用定义（`[1.2.4]: https://...`）。先由 mdToHtml() 从源文件里收集，
+   inline() 再把正文里的裸 `[label]` 还原成链接。 */
+let REFS = new Map();
+
+function link(u, t) {
+  return /^https?:/.test(u)
+    ? '<a href="' + u + '" target="_blank" rel="noopener">' + t + "</a>"
+    : '<a href="' + u + '">' + t + "</a>";
+}
+
+/* 裸引用只改标签之外的文本节点 —— 否则会把 <code> 和 <a> 里的内容也链掉。 */
+function linkifyRefs(html) {
+  if (!REFS.size) return html;
+  return html.split(/(<[^>]+>)/).map((seg) =>
+    seg.startsWith("<")
+      ? seg
+      : seg.replace(/\[([^\]\n]+)\]/g, (m, t) => (REFS.has(t) ? link(REFS.get(t), t) : m))
+  ).join("");
+}
+
 function inline(s) {
-  return esc(s)
-    .replace(/`([^`]+)`/g, (m, c) => "<code>" + c + "</code>")
-    .replace(/\*\*([^*]+)\*\*/g, (m, c) => "<strong>" + c + "</strong>")
-    .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (m, t, u) =>
-      /^https?:/.test(u)
-        ? '<a href="' + u + '" target="_blank" rel="noopener">' + t + "</a>"
-        : '<a href="' + u + '">' + t + "</a>");
+  return linkifyRefs(
+    esc(s)
+      .replace(/`([^`]+)`/g, (m, c) => "<code>" + c + "</code>")
+      .replace(/\*\*([^*]+)\*\*/g, (m, c) => "<strong>" + c + "</strong>")
+      /* <https://...> 自动链接。esc() 已经把 < > 变成实体，所以匹配的是实体的形式。 */
+      .replace(/&lt;(https?:[^<&\s]+)&gt;/g, (m, u) => link(u, u))
+      .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (m, t, u) => link(u, t))
+  );
 }
 
 function slugId(s) {
@@ -30,7 +51,27 @@ function slugId(s) {
 
 const BLOCK_START = /^(#{1,6}\s|```|\||>|[-*+]\s|\d+\.\s)/;
 
+/* 入口：先把引用定义从正文里摘出来（否则那段 `[1.3.0]: https://...` 会被当成
+   一个普通段落输出，长 URL 在窄屏下换不了行，直接把整页撑出横向滚动），
+   再进块级解析。 */
 function mdToHtml(md) {
+  const refs = new Map();
+  const body = [];
+  for (const line of md.replace(/\r\n/g, "\n").split("\n")) {
+    const r = /^\[([^\]]+)\]:\s+(https?:\S+)\s*$/.exec(line);
+    if (r) { refs.set(r[1], r[2]); continue; }
+    body.push(line);
+  }
+  const saved = REFS;
+  REFS = refs;
+  try {
+    return mdToHtmlBody(body.join("\n"));
+  } finally {
+    REFS = saved;
+  }
+}
+
+function mdToHtmlBody(md) {
   const lines = md.replace(/\r\n/g, "\n").split("\n");
   const out = [];
   let i = 0;
@@ -46,7 +87,10 @@ function mdToHtml(md) {
       i++;
       while (i < lines.length && !/^```/.test(lines[i])) buf.push(lines[i++]);
       i++;
-      out.push("<pre><code" + (lang ? ' class="language-' + esc(lang) + '"' : "") +
+      /* data-lang 给 CSS 贴右上角语言标；class="language-x" 保留惯例，
+         方便将来接语法高亮或外部工具识别。 */
+      out.push("<pre" + (lang ? ' data-lang="' + esc(lang) + '"' : "") +
+        "><code" + (lang ? ' class="language-' + esc(lang) + '"' : "") +
         ">" + esc(buf.join("\n")) + "</code></pre>");
       continue;
     }
@@ -80,7 +124,8 @@ function mdToHtml(md) {
     if (/^>\s?/.test(l)) {                                  // 引用
       const buf = [];
       while (i < lines.length && /^>\s?/.test(lines[i])) buf.push(lines[i++].replace(/^>\s?/, ""));
-      out.push("<blockquote>" + mdToHtml(buf.join("\n")) + "</blockquote>");
+      /* 块内递归直接调 Body，别重新收集引用 —— 外层的 REFS 还得用。 */
+      out.push("<blockquote>" + mdToHtmlBody(buf.join("\n")) + "</blockquote>");
       continue;
     }
 

@@ -419,7 +419,7 @@ function footer(loc) {
   const p = LOC[loc].up;
   return `<footer class="site-footer" aria-labelledby="footer-title">
   <div class="container">
-    <h2 id="footer-title" class="visually-hidden" style="position:absolute;left:-9999px">页脚导航</h2>
+    <h2 id="footer-title" class="visually-hidden">页脚导航</h2>
     <div class="footer-grid">
       <div class="footer-brand">
         <a class="brand" href="${p}" aria-label="Pixora 首页">
@@ -741,6 +741,7 @@ ${TOOL(from, to, "slug")}
 
 ${footer("slug")}
 
+<script src="${LOC.slug.up}assets/js/pixora-lib.js" defer></script>
 <script src="${LOC.slug.up}assets/js/main.js" defer></script>
 </body>
 </html>
@@ -914,6 +915,7 @@ ${header("hub", null)}
 
 ${footer("hub")}
 
+<script src="${LOC.hub.up}assets/js/pixora-lib.js" defer></script>
 <script src="${LOC.hub.up}assets/js/main.js" defer></script>
 </body>
 </html>
@@ -1041,6 +1043,7 @@ ${indent(formatIndex(BASE + "convert/"), 8)}
 
 ${footer("abs")}
 
+<script src="${BASE}assets/js/pixora-lib.js" defer></script>
 <script src="${BASE}assets/js/main.js" defer></script>
 <script>
 /* Show what was actually requested. Runs after main.js so it can stay a plain

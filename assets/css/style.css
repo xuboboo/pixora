@@ -330,6 +330,10 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 2.5rem 0; }
 }
 .hp-mode.on { background: var(--surface); color: var(--brand-ink); box-shadow: var(--shadow-xs); }
 .hp-pane { min-width: 0; }
+/* Hero 预览卡的两栏。--before / --after 同时是窄屏堆叠时区分「原图 / 结果」的
+   语义钩子：让 AFTER 的标签用品牌色，眼睛先落在处理结果上。 */
+.hp-pane--before .hp-label { color: var(--muted); }
+.hp-pane--after .hp-label { color: var(--brand-ink); }
 .hp-label {
   display: inline-block; margin-bottom: 7px;
   font-size: .75rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted);
@@ -909,6 +913,10 @@ table.cmp .col-us { background: color-mix(in srgb, var(--brand) 6%, transparent)
    读者看的渲染。现在本地渲染，内容由 tools/gen-doc-pages.mjs 从仓库里的 md 转出。
    这里的 .prose 把 markdown 生成的结构排版成可读的长文版式。 */
 .doc-page .prose { max-width: 74ch; }
+/* 长 URL / 长标识符没有天然断点，窄屏下会把整页顶出横向滚动。
+   安全政策里有 GitHub advisory 链接、更新日志里有 release tag，都撞过这条。 */
+.prose { overflow-wrap: break-word; }
+.prose pre { overflow-wrap: normal; }
 .prose h2 {
   margin: 40px 0 14px; font-size: 1.32rem; line-height: 1.35;
   letter-spacing: -.01em; padding-top: 14px; border-top: 1px solid var(--border);
@@ -1049,6 +1057,9 @@ table.cmp .col-us { background: color-mix(in srgb, var(--brand) 6%, transparent)
 }
 .panel { padding: 14px 16px; border-bottom: 1px solid var(--border); }
 .panel:last-child { border-bottom: 0; }
+/* 工具面板的挂载点：editor.js 把每个工具的面片塞进这里。里面是 flex / grid 子项
+   （滑杆行、色块行），默认 min-width:auto 会在窄屏把右侧栏顶宽。 */
+.panel-body { min-width: 0; }
 .panel h2 {
   margin: 0 0 10px; font-size: .78rem; font-weight: 700;
   letter-spacing: .05em; text-transform: uppercase; color: var(--muted);
@@ -1146,3 +1157,35 @@ table.cmp .col-us { background: color-mix(in srgb, var(--brand) 6%, transparent)
   .editor-stage { min-height: 300px; }
   .panel { flex: 1 1 100%; border-right: 0; }
 }
+
+/* ---------- 21. 通用工具类 ----------
+   站点里散着几处「给读屏器看、不给眼睛看」的标题（页脚的「页脚导航」h2，
+   由 aria-labelledby 关联）。原来靠内联 style="position:absolute;left:-9999px"
+   兜着 —— 能用，但把版式写死在标记里。现在收成类，标记只留语义。
+   注意别用 display:none：那会把元素从无障碍树里一起摘掉。 */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 页头下拉面板的 5 列由 .nav-panel-cols 的 grid 负责排版，.nav-col 只是语义包裹。
+   但 grid 项默认 min-width:auto，长标题会把列顶宽，所以显式给 0。 */
+.nav-col { min-width: 0; }
+
+/* 代码围栏的语言标注。站点没有语法高亮，所以这里的规则不为上色服务：
+   一是把语言贴到 pre 的右上角（用绝对定位，不占正文行、不参与选择复制），
+   二是给带语言类的 code 做块级规范化 —— 这正是 .language-bash 的用处。 */
+.prose pre { position: relative; }
+.prose pre[data-lang]::after {
+  content: attr(data-lang);
+  position: absolute; top: 10px; right: 14px;
+  font-family: var(--mono); font-size: .66rem; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+  pointer-events: none; user-select: none;
+}
+.prose pre code[class^="language-"] { display: block; }

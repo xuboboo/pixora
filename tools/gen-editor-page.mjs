@@ -198,6 +198,7 @@ ${BODY}
 
 ${footer(REL)}
 
+<script src="../assets/js/pixora-lib.js" defer></script>
 <script src="../assets/js/main.js" defer></script>
 <script src="../assets/js/editor.js" defer></script>
 </body>
