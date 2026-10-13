@@ -57,6 +57,13 @@ const F = {
 const INPUTS  = ["png", "jpg", "webp", "gif", "bmp", "avif", "svg", "ico"];
 const OUTPUTS = ["png", "jpg", "webp", "bmp", "ico"];
 
+/* How many (input, output) pairs actually exist: every input crossed with every
+   output, minus the ones where the two are the same format. Derived from the
+   lists rather than written as a number, because a hand-computed version was
+   wrong here once (8 × 4 = 32 instead of 5 × 7 = 35) and shipped a headline
+   that contradicted the 35 links directly beneath it. */
+const PAIR_COUNT = OUTPUTS.reduce((n, to) => n + INPUTS.filter((f) => f !== to).length, 0);
+
 /* Which canvas encoder produces each output. */
 const ENCODER = {
   png:  "由浏览器 Canvas 原生编码",
@@ -1010,7 +1017,7 @@ ${popularHtml}
       </div>
 
       <div class="nf-block reveal">
-        <h2 class="nf-h2">全部 ${INPUTS.length * (OUTPUTS.length - 1)} 种转换组合</h2>
+        <h2 class="nf-h2">全部 ${PAIR_COUNT} 种转换组合</h2>
         <p class="nf-note">按输出格式分成五组，每一条点进去都是一个已经预设好输出格式的转换页，不需要再选一次。</p>
 ${indent(formatIndex(BASE + "convert/"), 8)}
       </div>
@@ -1048,6 +1055,9 @@ for (const from of INPUTS) {
     if (from === to) continue;
     pairs.push([from, to]);
   }
+}
+if (pairs.length !== PAIR_COUNT) {
+  throw new Error(`PAIR_COUNT (${PAIR_COUNT}) 与实际生成的组合数 (${pairs.length}) 不一致`);
 }
 
 for (const [from, to] of pairs) {
