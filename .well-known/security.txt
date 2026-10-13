@@ -1,0 +1,6 @@
+Contact: https://github.com/xuboboo/pixora/issues
+Expires: 2027-10-13T00:00:00.000Z
+Preferred-Languages: zh-CN, en
+Canonical: https://xuboboo.github.io/pixora/.well-known/security.txt
+Policy: https://github.com/xuboboo/pixora/blob/main/CONTRIBUTING.md#安全
+Acknowledgments: https://github.com/xuboboo/pixora/graphs/contributors

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Pixora 更新日志</title>
+    <link>https://xuboboo.github.io/pixora/</link>
+    <description>Pixora 免费在线图片工具箱的版本更新与功能发布。</description>
+    <language>zh-CN</language>
+    <copyright>MIT License · Pixora contributors</copyright>
+    <lastBuildDate>Tue, 13 Oct 2026 11:00:00 +0800</lastBuildDate>
+    <atom:link href="https://xuboboo.github.io/pixora/feed.xml" rel="self" type="application/rss+xml"/>
+    <image>
+      <url>https://xuboboo.github.io/pixora/assets/img/logo.svg</url>
+      <title>Pixora</title>
+      <link>https://xuboboo.github.io/pixora/</link>
+    </image>
+    <item>
+      <title>Pixora 1.0.0 发布：一步完成图片按宽度等比缩放与 PNG 导出</title>
+      <link>https://xuboboo.github.io/pixora/</link>
+      <guid isPermaLink="true">https://xuboboo.github.io/pixora/</guid>
+      <pubDate>Tue, 13 Oct 2026 11:00:00 +0800</pubDate>
+      <description><![CDATA[首个正式版本。支持按宽度等比缩放（高度自动）、批量处理、PNG/JPG/WEBP 导出，全部在浏览器本地完成，无需注册、无使用限制。]]></description>
+      <category>Release</category>
+    </item>
+  </channel>
+</rss>

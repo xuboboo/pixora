@@ -1,0 +1,14 @@
+# Normalize line endings — the site is served as-is, keep LF in the repo.
+* text=auto eol=lf
+
+# Binary assets
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+
+# Keep SVG as text so diffs stay readable
+*.svg text eol=lf

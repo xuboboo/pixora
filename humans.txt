@@ -1,0 +1,17 @@
+/* TEAM */
+  项目：Pixora — 浏览器端免费图片工具箱
+  维护者：xuboboo
+  主页：https://github.com/xuboboo
+  联系：https://github.com/xuboboo/pixora/issues
+
+/* SITE */
+  最后更新：2026-10-13
+  语言：简体中文
+  技术栈：手写 HTML5 + CSS3 + 原生 JavaScript（零依赖）
+  渲染：GitHub Pages
+  图标：自绘 SVG
+  许可证：MIT
+
+/* THANKS */
+  感谢所有浏览器厂商持续推进 Canvas、createImageBitmap 与 Web 编码标准，
+  让「图片永不离开设备」成为可能。
