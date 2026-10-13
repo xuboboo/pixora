@@ -99,10 +99,10 @@ function alphaLine(from, to) {
 
 function specialNotes(from, to) {
   const out = [];
-  if (from === "svg") out.push("SVG 是矢量图，转成位图时必须先决定渲染尺寸。请在转换前设定目标宽度，否则会按图形原始尺寸栅格化，可能偏大或偏小。");
+  if (from === "svg") out.push("SVG 是矢量图，转成位图时按图形自身声明的尺寸栅格化。需要指定输出像素尺寸的话，去完整工具箱切到「调整尺寸」。");
   if (from === "gif") out.push("GIF 常常是动图。Pixora 取第一帧进行转换，因此动态效果不会被保留 —— 这一点在转换前就应当明确。");
   if (from === "ico") out.push("ICO 里可能打包了多个尺寸。Pixora 读取其中分辨率最高的一帧作为源图。");
-  if (to === "ico") out.push("ICO 的最长边被限制为 256px。选中 ICO 后，宽度预设会自动切换为 16 / 32 / 48 / 64 / 128 / 256 这组图标尺寸。");
+  if (to === "ico") out.push("ICO 的最长边被限制为 256px。超出时 Pixora 会按比例缩到 256px，这是格式本身的规定，不是缩放设置。");
   if (to === "bmp") out.push("BMP 不做压缩，体积通常是原图的几十倍。结果卡片会用 ↑ 标记提示膨胀幅度，确认后再下载。");
   if (to === "jpg") out.push("JPG 不支持透明通道，也不适合线条锐利的截图 —— 它会对边缘做有损压缩，产生轻微噪点。");
   if (to === "webp") out.push("WEBP 需要 Chrome 32+ / Firefox 96+ / Safari 16+ 才能编码。更老的浏览器上这个选项不会出现，因为页面会先做一次能力探测。");
@@ -301,22 +301,22 @@ const TOOL = (from, to) => `      <div class="tool reveal">
         <div class="drop" id="drop" role="button" tabindex="0" aria-label="拖入或点击选择图片">
           <div class="big" aria-hidden="true">🖼️</div>
           <h3>把 ${F[from].label} 图片拖到这里</h3>
-          <small>也可以点击选择文件，或直接按 Ctrl + V 粘贴截图 · 输出格式已预设为 ${F[to].label} · 可多张批量</small>
+          <small>也可以点击选择文件，或直接按 Ctrl + V 粘贴截图 · 输出格式已预设为 ${F[to].label} · 图片尺寸保持原样 · 可多张批量</small>
           <input type="file" id="file" accept="image/*" multiple hidden>
         </div>
 
         <div class="tool-controls">
-          <div class="field">
+          <div class="field" data-resize-only>
             <label for="w">目标宽度 (px)</label>
             <input type="number" id="w" min="1" step="1" value="400" inputmode="numeric">
           </div>
 
-          <div class="field">
+          <div class="field" data-resize-only>
             <label for="h">目标高度 (px)</label>
             <input type="number" id="h" min="1" step="1" placeholder="自动">
           </div>
 
-          <div class="field">
+          <div class="field" data-resize-only>
             <label for="mode">缩放方式</label>
             <select id="mode">
               <option value="contain" selected>等比适应</option>
@@ -337,6 +337,13 @@ const TOOL = (from, to) => `      <div class="tool reveal">
           </div>
         </div>
 
+        <!-- 这个页面只做格式转换，尺寸控件整块不出现（由 [data-tool-mode="convert"]
+             上的 CSS 隐藏，而不是从 DOM 里删掉 —— syncUI 依赖这些元素存在）。 -->
+        <p class="tool-note" data-convert-note>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16v-4M12 8h.01"/><circle cx="12" cy="12" r="10"/></svg>
+          <span>这个页面只换格式，<b>图片尺寸保持原样</b>，不会被缩小。需要同时调整宽高？<a href="${LOC.slug.up}#tool">用完整工具箱</a>。</span>
+        </p>
+
         <div class="field tool-row" id="qwrap" hidden>
           <label for="q">质量 <span id="qv">92</span>%</label>
           <input type="range" id="q" min="50" max="100" value="92">
@@ -351,7 +358,7 @@ const TOOL = (from, to) => `      <div class="tool reveal">
         </div>
 
         <div class="tool-options">
-          <div class="field">
+          <div class="field" data-resize-only>
             <label id="wpresets-label">常用宽度</label>
             <div class="presets" id="wpresets" role="group" aria-labelledby="wpresets-label">
               <button class="chip on" type="button" data-w="400" aria-pressed="true">400</button>
@@ -361,7 +368,7 @@ const TOOL = (from, to) => `      <div class="tool reveal">
               <button class="chip" type="button" data-w="1920" aria-pressed="false">1920</button>
             </div>
           </div>
-          <div class="field">
+          <div class="field" data-resize-only>
             <label id="spresets-label">按原图比例</label>
             <div class="presets" id="spresets" role="group" aria-labelledby="spresets-label">
               <button class="chip" type="button" data-scale="0.25" aria-pressed="false">25%</button>
@@ -370,8 +377,8 @@ const TOOL = (from, to) => `      <div class="tool reveal">
               <button class="chip" type="button" data-scale="1" aria-pressed="false">100%</button>
             </div>
           </div>
-          <div class="field">
-            <label id="switches-label">处理选项</label>
+          <div class="field" data-resize-only>
+            <label id="switches-label">缩放选项</label>
             <div class="switch-stack" role="group" aria-labelledby="switches-label">
               <label class="switch-row">
                 <span class="switch"><input type="checkbox" id="lock" checked><span class="track"></span></span>
@@ -381,6 +388,11 @@ const TOOL = (from, to) => `      <div class="tool reveal">
                 <span class="switch"><input type="checkbox" id="noup"><span class="track"></span></span>
                 不放大
               </label>
+            </div>
+          </div>
+          <div class="field">
+            <label id="misc-label">其他</label>
+            <div class="switch-stack" role="group" aria-labelledby="misc-label">
               <label class="switch-row">
                 <span class="switch"><input type="checkbox" id="auto"><span class="track"></span></span>
                 拖入即自动下载
@@ -529,7 +541,7 @@ function page(from, to) {
         tool: [{ "@type": "HowToTool", name: "Pixora 在线图片工具箱" }],
         step: [
           { "@type": "HowToStep", position: 1, name: `拖入 ${s.label} 图片`, text: `把 ${s.label} 图片拖入投放区，或点击选择文件、按 Ctrl + V 粘贴截图，支持一次多张。`, url: `${url}#tool` },
-          { "@type": "HowToStep", position: 2, name: `确认输出为 ${t.label} 并设定宽度`, text: `输出格式已预设为 ${t.label}。设定目标宽度（如 400 / 600），高度会自动按原图比例计算。`, url: `${url}#tool` },
+          { "@type": "HowToStep", position: 2, name: `确认输出为 ${t.label}`, text: `输出格式已预设为 ${t.label}，无需再选。图片尺寸保持原样，本页不做缩放。`, url: `${url}#tool` },
           { "@type": "HowToStep", position: 3, name: "下载或打包", text: "结果卡片会显示转换后的格式、尺寸与体积变化，可逐张下载，也可一键打包成 ZIP。", url: `${url}#tool` },
         ],
       },
@@ -546,7 +558,7 @@ function page(from, to) {
   };
 
   return `<!DOCTYPE html>
-<html lang="zh-CN" data-theme="light" data-convert-from="${from}" data-convert-to="${ENGINE_ID[to]}">
+<html lang="zh-CN" data-theme="light" data-tool-mode="convert" data-resize="off" data-convert-from="${from}" data-convert-to="${ENGINE_ID[to]}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">

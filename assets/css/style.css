@@ -585,6 +585,47 @@ table.cmp .col-us { background: color-mix(in srgb, var(--brand) 6%, transparent)
 .drop small { color: var(--muted); }
 /* Two columns on phones and tablets, one row of four from 860px up. auto-fit
    used to leave an orphaned fourth field on its own row at tablet widths. */
+/* ---------- 5c. 格式转换 vs 调整尺寸 ----------
+   Two separate intentions that used to share one set of controls, with the
+   resize controls winning by default — a "PNG 转 JPG" page quietly shrank a
+   1200x800 photo to 400x267. Now the mode is explicit, converting is the
+   default because it is the non-destructive one, and a landing page never
+   shows the resize controls at all.
+
+   The controls stay in the DOM (syncUI keys off them existing) and are hidden
+   by CSS, driven by data-resize on <html>. */
+[data-resize="off"] [data-resize-only] { display: none; }
+/* Landing pages are conversion-only: no mode switch to offer. */
+[data-tool-mode="convert"] [data-mode-switch] { display: none; }
+/* The explanatory note only belongs on a page that is conversion-only. */
+[data-tool-mode="full"] [data-convert-note] { display: none; }
+/* One field left, so let it use the full width instead of half a two-up grid. */
+[data-resize="off"] .tool-controls { grid-template-columns: 1fr; }
+
+.tool-modes { margin-top: 18px; }
+.seg {
+  display: inline-flex; gap: 4px; padding: 4px;
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius);
+}
+.seg-btn {
+  appearance: none; border: 0; background: none; cursor: pointer; font: inherit;
+  padding: .5rem 1.15rem; border-radius: var(--radius-sm);
+  font-size: .9rem; font-weight: 600; color: var(--text-2);
+  transition: background .18s var(--ease), color .18s var(--ease);
+}
+.seg-btn:hover { color: var(--text); }
+.seg-btn.on { background: var(--surface); color: var(--brand-ink); box-shadow: var(--shadow-xs); }
+.seg-hint { margin: 10px 0 0; font-size: .85rem; color: var(--muted); }
+
+.tool-note {
+  display: flex; align-items: flex-start; gap: 9px;
+  margin: 16px 0 0; padding: 11px 14px;
+  background: var(--brand-soft); border-radius: var(--radius-sm);
+  color: var(--text-2); font-size: .87rem; line-height: 1.6;
+}
+.tool-note svg { width: 16px; height: 16px; flex: none; margin-top: 2px; color: var(--brand-ink); }
+.tool-note b { color: var(--text); }
+
 .tool-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 18px; align-items: start; }
 .tool-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 16px; align-items: start; }
 /* The toggle group mirrors the chip row's height so both columns of

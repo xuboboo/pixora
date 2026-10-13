@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="light" data-convert-from="bmp" data-convert-to="jpeg">
+<html lang="zh-CN" data-theme="light" data-tool-mode="convert" data-resize="off" data-convert-from="bmp" data-convert-to="jpeg">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -143,8 +143,8 @@
         {
           "@type": "HowToStep",
           "position": 2,
-          "name": "确认输出为 JPG 并设定宽度",
-          "text": "输出格式已预设为 JPG。设定目标宽度（如 400 / 600），高度会自动按原图比例计算。",
+          "name": "确认输出为 JPG",
+          "text": "输出格式已预设为 JPG，无需再选。图片尺寸保持原样，本页不做缩放。",
           "url": "https://xuboboo.github.io/pixora/convert/bmp-to-jpg/#tool"
         },
         {
@@ -341,22 +341,22 @@
         <div class="drop" id="drop" role="button" tabindex="0" aria-label="拖入或点击选择图片">
           <div class="big" aria-hidden="true">🖼️</div>
           <h3>把 BMP 图片拖到这里</h3>
-          <small>也可以点击选择文件，或直接按 Ctrl + V 粘贴截图 · 输出格式已预设为 JPG · 可多张批量</small>
+          <small>也可以点击选择文件，或直接按 Ctrl + V 粘贴截图 · 输出格式已预设为 JPG · 图片尺寸保持原样 · 可多张批量</small>
           <input type="file" id="file" accept="image/*" multiple hidden>
         </div>
 
         <div class="tool-controls">
-          <div class="field">
+          <div class="field" data-resize-only>
             <label for="w">目标宽度 (px)</label>
             <input type="number" id="w" min="1" step="1" value="400" inputmode="numeric">
           </div>
 
-          <div class="field">
+          <div class="field" data-resize-only>
             <label for="h">目标高度 (px)</label>
             <input type="number" id="h" min="1" step="1" placeholder="自动">
           </div>
 
-          <div class="field">
+          <div class="field" data-resize-only>
             <label for="mode">缩放方式</label>
             <select id="mode">
               <option value="contain" selected>等比适应</option>
@@ -377,6 +377,13 @@
           </div>
         </div>
 
+        <!-- 这个页面只做格式转换，尺寸控件整块不出现（由 [data-tool-mode="convert"]
+             上的 CSS 隐藏，而不是从 DOM 里删掉 —— syncUI 依赖这些元素存在）。 -->
+        <p class="tool-note" data-convert-note>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16v-4M12 8h.01"/><circle cx="12" cy="12" r="10"/></svg>
+          <span>这个页面只换格式，<b>图片尺寸保持原样</b>，不会被缩小。需要同时调整宽高？<a href="../../#tool">用完整工具箱</a>。</span>
+        </p>
+
         <div class="field tool-row" id="qwrap" hidden>
           <label for="q">质量 <span id="qv">92</span>%</label>
           <input type="range" id="q" min="50" max="100" value="92">
@@ -391,7 +398,7 @@
         </div>
 
         <div class="tool-options">
-          <div class="field">
+          <div class="field" data-resize-only>
             <label id="wpresets-label">常用宽度</label>
             <div class="presets" id="wpresets" role="group" aria-labelledby="wpresets-label">
               <button class="chip on" type="button" data-w="400" aria-pressed="true">400</button>
@@ -401,7 +408,7 @@
               <button class="chip" type="button" data-w="1920" aria-pressed="false">1920</button>
             </div>
           </div>
-          <div class="field">
+          <div class="field" data-resize-only>
             <label id="spresets-label">按原图比例</label>
             <div class="presets" id="spresets" role="group" aria-labelledby="spresets-label">
               <button class="chip" type="button" data-scale="0.25" aria-pressed="false">25%</button>
@@ -410,8 +417,8 @@
               <button class="chip" type="button" data-scale="1" aria-pressed="false">100%</button>
             </div>
           </div>
-          <div class="field">
-            <label id="switches-label">处理选项</label>
+          <div class="field" data-resize-only>
+            <label id="switches-label">缩放选项</label>
             <div class="switch-stack" role="group" aria-labelledby="switches-label">
               <label class="switch-row">
                 <span class="switch"><input type="checkbox" id="lock" checked><span class="track"></span></span>
@@ -421,6 +428,11 @@
                 <span class="switch"><input type="checkbox" id="noup"><span class="track"></span></span>
                 不放大
               </label>
+            </div>
+          </div>
+          <div class="field">
+            <label id="misc-label">其他</label>
+            <div class="switch-stack" role="group" aria-labelledby="misc-label">
               <label class="switch-row">
                 <span class="switch"><input type="checkbox" id="auto"><span class="track"></span></span>
                 拖入即自动下载

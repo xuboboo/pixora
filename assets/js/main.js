@@ -151,6 +151,29 @@
   var modeHint = $("#modehint");
   var spresets = $("#spresets"), noupEl = $("#noup"), statEl = $("#stat");
   var zipBtn = $("#zip"), againBtn = $("#again"), clearBtn = $("#clear");
+  var modeTabs = $("#toolmodes"), modeHint2 = $("#modehint2");
+
+  /* ---------- Tool mode ----------
+     Two genuinely different jobs were sharing one set of controls, and the
+     resize controls won by default: a landing page advertised "PNG 转 JPG" and
+     then quietly shrank a 1200x800 photo to 400x267, because state.width
+     defaulted to 400. Converting a format and resizing an image are separate
+     intentions, so they are separate modes now.
+
+       "convert" — the 35 landing pages and the hub. Format only, dimensions
+                   untouched. The resize controls are never shown.
+       "full"    — the homepage toolbox. Both modes, chosen explicitly, and
+                   converting is the default because it is the non-destructive
+                   one: nothing changes that the user did not ask to change. */
+  var TOOL_MODE = document.documentElement.getAttribute("data-tool-mode") || "full";
+  var CAN_RESIZE = TOOL_MODE === "full";
+
+  /* Whether resizing is actually in effect *here*. Deliberately does not write
+     back to state.resize: a landing page forcing the mode off must not leak into
+     localStorage, or a later visit to the toolbox would forget the mode the user
+     picked there. (applyParams() saves on every landing-page load, so mutating
+     state.resize here would persist the forced value.) */
+  function resizeOn() { return CAN_RESIZE && !!state.resize; }
 
   /* ---------- Format registry ----------
      alpha:  whether the container can carry transparency
@@ -227,6 +250,9 @@
   /* ---------- State ---------- */
   var LS = "pixora-tool-v2";
   var state = {
+    /* resize: false means "只换格式" — computeSize returns the source dimensions
+       untouched. Only the homepage can turn it on; landing pages force it off. */
+    resize: false,
     width: 400, height: null, lock: true, mode: "contain",
     format: "png", quality: 92, background: "#ffffff", auto: false,
     /* scale: null means "use 目标宽度"; a fraction means "scale every image from
@@ -279,12 +305,16 @@
     if (!want || available.indexOf(want) < 0) want = pageTo;
     if (want && available.indexOf(want) >= 0) { state.format = want; touched = true; }
     if (q.mode && MODES[q.mode]) { state.mode = q.mode; touched = true; }
-    n = parseInt(q.w, 10);
-    if (n > 0) { state.width = n; touched = true; }
-    /* ?scale=50 is the percentage equivalent of ?w=, for links that scale rather
-       than target a fixed width. */
-    n = parseInt(q.scale, 10);
-    if (n > 0 && n <= 400) { state.scale = n / 100; touched = true; }
+    /* Dimension parameters only apply in the full toolbox. A landing page's
+       contract is "只换格式", so honouring ?w= there would give one page two
+       contradictory meanings. Passing them also implies the resize mode, since
+       asking for a width is asking to resize. */
+    if (CAN_RESIZE) {
+      n = parseInt(q.w, 10);
+      if (n > 0) { state.width = n; state.resize = true; touched = true; }
+      n = parseInt(q.scale, 10);
+      if (n > 0 && n <= 400) { state.scale = n / 100; state.resize = true; touched = true; }
+    }
     n = parseInt(q.q, 10);
     if (n >= 50 && n <= 100) { state.quality = n; touched = true; }
     if (touched) save();
@@ -315,7 +345,28 @@
     if (lab) lab.textContent = kind === "ico" ? "图标尺寸" : "常用宽度";
   }
 
+  /* Reflect the mode into the DOM. CSS does the hiding (the elements stay in
+     the tree so syncUI keeps working); this only keeps the attribute and the
+     tab state honest. */
+  function applyMode() {
+    var on = resizeOn();
+    document.documentElement.setAttribute("data-resize", on ? "on" : "off");
+    if (modeTabs) {
+      $$(".seg-btn", modeTabs).forEach(function (b) {
+        var sel = (b.dataset.mode === "resize") === on;
+        b.classList.toggle("on", sel);
+        b.setAttribute("aria-selected", String(sel));
+      });
+    }
+    if (modeHint2) {
+      modeHint2.textContent = on
+        ? "可改宽高：按宽度、按原图比例，或锁定宽高比"
+        : "只换格式，图片尺寸保持原样";
+    }
+  }
+
   function syncUI() {
+    applyMode();
     if (!wEl) return;
     var d = def();
     buildPresets();
@@ -362,21 +413,25 @@
   }
 
   function computeSize(sw, sh) {
-    var w, h;
-    if (state.scale) {
-      w = sw * state.scale;
-      h = sh * state.scale;
-    } else {
-      w = state.width || sw;
-      h = (state.lock || state.height == null) ? Math.round(w * sh / sw) : state.height;
-    }
-    w = Math.max(1, Math.round(w));
-    h = Math.max(1, Math.round(h));
-    /* Clamp per axis rather than by area: with the ratio locked both axes exceed
-       together, and in stretch mode each one is judged on its own. */
-    if (state.noUpscale) {
-      if (w > sw) w = sw;
-      if (h > sh) h = sh;
+    /* 格式转换模式：尺寸原样透传。下面 ICO 的 256px 上限仍然适用，因为那是
+       格式本身的定义，不是用户的缩放意图。 */
+    var w = sw, h = sh;
+    if (resizeOn()) {
+      if (state.scale) {
+        w = sw * state.scale;
+        h = sh * state.scale;
+      } else {
+        w = state.width || sw;
+        h = (state.lock || state.height == null) ? Math.round(w * sh / sw) : state.height;
+      }
+      w = Math.max(1, Math.round(w));
+      h = Math.max(1, Math.round(h));
+      /* Clamp per axis rather than by area: with the ratio locked both axes exceed
+         together, and in stretch mode each one is judged on its own. */
+      if (state.noUpscale) {
+        if (w > sw) w = sw;
+        if (h > sh) h = sh;
+      }
     }
     /* ICO entries top out at 256px per side by definition. */
     if (state.format === "ico") {
@@ -630,7 +685,11 @@
   }
   function outName(name, w, h, fmt) {
     var base = String(name).replace(/\.[^.]+$/, "").replace(/[\\/:*?"<>|]+/g, "_").slice(0, 80);
-    return (base || "image") + "_" + w + "x" + h + "." + FORMATS[fmt].ext;
+    /* Only stamp the dimensions when they actually changed. In convert mode the
+       numbers would just echo the source size and read as though the image had
+       been resized, which is the confusion this whole change is about. */
+    var tag = resizeOn() ? "_" + w + "x" + h : "";
+    return (base || "image") + tag + "." + FORMATS[fmt].ext;
   }
   function download(url, filename) {
     var a = document.createElement("a");
@@ -810,6 +869,21 @@
   if (bgEl) bgEl.addEventListener("input", function () { state.background = bgEl.value; syncUI(); save(); });
   autoEl.addEventListener("change", function () { state.auto = autoEl.checked; save(); });
   if (noupEl) noupEl.addEventListener("change", function () { state.noUpscale = noupEl.checked; save(); });
+  if (modeTabs) {
+    modeTabs.addEventListener("click", function (e) {
+      var b = e.target.closest && e.target.closest(".seg-btn");
+      if (!b) return;
+      var want = b.dataset.mode === "resize";
+      if (want === resizeOn()) return;
+      state.resize = want;
+      /* Coming back into resize mode with the ratio locked, drop any height left
+         over from a previous stretch so the field reads "自动" again. */
+      if (state.resize && state.lock) state.height = null;
+      syncUI(); save();
+      setIdle();
+    });
+  }
+
   $("#wpresets").addEventListener("click", function (e) {
     var b = e.target.closest(".chip"); if (!b) return;
     state.width = Number(b.dataset.w);
@@ -859,10 +933,22 @@
   });
 
   /* ---------- Boot ---------- */
+  /* The idle status names the active mode, so it must be recomputed whenever the
+     mode changes — otherwise switching to 调整尺寸 would leave the status bar
+     still claiming the image size is being left alone. */
+  var idleBase = "已就绪 · 拖入图片即可";
+  function statusTail() {
+    return "，全部在本地完成" + (resizeOn() ? "" : " · 尺寸保持原样");
+  }
+  function setIdle(base) {
+    if (base) idleBase = base;
+    if (!busy) statusEl.textContent = idleBase + statusTail();
+  }
+
   load();
   syncUI();
   syncActions();
-  statusEl.textContent = "已就绪 · 拖入图片即可，全部在本地完成";
+  setIdle();
 
   detectFormats().then(function () {
     buildFormatSelect();
@@ -870,12 +956,9 @@
     syncUI();
     var from = (document.documentElement.getAttribute("data-convert-from") || "").toUpperCase();
     if (linked && from && FORMATS[state.format]) {
-      statusEl.textContent = "已预设输出为 " + FORMATS[state.format].label +
-        " · 拖入 " + from + " 图片即可，全部在本地完成";
+      setIdle("已预设输出为 " + FORMATS[state.format].label + " · 拖入 " + from + " 图片即可");
     } else {
-      statusEl.textContent = linked
-        ? "已按链接预设输出格式 · 拖入图片即可，全部在本地完成"
-        : "已就绪 · 拖入图片即可，全部在本地完成";
+      setIdle(linked ? "已按链接预设输出格式 · 拖入图片即可" : "已就绪 · 拖入图片即可");
     }
   });
 })();
