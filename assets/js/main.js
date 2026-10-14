@@ -175,6 +175,7 @@
   var wEl = $("#w"), hEl = $("#h"), lockEl = $("#lock"), modeEl = $("#mode");
   var fmtEl = $("#format"), qEl = $("#q"), qvEl = $("#qv"), qwrap = $("#qwrap"), autoEl = $("#auto");
   var bgEl = $("#bgcolor"), bgVal = $("#bgval"), bgRow = $("#bgrow"), fmtHint = $("#fmthint");
+  var palEl = $("#palcolors"), palWrap = $("#palwrap");
   var modeHint = $("#modehint");
   var spresets = $("#spresets"), noupEl = $("#noup"), statEl = $("#stat");
   var zipBtn = $("#zip"), againBtn = $("#again"), clearBtn = $("#clear");
@@ -232,6 +233,15 @@
   };
   var FORMAT_ORDER = ["png", "jpeg", "webp", "avif", "bmp", "ico"];
   var available = ["png", "jpeg", "bmp", "ico"];
+
+  /* PNG 调色板量化的可选档位。用整数枚举而不是滑杆：median cut 的收益是按 2 的幂
+     台阶跳的，允许「137 色」只会让结果不可预期，换不来任何好处。 */
+  var PALETTE_STEPS = [0, 256, 128, 64, 32, 16, 8, 4, 2];
+  /* 只认下拉里真实存在的档位，免得 localStorage 里一个野值让 select 显示空白。 */
+  function paletteValue() {
+    var v = Number(state.palette) || 0;
+    return PALETTE_STEPS.indexOf(v) >= 0 ? v : 0;
+  }
 
   /* ---------- Resize-mode registry ----------
      The option labels stay bare ("等比适应") because the field is only ~150px
@@ -292,6 +302,10 @@
     resize: false,
     width: 400, height: null, lock: true, mode: "contain",
     format: "png", quality: 92, background: "#ffffff", auto: false,
+    /* palette: PNG 调色板量化的目标色数，0 表示不量化。它只在 PNG 输出时生效 ——
+       BMP 无压缩（量化只降画质不缩体积），JPG/WEBP/AVIF 本身有损（先量化再编码是
+       双重劣化），所以别的格式一律忽略这个值，UI 也不显示它。 */
+    palette: 0,
     /* scale: null means "use 目标宽度"; a fraction means "scale every image from
        its own pixel size". A batch can mix dimensions, so a percentage has to be
        resolved per image rather than baked into one width up front.
@@ -444,6 +458,9 @@
     /* The background swatch only means something when the target cannot keep
        alpha — otherwise it would be a control that silently does nothing. */
     if (bgRow) bgRow.hidden = d.alpha;
+    /* 量化只对 PNG 有意义；换到别的格式就整块收起，不给一个点了没反应的控件。 */
+    if (palWrap) palWrap.hidden = state.format !== "png";
+    if (palEl) palEl.value = String(paletteValue());
     if (fmtHint) fmtHint.textContent = d.hint;
     if (modeHint) modeHint.textContent = MODES[state.mode] || MODES.contain;
     $$("#wpresets .chip").forEach(function (b) {
@@ -617,10 +634,37 @@
     });
   }
 
+  /* 调色板量化：把画布颜色收敛到 n 色，产出**一张新画布**。原画布一个像素都不动 ——
+     调用方可能还要拿它编别的格式（体积对比要同一张图编成多种格式），就地改会污染结果。
+     median cut 在内核里，这里只负责 canvas <-> ImageData 这一层搬运。 */
+  function quantizedCanvas(canvas, n) {
+    var w = canvas.width, h = canvas.height;
+    if (!(n >= 2) || !w || !h) return null;
+    var img = canvas.getContext("2d").getImageData(0, 0, w, h);
+    Pixora.pixels.quantize(img.data, w, h, n);
+    var tmp = document.createElement("canvas");
+    tmp.width = w; tmp.height = h;
+    tmp.getContext("2d").putImageData(img, 0, 0);
+    return tmp;
+  }
+
   function encode(canvas, fmt, quality) {
     if (fmt === "bmp") return encodeBMP(canvas);
     if (fmt === "ico") return encodeICO(canvas);
-    return canvasToBlob(canvas, FORMATS[fmt].mime, FORMATS[fmt].quality ? quality / 100 : undefined);
+    var mime = FORMATS[fmt].mime;
+    var q = FORMATS[fmt].quality ? quality / 100 : undefined;
+    var small = fmt === "png" ? quantizedCanvas(canvas, paletteValue()) : null;
+    if (!small) return canvasToBlob(canvas, mime, q);
+    /* 量化有代价：减少颜色数的同时破坏了 PNG 滤波所依赖的平滑性。实测
+       （_audit/probe-quant.mjs）对真实图形能降 36–64%，但对手工生成的平滑渐变反而会
+       涨 3–7 倍。所以**只在确实更小时才采用** —— 宁可什么都不做，也不给用户一个
+       「开了之后文件更大」的开关。多编一次的代价换来这条不变量，值。 */
+    return Promise.all([canvasToBlob(canvas, mime, q), canvasToBlob(small, mime, q)])
+      .then(function (both) {
+        if (both[1].size < both[0].size) { both[1].quantized = true; return both[1]; }
+        both[0].quantized = false;
+        return both[0];
+      });
   }
 
   /* ======================================================================
@@ -854,6 +898,10 @@
     }
     $(".sz", el).innerHTML = fromLabel + " → <b>" + def().label + "</b> · " +
       tw + " × " + th + " · " + humanSize(blob.size) + delta +
+      /* 用户要求了量化、量化却反而更大时如实说明，否则「选了 16 色体积没变」
+         看起来像功能坏了。 */
+      (blob.quantized === false && state.format === "png" && paletteValue() >= 2
+        ? ' <span class="delta">量化未生效（原图更小）</span>' : "") +
       ' <span class="badge-ok">完成</span>' +
       '<br><a class="dl" download="' + esc(filename) + '" href="' + url + '">下载 ' +
       esc(filename.split(".").pop().toUpperCase()) + "</a>";
@@ -1003,6 +1051,9 @@
   });
   modeEl.addEventListener("change", function () { state.mode = modeEl.value; syncUI(); save(); });
   fmtEl.addEventListener("change", function () { state.format = fmtEl.value; syncUI(); save(); });
+  if (palEl) palEl.addEventListener("change", function () {
+    state.palette = parseInt(palEl.value, 10) || 0; syncUI(); save();
+  });
   qEl.addEventListener("input", function () { state.quality = parseInt(qEl.value, 10); qvEl.textContent = state.quality; save(); });
   if (bgEl) bgEl.addEventListener("input", function () { state.background = bgEl.value; syncUI(); save(); });
   autoEl.addEventListener("change", function () { state.auto = autoEl.checked; save(); });

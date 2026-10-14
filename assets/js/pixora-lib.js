@@ -364,8 +364,117 @@
     return px;
   }
 
+  /* ======================================================================
+     6. 调色板量化（median cut）—— Squoosh 的 Reduce palette 同款能力
+
+     把图片压到 maxColors 色以内，主要收益在 PNG：扁平插画、截图、线稿这类图，
+     PNG 的无损压缩对渐近色仍然逐个像素记账，砍到 256 色后体积常能腰斩。
+
+     为什么先聚到 5bit 直方图再切：照片有上百万个不同颜色，直接对精确颜色做
+     中位切分，箱子表和排序都撑不住。5bit/通道共 32768 桶，先合并桶内颜色，
+     切分在桶上进行 —— 最大颜色偏差 ±4/255，肉眼不可见，复杂度从 O(颜色数)
+     降到 O(32768)。
+
+     alpha 一个字节都不动：透明形状是抠图 / 图标类图片的命门，量化只该动
+     颜色、不该动透明度。原地改 px 并返回它，与本节其他函数一致。
+     ====================================================================== */
+  function quantizeRGBA(px, w, h, maxColors) {
+    var n = Math.floor(maxColors);
+    if (!(n >= 1)) n = 256;
+    if (n > 256) n = 256;
+    var len = w * h;
+    if (!len || !px || px.length < len * 4) return px;
+
+    var BINS = 32768;                    // 5bit × 3 通道
+    var cnt = new Uint32Array(BINS);
+    var sr = new Float64Array(BINS), sg = new Float64Array(BINS), sb = new Float64Array(BINS);
+    var used = [];
+    for (var i = 0; i < len; i++) {
+      var o = i * 4;
+      var key = ((px[o] >> 3) << 10) | ((px[o + 1] >> 3) << 5) | (px[o + 2] >> 3);
+      if (cnt[key] === 0) used.push(key);
+      cnt[key]++;
+      sr[key] += px[o]; sg[key] += px[o + 1]; sb[key] += px[o + 2];
+    }
+    if (!used.length) return px;
+
+    /* 箱子用通道区间表示，比维护成员列表省内存；切分时按最长轴排序成员。 */
+    var box = { r0: 31, r1: 0, g0: 31, g1: 0, b0: 31, b1: 0, keys: used, count: len };
+    for (var u = 0; u < used.length; u++) {
+      var k = used[u];
+      var kr = (k >> 10) & 31, kg = (k >> 5) & 31, kb = k & 31;
+      if (kr < box.r0) box.r0 = kr; if (kr > box.r1) box.r1 = kr;
+      if (kg < box.g0) box.g0 = kg; if (kg > box.g1) box.g1 = kg;
+      if (kb < box.b0) box.b0 = kb; if (kb > box.b1) box.b1 = kb;
+    }
+    var boxes = [box];
+
+    /* 每次把像素最多的箱子沿最长轴对半切 —— 经典 median cut。只有 1 个成员的
+       箱子没得切，跳过；凑不齐 n 个箱子就停（图片本身就没那么多颜色）。 */
+    while (boxes.length < n) {
+      var bi = -1, best = 0;
+      for (var bi2 = 0; bi2 < boxes.length; bi2++) {
+        var bx = boxes[bi2];
+        if (bx.keys.length < 2) continue;
+        if (bx.count > best) { best = bx.count; bi = bi2; }
+      }
+      if (bi < 0) break;
+      var b = boxes[bi];
+      var dr = b.r1 - b.r0, dg = b.g1 - b.g0, db = b.b1 - b.b0;
+      var axis = dr >= dg && dr >= db ? "r" : (dg >= db ? "g" : "b");
+      var sh = axis === "r" ? 10 : (axis === "g" ? 5 : 0);
+      b.keys.sort(function (x, y) { return ((x >> sh) & 31) - ((y >> sh) & 31); });
+      var half = b.count / 2, acc = 0, cut = 0;
+      for (var ki = 0; ki < b.keys.length - 1; ki++) {
+        acc += cnt[b.keys[ki]];
+        cut = ki + 1;
+        if (acc >= half) break;
+      }
+      var lk = b.keys.slice(0, cut), rk = b.keys.slice(cut);
+      var lb = { keys: lk }, rb = { keys: rk };
+      [lb, rb].forEach(function (nb) {
+        nb.count = 0;
+        nb.r0 = nb.g0 = nb.b0 = 31; nb.r1 = nb.g1 = nb.b1 = 0;
+        for (var q = 0; q < nb.keys.length; q++) {
+          var key = nb.keys[q];
+          nb.count += cnt[key];
+          var r2 = (key >> 10) & 31, g2 = (key >> 5) & 31, b2 = key & 31;
+          if (r2 < nb.r0) nb.r0 = r2; if (r2 > nb.r1) nb.r1 = r2;
+          if (g2 < nb.g0) nb.g0 = g2; if (g2 > nb.g1) nb.g1 = g2;
+          if (b2 < nb.b0) nb.b0 = b2; if (b2 > nb.b1) nb.b1 = b2;
+        }
+        boxes.push(nb);
+      });
+      boxes.splice(bi, 1);
+    }
+
+    /* 每个箱子一颗代表色（加权平均），再摊成 32768 项的查找表，主循环一次命中。 */
+    var lut = new Uint8Array(BINS * 3);
+    for (var bi3 = 0; bi3 < boxes.length; bi3++) {
+      var bb = boxes[bi3];
+      var R = 0, G = 0, B = 0;
+      for (var kj = 0; kj < bb.keys.length; kj++) {
+        var key2 = bb.keys[kj], c = cnt[key2];
+        R += sr[key2]; G += sg[key2]; B += sb[key2];
+      }
+      var inv = bb.count ? 1 / bb.count : 0;
+      var pr = clamp255(Math.round(R * inv)), pg = clamp255(Math.round(G * inv)), pb = clamp255(Math.round(B * inv));
+      for (var kk = 0; kk < bb.keys.length; kk++) {
+        var key3 = bb.keys[kk];
+        lut[key3 * 3] = pr; lut[key3 * 3 + 1] = pg; lut[key3 * 3 + 2] = pb;
+      }
+    }
+
+    for (var p = 0; p < len; p++) {
+      var po = p * 4;
+      var pk = ((px[po] >> 3) << 10) | ((px[po + 1] >> 3) << 5) | (px[po + 2] >> 3);
+      px[po] = lut[pk * 3]; px[po + 1] = lut[pk * 3 + 1]; px[po + 2] = lut[pk * 3 + 2];
+    }
+    return px;
+  }
+
   return {
-    version: "1.3.0",
+    version: "1.4.0",
     clamp: clamp, clamp255: clamp255,
     humanSize: humanSize, pad2: pad2, stamp: stamp,
 
@@ -385,7 +494,8 @@
       adjust: adjustRGBA,
       blur: blurRGBA,
       sharpen: sharpenRGBA,
-      vignette: vignetteRGBA
+      vignette: vignetteRGBA,
+      quantize: quantizeRGBA
     }
   };
 });

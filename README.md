@@ -66,6 +66,7 @@ Pixora 把「打开在线 PS → 上传图片 → 文件 → 导出为 PNG → �
 | **AI 超分放大** | 首页工具箱的「AI 放大」模式：Real-ESRGAN x4v3 端上推理，最高 4 倍、输入上限 150 万像素；不放大时只做轻量增强 |
 | **在线修图编辑器** | [`/editor/`](https://xuboboo.github.io/pixora/editor/)：7 种工具 + 7 项实时调整 + 9 个滤镜 + 裁剪旋转翻转 + 撤销重做 + PNG/JPG/WEBP 导出 |
 | **专业级画质** | 分步降采样 + 高质量重采样，大幅缩小时依旧锐利 |
+| **PNG 调色板量化** | 把颜色收敛到 2–256 色再编码（median cut），实测真实图形体积可降 36–64%、照片类可降 27–59%；量化后反而更大时自动放弃并如实说明 |
 | **离线可用** | 页面加载后断网也能继续处理（AI 放大需模型已加载） |
 | **明暗双主题** | 跟随系统偏好，也可手动切换并记忆 |
 | **粘贴即用** | 支持 `Ctrl` + `V` 直接粘贴剪贴板截图 |
@@ -192,7 +193,7 @@ pixora/
 │   ├── gen-convert-pages.mjs      # 落地页 + 总览页 + 404 页 + sitemap.xml 生成器
 │   ├── gen-editor-page.mjs        # 在线修图编辑器页生成器
 │   ├── gen-doc-pages.mjs          # 5 个项目文档页（由 md / LICENSE / CHANGELOG.md 生成）
-│   ├── test-lib.mjs               # 图像内核单测（59 项：期望值 + CJS/ESM/类型/package.json 对齐）
+│   ├── test-lib.mjs               # 图像内核单测（69 项：期望值 + CJS/ESM/类型/package.json 对齐）
 │   └── test-package.mjs           # 封装冒烟（28 项：从外部消费者视角跑三条引入路径）
 ├── assets/
 │   ├── css/style.css              # 设计系统（Design Tokens + 组件）
@@ -259,8 +260,8 @@ node tools/gen-doc-pages.mjs       # 五个项目文档页
 
 `assets/js/pixora-lib.js` 把站点里零散的图像实现收拢成一份**不碰 DOM 的内核**：
 降采样阶梯、24 位 BMP 编码、ZIP 打包与 CRC32、超分分块表、完整像素调整链
-（LUT → 饱和度 → sepia → 反色 → 模糊 → 锐化 → 暗角）。首页工具箱与编辑器原先各抄了一份
-像素链，现在全部委托内核，重复实现与漂移面一起消失。
+（LUT → 饱和度 → sepia → 反色 → 模糊 → 锐化 → 暗角）、调色板量化（median cut）。
+首页工具箱与编辑器原先各抄了一份像素链，现在全部委托内核，重复实现与漂移面一起消失。
 
 内核只吃普通对象和数字，所以浏览器里能用、Node 里也能用，你自己写的工具可以直接调用：
 
@@ -280,7 +281,7 @@ const ladder = Pixora.resize.ladder(4000, 3000, 1200);
 `import { pixels } from "pixora"`（带类型声明）；不想引入依赖就把单个
 `assets/js/pixora-lib.js` 拷走 —— 零依赖、不碰 DOM，页面自己就是这么用的。
 
-测试两条：内核单测 `npm test`（59 项），封装冒烟 `npm run test:package`
+测试两条：内核单测 `npm test`（69 项），封装冒烟 `npm run test:package`
 （28 项，从外部消费者视角把 CJS / ESM / 深路径三条路各跑一遍真实操作）。
 
 ## 部署形态与路径前缀
@@ -423,7 +424,7 @@ npx serve .
 改内核请先跑单测，两条一起 —— 第一条盯内核自身，第二条从「装了 `pixora` 包的外部工具」视角验证 `exports` 解析：
 
 ```bash
-npm test                # 内核 59 项
+npm test                # 内核 69 项
 npm run test:package    # 封装 28 项
 ```
 

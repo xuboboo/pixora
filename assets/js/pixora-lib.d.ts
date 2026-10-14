@@ -106,6 +106,12 @@ export interface PixoraApi {
     /** amount 是 0..1，不是百分比（1 是中心权重，-1/4 是四邻）。amount <= 0 时原样返回 */
     sharpen(px: Uint8ClampedArray, w: number, h: number, amount: number): Uint8ClampedArray;
     vignette(px: Uint8ClampedArray, w: number, h: number, amount: number): Uint8ClampedArray;
+    /**
+     * 调色板量化（median cut）：把颜色收敛到 maxColors 种，就地改 RGB 并返回同一引用。
+     * alpha 一个字节都不动。maxColors 向下取整后夹到 1..256，缺省 256。
+     * 图幅为空或像素不足时原样返回。
+     */
+    quantize(px: Uint8ClampedArray, w: number, h: number, maxColors?: number): Uint8ClampedArray;
   };
 }
 

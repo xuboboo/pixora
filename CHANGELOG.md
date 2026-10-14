@@ -3,6 +3,53 @@
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)，
 变更记录参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [1.4.0] — 2026-10-14
+
+一次「把同类工具的长处搬过来」的升级。用 REA 受控重放采集了四家同类工具
+（Squoosh / iLoveIMG / Convertio / docsmall）并**用同一把尺子量了自家站点**，
+按证据排出差距后落地：PNG 输出长出调色板量化，另修掉一条量自己时才暴露的 manifest 缺陷。
+
+### 新增
+
+- **PNG 调色板量化**
+  - 首页工具箱与 35 个转换页在输出 PNG 时多出一个「调色板量化」下拉，可选
+    256 / 128 / 64 / 32 / 16 / 8 / 4 / 2 色，默认关闭
+  - 内核新增 `pixels.quantize(px, w, h, maxColors)`：5 bit/通道直方图 + median cut
+    切分 + 加权平均代表色 + LUT 查表，**alpha 一个字节都不动**
+  - 量化只在**确实更小**时才采用。它减少颜色数的同时会破坏 PNG 滤波所依赖的平滑性：
+    实测（`_audit/probe-quant.mjs`）对真实图形降 36–64%、照片类降 27–59%，但对手工
+    生成的平滑渐变反而会涨 3–7 倍。守卫会把这种情况退回未量化结果，并在结果卡上写明
+    「量化未生效（原图更小）」
+  - 量化只在 PNG 出现：BMP 无压缩（量化只降画质不缩体积），JPG / WEBP / AVIF 本身有损
+    （先量化再编码是双重劣化）
+  - 验收 29 项端到端（`_audit/palette.mjs`），三条主线是颜色确实收敛、alpha 确实不变、
+    变大时确实被拦下
+
+### 修复
+
+- **`site.webmanifest` 里的 SVG 图标条目**
+  - 清单把 `favicon.svg` 声明为图标，而 Chrome 的 manifest 解析器不接受 SVG 图标，
+    于是每次加载都记一条 `Error while trying to use the following icon from the
+    Manifest`，并连带两次 `favicon.svg` 的 `net::ERR_ABORTED`
+  - 这条是**用 REA 采集自家站点时发现的**：五家同一个场景、同一套参数，只有我们自己
+    留下这条控制台告警
+  - 清单里本就有合规的 `icon-192.png` / `icon-512.png` / `icon-maskable-512.png`，
+    那条 SVG 既多余又有害，删除即可
+- `site.webmanifest` 的 `description` 仍写着「按宽度等比缩放并一键导出 PNG」，而站点
+  早已支持 6 种格式输出、AI 放大与在线修图 —— 改为如实描述
+
+### 文档
+
+- `docs/api.md` 补第 6 节「调色板量化」：量纲、alpha 约定、幂等性、性能量级
+- `README.md` 能力表补一行、内核能力列表补一项
+- `docs/api.md` 与 `README.md` 的内核单测计数 59 → 69 修正（1.3.0 起就已过期）
+
+### 内核
+
+- `assets/js/pixora-lib.js` 版本 1.3.0 → 1.4.0，`pixels` 命名空间新增 `quantize`
+- `assets/js/pixora-lib.d.ts` 补 `quantize` 声明
+- `package.json` 版本与描述同步，keywords 补 `quantize` / `median-cut` / `palette`
+
 ## [1.3.0] — 2026-10-13
 
 一次能力扩展：站点从「格式转换 + 等比缩放」长成「转换 + 缩放 + AI 放大 + 在线修图」
@@ -478,6 +525,7 @@
 - 首个版本不包含图层级编辑能力。若需要精细修图，建议搭配 Photopea 等完整编辑器使用。
 - 结构化数据刻意不含 `aggregateRating`，以避免标注虚假评价。
 
+[1.4.0]: https://github.com/xuboboo/pixora/releases/tag/v1.4.0
 [1.3.0]: https://github.com/xuboboo/pixora/releases/tag/v1.3.0
 [1.2.4]: https://github.com/xuboboo/pixora/releases/tag/v1.2.4
 [1.2.3]: https://github.com/xuboboo/pixora/releases/tag/v1.2.3

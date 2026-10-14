@@ -114,6 +114,7 @@ node tools/test-package.mjs
 | `sr` | `starts(total)` / `tiles(w, h)` | 超分分块表 |
 | `pixels` | `adjust(px, w, h, a)` | 完整调整链 |
 | `pixels` | `blur` / `sharpen` / `vignette` / `buildLUT` | 单独效果 |
+| `pixels` | `quantize(px, w, h, maxColors)` | 调色板量化（median cut） |
 
 ---
 
@@ -227,13 +228,44 @@ Pixora.pixels.vignette(px, w, h, 0.6)  // 强度 0..1，0 时无操作
 
 ---
 
+## 6. 调色板量化
+
+```js
+const imgData = ctx.getImageData(0, 0, w, h);
+Pixora.pixels.quantize(imgData.data, w, h, 64);   // 收敛到 64 色，就地改 RGB
+ctx.putImageData(imgData, 0, 0);
+```
+
+经典 **median cut**：先把 RGB 各压到 5 bit（32768 个箱子）建直方图，再反复把**像素最多的
+箱子沿最长轴对半切**，直到凑够 `maxColors` 个箱子；每个箱子取加权平均作为代表色，摊成一张
+32768 项的查找表，主循环一次命中。
+
+用途是给 PNG 减重 —— PNG 无损但体积大，把颜色数收下来，体积能降一个量级，而画质损失在
+多数截图/插画上肉眼不可见。**BMP 不要用它**（无压缩，量化只降画质不缩体积）；**JPG/WEBP/AVIF
+也不要**（本身有损，先量化再编码是双重劣化）。
+
+几个约定：
+
+- `maxColors` 向下取整后夹到 **1..256**，缺省 256。给 1 就是单色图。
+- **alpha 一个字节都不动** —— 量化只作用于 RGB，透明边缘不受影响。
+- 输入颜色本来就少于 `maxColors` 时，结果与输入逐像素相同（没有箱子可切就停下）。
+- 就地修改并返回同一引用；图幅为空或 `px` 长度不足时原样返回，不抛异常。
+- 同一输入两次调用结果一致（无随机性）；对已量化的结果再量化一次是**无操作**。
+
+### 性能
+
+O(像素数 + 箱子数 × 切分深度)。一张 2000×2000 约 100–300ms，属于「按一下、等一下」的量级，
+不适合挂在拖动中的滑杆上。
+
+---
+
 ## 基准向量
 
 `tools/test-lib.mjs` 用独立的期望值钉住以上行为（BMP 字节布局、灰度权重、模糊均值、
 分块表覆盖性、ZIP 魔数与 CRC）。改动内核先跑它，改期望值前先确认是内核错了：
 
 ```
-node tools/test-lib.mjs        # 内核 59 项：期望值 + CJS/ESM/类型/package.json 四方对齐
+node tools/test-lib.mjs        # 内核 69 项：期望值 + CJS/ESM/类型/package.json 四方对齐
 node tools/test-package.mjs    # 封装 28 项：从外部消费者视角跑三条引入路径
 ```
 

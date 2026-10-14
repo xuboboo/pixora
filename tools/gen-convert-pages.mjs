@@ -357,6 +357,24 @@ const TOOL = (from, to, loc) => `      <div class="tool reveal">
           </div>
         </div>
 
+        <!-- 量化只在 PNG 输出时出现，这不是懒，是诚实：BMP 无压缩，收敛颜色只会降画质、
+             不会缩体积；JPG/WEBP/AVIF 本身有损，先量化再编码是双重劣化。 -->
+        <div class="field tool-row" id="palwrap" hidden>
+          <label for="palcolors">调色板量化 · 把颜色收敛到指定数量再编码</label>
+          <select id="palcolors">
+            <option value="0" selected>关闭（保留全部颜色）</option>
+            <option value="256">256 色</option>
+            <option value="128">128 色</option>
+            <option value="64">64 色</option>
+            <option value="32">32 色</option>
+            <option value="16">16 色</option>
+            <option value="8">8 色</option>
+            <option value="4">4 色</option>
+            <option value="2">2 色</option>
+          </select>
+          <p class="field-hint">median cut 调色板 · 透明通道原样保留 · 只作用于 PNG · 量化后反而更大时自动放弃</p>
+        </div>
+
         <div class="tool-options">
           <div class="field" data-resize-only>
             <label id="wpresets-label">常用宽度</label>

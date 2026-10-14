@@ -6,13 +6,21 @@
     <description>Pixora 免费在线图片工具箱的版本更新与功能发布。</description>
     <language>zh-CN</language>
     <copyright>MIT License · Pixora contributors</copyright>
-    <lastBuildDate>Tue, 13 Oct 2026 17:30:00 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 14 Oct 2026 11:45:00 +0800</lastBuildDate>
     <atom:link href="https://xuboboo.github.io/pixora/feed.xml" rel="self" type="application/rss+xml"/>
     <image>
       <url>https://xuboboo.github.io/pixora/assets/img/logo.svg</url>
       <title>Pixora</title>
       <link>https://xuboboo.github.io/pixora/</link>
     </image>
+    <item>
+      <title>Pixora 1.4.0 发布：PNG 输出新增调色板量化，并修掉 manifest 的 SVG 图标缺陷</title>
+      <link>https://xuboboo.github.io/pixora/#tool</link>
+      <guid isPermaLink="false">https://xuboboo.github.io/pixora/#release-1-4-0</guid>
+      <pubDate>Wed, 14 Oct 2026 11:45:00 +0800</pubDate>
+      <description><![CDATA[用 REA 受控重放采集了四家同类工具（Squoosh / iLoveIMG / Convertio / docsmall），并用同一把尺子量了自家站点，按证据排出差距后落地：PNG 输出长出调色板量化。内核新增 pixels.quantize——5 bit/通道直方图 + median cut 切分 + 加权平均代表色 + LUT 查表，256 到 2 色共 8 档，alpha 一个字节都不动。量化只在确实更小时才采用：它减少颜色数的同时会破坏 PNG 滤波依赖的平滑性，实测对真实图形降 36–64%、照片类降 27–59%，但对手工生成的平滑渐变反而会涨 3–7 倍，守卫会把这种情况退回未量化结果并写明「量化未生效」。同时修掉一条量自己时才暴露的缺陷：site.webmanifest 把 favicon.svg 声明为图标，而 Chrome 的 manifest 解析器不接受 SVG 图标，于是每次加载都记一条控制台错误——五家同一个场景、同一套参数，只有我们自己有这条告警。验收 29 项端到端。]]></description>
+      <category>Release</category>
+    </item>
     <item>
       <title>Pixora 1.3.0 发布：新增 AI 超分放大与在线修图编辑器，图像能力收拢成可复用的内核</title>
       <link>https://xuboboo.github.io/pixora/#tool</link>

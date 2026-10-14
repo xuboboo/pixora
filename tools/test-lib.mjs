@@ -110,7 +110,79 @@ const check = (name, ok, detail) => {
   check("暗角 0 是无操作", v0.join() === "200,200,200,255");
 }
 
-/* ---------- 4. 超分分块表 ---------- */
+/* ---------- 4. 调色板量化（median cut） ---------- */
+{
+  /* 纯色图：一个桶 → 一个箱子 → 代表色就是原色，必须逐字节不变 */
+  const solid = new Uint8ClampedArray(64 * 64 * 4);
+  for (let i = 0; i < solid.length; i += 4) { solid[i] = 200; solid[i + 1] = 100; solid[i + 2] = 50; solid[i + 3] = 255; }
+  P.pixels.quantize(solid, 64, 64, 16);
+  check("纯色图量化后逐字节不变", solid[(32 * 64 + 32) * 4] === 200 && solid[(32 * 64 + 32) * 4 + 1] === 100 &&
+    solid[(32 * 64 + 32) * 4 + 2] === 50, "got " + solid[(32 * 64 + 32) * 4] + "," + solid[(32 * 64 + 32) * 4 + 1]);
+
+  /* 4 色图压到 4 色：颜色集合必须原样保留 —— 扁平插画的命门就是别把品牌色改掉 */
+  const four = new Uint8ClampedArray(16 * 16 * 4);
+  for (let i = 0; i < four.length; i += 4) {
+    const q = (i / 4) % 4;
+    four[i] = q === 0 ? 255 : 0; four[i + 1] = q === 1 ? 255 : 0;
+    four[i + 2] = q === 2 ? 255 : 0; four[i + 3] = 255;
+  }
+  P.pixels.quantize(four, 16, 16, 4);
+  const set4 = new Set();
+  for (let i = 0; i < four.length; i += 4) set4.add(four[i] + "," + four[i + 1] + "," + four[i + 2]);
+  check("4 色图量化到 4 色后颜色原样", set4.size === 4 && set4.has("255,0,0") && set4.has("0,255,0") &&
+    set4.has("0,0,255") && set4.has("0,0,0"), [...set4].join(" | "));
+
+  /* 渐变（照片的最坏情形：几乎每像素一个色）压到 256：色数必须 ≤ 256，误差要小 */
+  const W = 128, H = 128;
+  const grad = new Uint8ClampedArray(W * H * 4);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const o = (y * W + x) * 4;
+    grad[o] = Math.round(x * 2); grad[o + 1] = Math.round(y * 2); grad[o + 2] = 128; grad[o + 3] = 255;
+  }
+  const before = Uint8ClampedArray.from(grad);
+  P.pixels.quantize(grad, W, H, 256);
+  const colors = new Set(); let err = 0;
+  for (let i = 0; i < grad.length; i += 4) {
+    colors.add((grad[i] >> 3) + "," + (grad[i + 1] >> 3) + "," + (grad[i + 2] >> 3));
+    err += Math.abs(grad[i] - before[i]) + Math.abs(grad[i + 1] - before[i + 1]) + Math.abs(grad[i + 2] - before[i + 2]);
+  }
+  check("256 档量化后颜色数不超 256", colors.size <= 256, "colors=" + colors.size);
+  check("256 档量化的平均通道误差 < 3", err / (W * H * 3) < 3, "mean=" + (err / (W * H * 3)).toFixed(2));
+
+  /* alpha 一个字节都不能动 —— 抠图 / 图标的透明形状是命门 */
+  const al = new Uint8ClampedArray(32 * 32 * 4);
+  for (let i = 0; i < al.length; i += 4) {
+    al[i] = (i >> 2) % 200; al[i + 1] = 100; al[i + 2] = 50; al[i + 3] = (i >> 2) % 4 === 0 ? 0 : (i >> 2) % 256;
+  }
+  const alBefore = Uint8ClampedArray.from(al);
+  P.pixels.quantize(al, 32, 32, 8);
+  let alphaOk = true;
+  for (let i = 3; i < al.length; i += 4) if (al[i] !== alBefore[i]) { alphaOk = false; break; }
+  check("量化不动 alpha", alphaOk);
+
+  /* 确定性：同一份输入跑两遍必须逐字节一致（否则用户每转一次图都在变） */
+  const d1 = new Uint8ClampedArray(W * H * 4);
+  for (let i = 0; i < d1.length; i += 4) { d1[i] = (i >> 2) % 251; d1[i + 1] = (i >> 5) % 241; d1[i + 2] = (i >> 7) % 199; d1[i + 3] = 255; }
+  const d2 = Uint8ClampedArray.from(d1);
+  P.pixels.quantize(d1, W, H, 64);
+  P.pixels.quantize(d2, W, H, 64);
+  check("量化是确定性的", d1.join() === d2.join());
+
+  /* 二次量化必须无操作 —— 否则连续转换会逐轮劣化 */
+  const again = Uint8ClampedArray.from(d1);
+  P.pixels.quantize(again, W, H, 64);
+  check("≤256 色档二次量化无操作", again.join() === d1.join());
+
+  /* 边界：1 色 / 1×1 / 空图都不许炸 */
+  const one = new Uint8ClampedArray([10, 20, 30, 255]);
+  P.pixels.quantize(one, 1, 1, 1);
+  check("1 色档不炸", one[0] === 10 && one[1] === 20 && one[2] === 30, "got " + one[0] + "," + one[1]);
+  const empty = new Uint8ClampedArray(0);
+  check("空图原样返回", P.pixels.quantize(empty, 0, 0, 256) === empty);
+  check("maxColors 缺省按 256", P.pixels.quantize(new Uint8ClampedArray(4 * 4), 2, 2) !== undefined);
+}
+
+/* ---------- 5. 超分分块表 ---------- */
 {
   check("小于 CORE 只有一块", P.sr.tiles(200, 200).count === 1);
   check("512 是 2×2 共 4 块", P.sr.tiles(512, 512).count === 4);

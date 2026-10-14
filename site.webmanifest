@@ -1,7 +1,7 @@
 {
   "name": "Pixora — 免费在线图片工具箱",
   "short_name": "Pixora",
-  "description": "按宽度等比缩放并一键导出 PNG 的浏览器端图片工具。无需注册、无使用限制，图片全程本地处理。",
+  "description": "浏览器端图片工具箱：PNG / JPG / WEBP / AVIF / BMP / ICO 互转、等比缩放、AI 超分放大与在线修图，图片全程在本地处理、不上传服务器。",
   "lang": "zh-CN",
   "dir": "ltr",
   "start_url": "./?utm_source=pwa",
@@ -12,7 +12,6 @@
   "theme_color": "#4d6bfe",
   "categories": ["photo", "productivity", "utilities"],
   "icons": [
-    { "src": "assets/img/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
     { "src": "assets/img/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "assets/img/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
     { "src": "assets/img/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
