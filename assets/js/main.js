@@ -175,7 +175,7 @@
   var wEl = $("#w"), hEl = $("#h"), lockEl = $("#lock"), modeEl = $("#mode");
   var fmtEl = $("#format"), qEl = $("#q"), qvEl = $("#qv"), qwrap = $("#qwrap"), autoEl = $("#auto");
   var bgEl = $("#bgcolor"), bgVal = $("#bgval"), bgRow = $("#bgrow"), fmtHint = $("#fmthint");
-  var palEl = $("#palcolors"), palWrap = $("#palwrap");
+  var palEl = $("#palcolors"), palWrap = $("#palwrap"), cmpEl = $("#cmp");
   var modeHint = $("#modehint");
   var spresets = $("#spresets"), noupEl = $("#noup"), statEl = $("#stat");
   var zipBtn = $("#zip"), againBtn = $("#again"), clearBtn = $("#clear");
@@ -306,6 +306,9 @@
        BMP 无压缩（量化只降画质不缩体积），JPG/WEBP/AVIF 本身有损（先量化再编码是
        双重劣化），所以别的格式一律忽略这个值，UI 也不显示它。 */
     palette: 0,
+    /* compare: 是否在同一张结果图上把各格式都编一遍、把体积并排列出来。默认关 ——
+       它是纯信息增益，不该在用户没要求时替他多编 3–4 次。 */
+    compare: false,
     /* scale: null means "use 目标宽度"; a fraction means "scale every image from
        its own pixel size". A batch can mix dimensions, so a percentage has to be
        resolved per image rather than baked into one width up front.
@@ -451,6 +454,7 @@
     if (fmtEl) fmtEl.value = state.format;
     qEl.value = state.quality; qvEl.textContent = state.quality;
     autoEl.checked = state.auto;
+    if (cmpEl) cmpEl.checked = !!state.compare;
     if (noupEl) noupEl.checked = state.noUpscale;
     if (qwrap) qwrap.hidden = !d.quality;
     if (bgEl) bgEl.value = state.background;
@@ -665,6 +669,32 @@
         both[0].quantized = false;
         return both[0];
       });
+  }
+
+  /* 各格式体积对比：拿**已经产出的那张画布**再编几次，不重跑解码、缩放与 AI 推理 ——
+     所以它在 AI 模式下同样便宜，也就没有理由在 AI 模式下藏起来（4 倍放大的 PNG 动辄
+     几 MB，恰恰最需要知道换 WEBP 能省多少）。encode() 不会改这张画布（量化走的是副本），
+     所以多次编码互不干扰。
+     只比真实有意义的几个：BMP 是无压缩位图，永远是最大的那个，放进来只会占位置；
+     ICO 是特殊用途容器，不参与「选哪个格式」这个决策。 */
+  var COMPARE_SET = ["png", "jpeg", "webp", "avif"];
+  function compareFormats(canvas) {
+    var ids = COMPARE_SET.filter(function (id) { return available.indexOf(id) >= 0; });
+    return Promise.all(ids.map(function (id) {
+      return encode(canvas, id, state.quality).then(function (b) {
+        return { id: id, size: b.size };
+      }).catch(function () { return null; });
+    })).then(function (rows) { return rows.filter(Boolean); });
+  }
+
+  function compareLine(rows) {
+    if (!rows || rows.length < 2) return "";
+    var min = rows[0];
+    rows.forEach(function (r) { if (r.size < min.size) min = r; });
+    return "<br>各格式体积：" + rows.map(function (r) {
+      var t = FORMATS[r.id].label + " " + humanSize(r.size);
+      return r === min ? "<b>" + t + "（最小）</b>" : t;
+    }).join(" · ");
   }
 
   /* ======================================================================
@@ -887,7 +917,7 @@
     results.prepend(el);
     return el;
   }
-  function finishCard(el, url, blob, tw, th, filename, fromLabel, srcBytes) {
+  function finishCard(el, url, blob, tw, th, filename, fromLabel, srcBytes, cmpRows) {
     $(".thumb", el).innerHTML = '<img src="' + url + '" alt="转换结果预览" loading="lazy" decoding="async">';
     var delta = "";
     if (srcBytes && srcBytes > 0) {
@@ -902,7 +932,7 @@
          看起来像功能坏了。 */
       (blob.quantized === false && state.format === "png" && paletteValue() >= 2
         ? ' <span class="delta">量化未生效（原图更小）</span>' : "") +
-      ' <span class="badge-ok">完成</span>' +
+      ' <span class="badge-ok">完成</span>' + compareLine(cmpRows) +
       '<br><a class="dl" download="' + esc(filename) + '" href="' + url + '">下载 ' +
       esc(filename.split(".").pop().toUpperCase()) + "</a>";
   }
@@ -975,14 +1005,19 @@
             return encode(canvas, fmt, quality).then(function (blob) {
               var url = URL.createObjectURL(blob);
               var filename = outName(f.name, size.w, size.h, fmt);
-              finishCard(card, url, blob, size.w, size.h, filename,
-                ai ? srcExt(f) + " " + sw + "×" + sh : srcExt(f), f.size);
-              made.push({ name: filename, url: url, blob: blob });
-              session.count++; session.src += f.size; session.out += blob.size;
-              if (auto) download(url, filename);
-              done++;
-              if (bmp.close) bmp.close();
-              if (bmp.__revoke) URL.revokeObjectURL(bmp.__revoke);
+              /* 对比是可选项，且用的是同一张画布 —— 不重跑解码/缩放/推理。
+                 它失败不该拖垮这一张的正常产出，所以 catch 成 null。 */
+              return (state.compare ? compareFormats(canvas) : Promise.resolve(null))
+                .then(function (rows) {
+                  finishCard(card, url, blob, size.w, size.h, filename,
+                    ai ? srcExt(f) + " " + sw + "×" + sh : srcExt(f), f.size, rows);
+                  made.push({ name: filename, url: url, blob: blob });
+                  session.count++; session.src += f.size; session.out += blob.size;
+                  if (auto) download(url, filename);
+                  done++;
+                  if (bmp.close) bmp.close();
+                  if (bmp.__revoke) URL.revokeObjectURL(bmp.__revoke);
+                });
             });
           });
         }).catch(function (err) {
@@ -1054,6 +1089,7 @@
   if (palEl) palEl.addEventListener("change", function () {
     state.palette = parseInt(palEl.value, 10) || 0; syncUI(); save();
   });
+  if (cmpEl) cmpEl.addEventListener("change", function () { state.compare = cmpEl.checked; save(); });
   qEl.addEventListener("input", function () { state.quality = parseInt(qEl.value, 10); qvEl.textContent = state.quality; save(); });
   if (bgEl) bgEl.addEventListener("input", function () { state.background = bgEl.value; syncUI(); save(); });
   autoEl.addEventListener("change", function () { state.auto = autoEl.checked; save(); });

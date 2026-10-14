@@ -6,13 +6,21 @@
     <description>Pixora 免费在线图片工具箱的版本更新与功能发布。</description>
     <language>zh-CN</language>
     <copyright>MIT License · Pixora contributors</copyright>
-    <lastBuildDate>Wed, 14 Oct 2026 11:45:00 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 14 Oct 2026 12:20:00 +0800</lastBuildDate>
     <atom:link href="https://xuboboo.github.io/pixora/feed.xml" rel="self" type="application/rss+xml"/>
     <image>
       <url>https://xuboboo.github.io/pixora/assets/img/logo.svg</url>
       <title>Pixora</title>
       <link>https://xuboboo.github.io/pixora/</link>
     </image>
+    <item>
+      <title>Pixora 1.5.0 发布：新增各格式体积对比，一次操作就能看出换哪个格式最省</title>
+      <link>https://xuboboo.github.io/pixora/#tool</link>
+      <guid isPermaLink="false">https://xuboboo.github.io/pixora/#release-1-5-0</guid>
+      <pubDate>Wed, 14 Oct 2026 12:20:00 +0800</pubDate>
+      <description><![CDATA[把 REA 对比里排在第一位的差距补上：像 Squoosh 那样，让用户在同一次操作里就看到「同一张图，换成别的格式能小多少」，而不是先转一遍、不满意再转一遍。工具箱「其他」里多一个开关「对比各格式体积」，默认关闭；打开后每张结果卡在体积下方多出一行，把 PNG / JPG / WEBP / AVIF 的体积并排列出并加粗标出最小的那个。它用的是已经产出的那张画布再编几次，不重跑解码、缩放与 AI 推理，所以在 AI 放大模式下同样便宜，也就没有理由在 AI 模式下藏起来——这一条修正了 1.4.0 决策记录里「AI 模式下不显示体积对比」的判断。BMP 无压缩、永远是最大的那个，ICO 是特殊用途容器，两者都不参与对比。验收 13 项端到端，核心断言不是「这行文字出现了」，而是它说的是真的：对比行里对应当前输出格式的那一项必须等于结果卡上真实产出的字节数。本次未改动内核，站点版本与内核版本是两条线。]]></description>
+      <category>Release</category>
+    </item>
     <item>
       <title>Pixora 1.4.0 发布：PNG 输出新增调色板量化</title>
       <link>https://xuboboo.github.io/pixora/#tool</link>

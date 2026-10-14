@@ -159,6 +159,14 @@
 
       <article class="prose reveal">
 <p>本项目遵循 <a href="https://semver.org/lang/zh-CN/" target="_blank" rel="noopener">语义化版本</a>， 变更记录参考 <a href="https://keepachangelog.com/zh-CN/1.1.0/" target="_blank" rel="noopener">Keep a Changelog</a>。</p>
+<h2 id="1-5-0-2026-10-14"><a href="https://github.com/xuboboo/pixora/releases/tag/v1.5.0" target="_blank" rel="noopener">1.5.0</a> — 2026-10-14</h2>
+<p>把 REA 对比里排在第一位的差距补上：像 Squoosh 那样，让用户在同一次操作里就看到 「同一张图，换成别的格式能小多少」，而不是先转一遍、不满意再转一遍。</p>
+<h3 id="新增">新增</h3>
+<ul><li><strong>各格式体积对比</strong></li><li>工具箱「其他」里多一个开关「对比各格式体积」，默认关闭</li><li>打开后每张结果卡在体积下方多一行：</li></ul>
+<p>    <code>各格式体积：PNG 2.40 MB · JPG 420 KB · WEBP 96 KB（最小）</code>，最小的那个加粗标出   - 用的是<strong>已经产出的那张画布</strong>再编几次，不重跑解码、缩放与 AI 推理。所以它在     AI 放大模式下同样便宜，也就没有理由在 AI 模式下藏起来 —— 4 倍放大的 PNG 动辄几 MB，     恰恰最需要知道换 WEBP 能省多少。     <strong>这一条修正了 1.4.0 决策记录里「AI 模式下不显示体积对比」的判断</strong>：当时假设对比     需要重跑管线、代价是重新推理；实际不需要，前提是编码不得改动源画布（1.4.0 给量化     加的「走副本」约束正好保证了这一点）。   - 只比 PNG / JPG / WEBP / AVIF，且按浏览器实际能编码的来（运行时探测）：     BMP 是无压缩位图，永远是最大的那个，放进来只会占位置；ICO 是特殊用途容器，     不参与「选哪个格式」这个决策   - 验收 13 项端到端（<code>_audit/compare.mjs</code>）。核心断言不是「这行文字出现了」，而是     <strong>它说的是真的</strong>：对比行里对应当前输出格式的那一项必须等于结果卡上真实产出的     字节数（容差取整），被标「最小」的必须是所有项里真的最小</p>
+<h3 id="说明">说明</h3>
+<ul><li>本次<strong>未改动内核</strong>，<code>assets/js/pixora-lib.js</code> 仍是 1.4.0、<code>package.json</code> 仍是 1.4.0。</li></ul>
+<p>  站点版本与内核版本是两条线：内核版本只在内核本身变化时前进。</p>
 <h2 id="1-4-0-2026-10-14"><a href="https://github.com/xuboboo/pixora/releases/tag/v1.4.0" target="_blank" rel="noopener">1.4.0</a> — 2026-10-14</h2>
 <p>一次「把同类工具的长处搬过来」的升级。用 REA 受控重放采集了四家同类工具 （Squoosh / iLoveIMG / Convertio / docsmall）并<strong>用同一把尺子量了自家站点</strong>， 按证据排出差距后落地 PNG 调色板量化；顺带修正一处过期的 manifest 文案， 并记录一次「先判定为缺陷、重新测量后又自己推翻」的过程。</p>
 <h3 id="新增">新增</h3>

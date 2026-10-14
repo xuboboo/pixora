@@ -415,6 +415,10 @@ const TOOL = (from, to, loc) => `      <div class="tool reveal">
                 <span class="switch"><input type="checkbox" id="auto"><span class="track"></span></span>
                 拖入即自动下载
               </label>
+              <label class="switch-row">
+                <span class="switch"><input type="checkbox" id="cmp"><span class="track"></span></span>
+                对比各格式体积
+              </label>
             </div>
           </div>
         </div>
