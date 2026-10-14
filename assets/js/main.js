@@ -640,7 +640,10 @@
 
   /* 调色板量化：把画布颜色收敛到 n 色，产出**一张新画布**。原画布一个像素都不动 ——
      调用方可能还要拿它编别的格式（体积对比要同一张图编成多种格式），就地改会污染结果。
-     median cut 在内核里，这里只负责 canvas <-> ImageData 这一层搬运。 */
+     median cut 在内核里，这里只负责 canvas <-> ImageData 这一层搬运。
+     1.6.0 起这是**退路**：PNG 优先走 indexedPNG() 直接写索引色，只有索引色编码器不可用
+     （环境没有 CompressionStream）时才轮到它。留着是因为「新路径不可用」不该等于
+     「功能整个消失」。 */
   function quantizedCanvas(canvas, n) {
     var w = canvas.width, h = canvas.height;
     if (!(n >= 2) || !w || !h) return null;
@@ -652,22 +655,53 @@
     return tmp;
   }
 
+  /* 索引色 PNG：走内核的自写编码器（color type 3，位深 1/2/4/8 自适应）。这是「减少
+     颜色数」真正能兑现体积的那一步 —— canvas 的 toBlob("image/png") 永远写真彩色，
+     颜色再少也每像素 3 字节。失败/不支持一律返回 null，由 encode() 决定退路。 */
+  function indexedPNG(canvas, n) {
+    var w = canvas.width, h = canvas.height;
+    if (!(n >= 2) || !w || !h) return Promise.resolve(null);
+    var img = canvas.getContext("2d").getImageData(0, 0, w, h);
+    return Pixora.encode.pngIndexed(img.data, w, h, n).then(function (bytes) {
+      return bytes ? new Blob([bytes], { type: "image/png" }) : null;
+    }).catch(function () { return null; });
+  }
+
   function encode(canvas, fmt, quality) {
     if (fmt === "bmp") return encodeBMP(canvas);
     if (fmt === "ico") return encodeICO(canvas);
     var mime = FORMATS[fmt].mime;
     var q = FORMATS[fmt].quality ? quality / 100 : undefined;
-    var small = fmt === "png" ? quantizedCanvas(canvas, paletteValue()) : null;
-    if (!small) return canvasToBlob(canvas, mime, q);
+    var pal = fmt === "png" ? paletteValue() : 0;
+    if (pal < 2) return canvasToBlob(canvas, mime, q);
     /* 量化有代价：减少颜色数的同时破坏了 PNG 滤波所依赖的平滑性。实测
        （_audit/probe-quant.mjs）对真实图形能降 36–64%，但对手工生成的平滑渐变反而会
        涨 3–7 倍。所以**只在确实更小时才采用** —— 宁可什么都不做，也不给用户一个
-       「开了之后文件更大」的开关。多编一次的代价换来这条不变量，值。 */
-    return Promise.all([canvasToBlob(canvas, mime, q), canvasToBlob(small, mime, q)])
+       「开了之后文件更大」的开关。多编一次的代价换来这条不变量，值。
+       索引色路径（_audit/probe-indexed.mjs）把这个取舍的天平整个掰过来了：它直接写
+       1/2/4/8bpp 的索引数据，纯色块 400×300 能从 360000 字节落到 356 字节，连平滑
+       渐变也不再是「反而更大」。但索引色并非永远更小（颜色数接近原图时它要额外背
+       一张调色板），所以这里仍然老老实实比一次。 */
+    return Promise.all([canvasToBlob(canvas, mime, q), indexedPNG(canvas, pal)])
       .then(function (both) {
-        if (both[1].size < both[0].size) { both[1].quantized = true; return both[1]; }
-        both[0].quantized = false;
-        return both[0];
+        var ref = both[0];
+        if (both[1]) {
+          if (both[1].size < ref.size) {
+            both[1].quantized = true; both[1].indexed = true;
+            return both[1];
+          }
+          ref.quantized = false;
+          return ref;
+        }
+        /* 老浏览器没有 CompressionStream（索引色编码器要它）—— 退回 1.4.0 的真彩
+           量化路径：颜色收敛后交给 canvas 编，能不能缩体积交给上面的不变量裁决。 */
+        var small = quantizedCanvas(canvas, pal);
+        if (!small) { ref.quantized = false; return ref; }
+        return canvasToBlob(small, mime, q).then(function (s) {
+          if (s.size < ref.size) { s.quantized = true; return s; }
+          ref.quantized = false;
+          return ref;
+        });
       });
   }
 
@@ -928,10 +962,13 @@
     }
     $(".sz", el).innerHTML = fromLabel + " → <b>" + def().label + "</b> · " +
       tw + " × " + th + " · " + humanSize(blob.size) + delta +
-      /* 用户要求了量化、量化却反而更大时如实说明，否则「选了 16 色体积没变」
-         看起来像功能坏了。 */
-      (blob.quantized === false && state.format === "png" && paletteValue() >= 2
-        ? ' <span class="delta">量化未生效（原图更小）</span>' : "") +
+      /* 量化到底有没有生效、以什么形式生效，都要说清楚 —— 否则「选了 16 色体积没变」
+         看起来像功能坏了，「体积突然小了一大截」也来得不明不白。 */
+      (state.format === "png" && paletteValue() >= 2
+        ? (blob.quantized === false
+          ? ' <span class="delta">量化未生效（原图更小）</span>'
+          : (blob.indexed ? ' <span class="delta">索引色</span>' : ""))
+        : "") +
       ' <span class="badge-ok">完成</span>' + compareLine(cmpRows) +
       '<br><a class="dl" download="' + esc(filename) + '" href="' + url + '">下载 ' +
       esc(filename.split(".").pop().toUpperCase()) + "</a>";

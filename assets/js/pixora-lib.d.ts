@@ -75,6 +75,21 @@ export interface PixoraApi {
   encode: {
     /** 24 位 BMP：行底向上、BGR、4 字节行对齐。返回 ArrayBuffer，不是 Blob */
     bmp(img: BMPImage): ArrayBuffer;
+    /**
+     * 索引色 PNG（color type 3）：每像素只存调色板下标，位深 1/2/4/8 按调色板大小自适应。
+     *
+     * 两条路径：整图不同 RGBA 不超过 `maxColors` 时用**精确调色板**（颜色与 alpha 都无损，
+     * 扁平插画/截图/图标走这条）；超了则在 RGBA 四维直方图上做 median cut（连续色，如照片）。
+     * alpha 参与建箱，所以「透明背景 + 不透明同色内容」不会互相污染。
+     *
+     * `maxColors` 向下取整后夹到 1..256。返回 PNG 字节（`Uint8Array`，不是 Blob）。
+     * 环境没有 `CompressionStream`、入参非法、图幅为空、像素长度不足时返回 `null` ——
+     * **不抛异常**，调用方应据此退回 canvas 编码。
+     *
+     * 注意：本函数不判断「结果是否比真彩色 PNG 更小」。索引色并非永远更小（例如颜色数
+     * 已接近原图时），是否采用由调用方比较后决定。
+     */
+    pngIndexed(px: Uint8ClampedArray, w: number, h: number, maxColors?: number): Promise<Uint8Array | null>;
   };
 
   zip: {

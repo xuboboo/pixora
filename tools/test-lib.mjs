@@ -182,6 +182,91 @@ const check = (name, ok, detail) => {
   check("maxColors 缺省按 256", P.pixels.quantize(new Uint8ClampedArray(4 * 4), 2, 2) !== undefined);
 }
 
+/* ---------- 4b. 索引色 PNG 编码 ----------
+   这一节的参考值全部来自**独立解析**（自己读块、自己校验 CRC、用 node:zlib 解 IDAT），
+   不引用内核的任何实现 —— 拿被测代码验证被测代码等于没验证。 */
+{
+  /* 4×1：红 / 绿 / 蓝 / 半透明红。4 色 → 2bpp（2 位装得下 4 个下标）。 */
+  const px = new Uint8ClampedArray([
+    255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255, 255, 0, 0, 128,
+  ]);
+  const png = await P.encode.pngIndexed(px, 4, 1, 16);
+  check("pngIndexed 返回 Uint8Array", png instanceof Uint8Array);
+  check("PNG 魔数正确",
+    [137, 80, 78, 71, 13, 10, 26, 10].every((b, i) => png[i] === b));
+
+  /* 逐块走一遍，顺便校验每块的 CRC —— CRC 错了别的解码器会直接拒收。 */
+  const chunks = [];
+  let at = 8;
+  while (at < png.length) {
+    const len = (png[at] << 24 | png[at + 1] << 16 | png[at + 2] << 8 | png[at + 3]) >>> 0;
+    const type = String.fromCharCode(png[at + 4], png[at + 5], png[at + 6], png[at + 7]);
+    const got = (png[at + 8 + len] << 24 | png[at + 9 + len] << 16 |
+      png[at + 10 + len] << 8 | png[at + 11 + len]) >>> 0;
+    const body = Buffer.from(png.subarray(at + 4, at + 8 + len));
+    const want = zlib.crc32 ? zlib.crc32(body) >>> 0 : got;
+    chunks.push({ type, data: png.subarray(at + 8, at + 8 + len), crcOk: got === want });
+    at += 12 + len;
+  }
+  const names = chunks.map((c) => c.type).join(",");
+  check("块顺序是 IHDR,PLTE,tRNS,IDAT,IEND", names === "IHDR,PLTE,tRNS,IDAT,IEND", names);
+  check("每块 CRC 都正确（与 Node zlib.crc32 对得上）",
+    chunks.every((c) => c.crcOk), chunks.map((c) => c.type + (c.crcOk ? "✓" : "✗")).join(" "));
+
+  const ihdr = chunks[0].data;
+  check("IHDR 宽高正确",
+    ((ihdr[0] << 24 | ihdr[1] << 16 | ihdr[2] << 8 | ihdr[3]) >>> 0) === 4 &&
+    ((ihdr[4] << 24 | ihdr[5] << 16 | ihdr[6] << 8 | ihdr[7]) >>> 0) === 1);
+  check("color type 是 3（索引色），不是 6（真彩色）", ihdr[9] === 3, "colorType=" + ihdr[9]);
+  check("位深自适应到 2（4 色）", ihdr[8] === 2, "depth=" + ihdr[8]);
+  check("压缩/滤波/隔行字段都是 0", ihdr[10] === 0 && ihdr[11] === 0 && ihdr[12] === 0);
+
+  const plte = chunks[1].data;
+  check("PLTE 是 4 项 × 3 字节", plte.length === 12, "len=" + plte.length);
+  check("PLTE 第 1 项是红色（RGB 顺序，不是 BGR）",
+    plte[0] === 255 && plte[1] === 0 && plte[2] === 0);
+  const trns = chunks[2].data;
+  check("tRNS 记下了第 4 项的 alpha=128", trns.length === 4 && trns[3] === 128,
+    "trns=[" + Array.from(trns).join() + "]");
+
+  /* 解 IDAT：2bpp，4 像素 = 1 字节，加 1 字节滤波器 = 每行 2 字节。 */
+  const raw = zlib.inflateSync(Buffer.from(chunks[3].data));
+  check("IDAT 是标准 zlib 流（node:zlib 解得开）", raw.length === 2, "raw=" + raw.length);
+  check("扫描行滤波器是 None", raw[0] === 0);
+  check("2bpp 打包：下标 0,1,2,3 → 0b00011011",
+    raw[1] === 0x1b, "0x" + raw[1].toString(16).padStart(2, "0"));
+
+  /* 精确路径必须无损：解回来逐像素比对，alpha 也要一致。 */
+  const decoded = new Uint8ClampedArray(16);
+  for (let i = 0; i < 4; i++) {
+    const idx = (raw[1] >> (6 - i * 2)) & 3;
+    decoded[i * 4] = plte[idx * 3];
+    decoded[i * 4 + 1] = plte[idx * 3 + 1];
+    decoded[i * 4 + 2] = plte[idx * 3 + 2];
+    decoded[i * 4 + 3] = idx < trns.length ? trns[idx] : 255;
+  }
+  check("精确路径逐像素无损（含 alpha）",
+    Array.from(decoded).join() === Array.from(px).join(),
+    "解码 [" + Array.from(decoded).join() + "]");
+
+  /* 不透明图不该写 tRNS —— 少一个块就是少几十字节。 */
+  const opaque = new Uint8ClampedArray([1, 2, 3, 255, 4, 5, 6, 255]);
+  const o = await P.encode.pngIndexed(opaque, 2, 1, 4);
+  const oNames = [];
+  for (let a = 8; a < o.length;) {
+    const len = (o[a] << 24 | o[a + 1] << 16 | o[a + 2] << 8 | o[a + 3]) >>> 0;
+    oNames.push(String.fromCharCode(o[a + 4], o[a + 5], o[a + 6], o[a + 7]));
+    a += 12 + len;
+  }
+  check("全不透明图不写 tRNS", oNames.join(",") === "IHDR,PLTE,IDAT,IEND", oNames.join(","));
+
+  /* 非法入参一律 null，不抛异常 —— 调用方靠 null 决定退回 canvas。 */
+  check("maxColors=0 返回 null", (await P.encode.pngIndexed(px, 4, 1, 0)) === null);
+  check("空图返回 null", (await P.encode.pngIndexed(px, 0, 0, 16)) === null);
+  check("像素长度不足返回 null",
+    (await P.encode.pngIndexed(new Uint8ClampedArray(4), 4, 1, 16)) === null);
+}
+
 /* ---------- 5. 超分分块表 ---------- */
 {
   check("小于 CORE 只有一块", P.sr.tiles(200, 200).count === 1);

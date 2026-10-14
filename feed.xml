@@ -6,13 +6,21 @@
     <description>Pixora 免费在线图片工具箱的版本更新与功能发布。</description>
     <language>zh-CN</language>
     <copyright>MIT License · Pixora contributors</copyright>
-    <lastBuildDate>Wed, 14 Oct 2026 12:20:00 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 14 Oct 2026 13:05:00 +0800</lastBuildDate>
     <atom:link href="https://xuboboo.github.io/pixora/feed.xml" rel="self" type="application/rss+xml"/>
     <image>
       <url>https://xuboboo.github.io/pixora/assets/img/logo.svg</url>
       <title>Pixora</title>
       <link>https://xuboboo.github.io/pixora/</link>
     </image>
+    <item>
+      <title>Pixora 1.6.0 发布：自写索引色 PNG 编码器，调色板量化终于真的缩体积了</title>
+      <link>https://xuboboo.github.io/pixora/#tool</link>
+      <guid isPermaLink="false">https://xuboboo.github.io/pixora/#release-1-6-0</guid>
+      <pubDate>Wed, 14 Oct 2026 13:05:00 +0800</pubDate>
+      <description><![CDATA[把 1.4.0 埋下的那半截兑现完。1.4.0 加了调色板量化，但它单独用往往缩不了体积——量化只改像素，编码仍旧由 canvas 完成，而 canvas 永远按真彩色（color type 6）写盘，每像素固定 3 字节；颜色少不等于字节少，实测纯色块图 ±0%、手工平滑渐变反而涨 3–7 倍。本次内核新增 Pixora.encode.pngIndexed：自己写索引色 PNG（color type 3），每像素只存调色板下标，位深按调色板大小自适应（≤2 色 1bpp、≤4 色 2bpp、≤16 色 4bpp、其余 8bpp）。整图不同 RGBA 不超过上限时走精确路径，调色板就是原色本身，颜色与 alpha 都无损；颜色超了则先按 alpha 分桶、再在各桶内做 RGB median cut。实测 320×240 五色块图 2569 → 272 字节（↓89%）且逐像素无损，连续色图 ↓86%。过程中修掉一个自己引入的回归：初版把 alpha 当第四根轴丢进同一个 median cut，切分永远优先切像素最多的箱子，导致只有 1.6% 透明的照片整幅变不透明（透明像素 1024 → 0，而 1.4.0 承诺 alpha 不动），由既有验收当场抓出，改为 alpha 硬分桶后修复。站点 1.6.0，内核 1.5.0。]]></description>
+      <category>Release</category>
+    </item>
     <item>
       <title>Pixora 1.5.0 发布：新增各格式体积对比，一次操作就能看出换哪个格式最省</title>
       <link>https://xuboboo.github.io/pixora/#tool</link>

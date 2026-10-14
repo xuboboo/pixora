@@ -110,6 +110,7 @@ node tools/test-package.mjs
 | — | `humanSize(n)` / `pad2(n)` / `stamp()` | 体积格式化、时间戳 |
 | `resize` | `ladder(sw, sh, target)` | 降采样中间尺寸阶梯 |
 | `encode` | `bmp({w, h, data})` | 24 位 BMP 编码 |
+| `encode` | `pngIndexed(px, w, h, maxColors)` | 索引色 PNG（color type 3）编码 |
 | `zip` | `build(entries)` / `crc32(bytes)` | ZIP 打包 / CRC32 |
 | `sr` | `starts(total)` / `tiles(w, h)` | 超分分块表 |
 | `pixels` | `adjust(px, w, h, a)` | 完整调整链 |
@@ -256,6 +257,52 @@ ctx.putImageData(imgData, 0, 0);
 
 O(像素数 + 箱子数 × 切分深度)。一张 2000×2000 约 100–300ms，属于「按一下、等一下」的量级，
 不适合挂在拖动中的滑杆上。
+
+**它单独用往往缩不了体积。** 量化只改像素，编码仍旧由宿主（canvas 的 `toBlob`）完成，
+而 canvas 永远按**真彩色**（color type 6）写盘 —— 每像素固定 3 字节。颜色少不等于字节少，
+能缩多少全看无损压缩对重复内容有多友好。纯色块图因此常常是 ±0%，手工平滑渐变甚至会涨。
+要真正兑现「颜色少 → 体积小」，得配上第 7 节的索引色编码器。
+
+---
+
+## 7. 索引色 PNG 编码
+
+```js
+const imgData = ctx.getImageData(0, 0, w, h);
+const png = await Pixora.encode.pngIndexed(imgData.data, w, h, 64);   // Uint8Array | null
+if (png) new Blob([png], { type: "image/png" });
+```
+
+写的是 **color type 3**：每像素只存一个调色板下标，位深按调色板大小自适应
+（≤2 色用 1bpp、≤4 色用 2bpp、≤16 色用 4bpp、其余 8bpp）。同样一张 400×300 的 5 色块图，
+真彩色未压缩要 360000 字节，这里落到 **356 字节**。
+
+两条产出路径：
+
+- **精确路径** —— 整图不同 RGBA 不超过 `maxColors` 时，调色板就是原色本身，下标唯一，
+  **颜色与 alpha 都无损**。扁平插画、截图、图标、纯色块走这条。颜色一超标就立刻放弃
+  （最多扫到第 n+1 种颜色），所以照片类图在这里只花几十微秒。
+- **median cut 路径** —— 颜色超了，就在 **RGBA 四维**直方图上切箱（每通道 4 bit，65536 桶）。
+  alpha 参与建箱是必须的：索引色每个像素只存一个下标，下标同时决定 RGB 和 alpha；若按 RGB
+  建箱，一张「透明背景 + 黑字」的图里 `(0,0,0,0)` 与 `(0,0,0,255)` 会落进同一个箱子，
+  于是要么背景变实、要么字变透明。整幅不透明时 alpha 极差为 0，切分永远落在 RGB 轴上，
+  行为自然退化回三维。
+
+几个约定：
+
+- `maxColors` 向下取整后夹到 **1..256**。
+- 返回 **`Uint8Array`**（PNG 字节），不是 `Blob` —— 与 `encode.bmp` 一致，内核不认识宿主。
+- **不抛异常**：环境没有 `CompressionStream`、入参非法、图幅为空或 `px` 长度不足时返回 `null`，
+  调用方应据此退回 canvas 编码。
+- 压缩走 `CompressionStream("deflate")` —— PNG 的 IDAT 要的是 **zlib 流**（RFC1950，带
+  2 字节头与 Adler-32），不是第 3 节 ZIP 用的 `deflate-raw`。所以本函数是异步的。
+- 每行滤波器固定 None：下标是查表序号、不是颜色强度，Sub/Paeth 那套「相邻像素作差」在这里
+  没有物理意义。
+- **本函数不判断结果是否比真彩色更小。** 索引色并非永远更小，是否采用由调用方比较后决定。
+
+### 性能
+
+O(像素数)。精确路径对有限色图是一次扫描；median cut 路径是两次扫描加切箱，量级与第 6 节相当。
 
 ---
 
