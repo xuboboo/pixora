@@ -7,7 +7,8 @@
 
 一次「把同类工具的长处搬过来」的升级。用 REA 受控重放采集了四家同类工具
 （Squoosh / iLoveIMG / Convertio / docsmall）并**用同一把尺子量了自家站点**，
-按证据排出差距后落地：PNG 输出长出调色板量化，另修掉一条量自己时才暴露的 manifest 缺陷。
+按证据排出差距后落地 PNG 调色板量化；顺带修正一处过期的 manifest 文案，
+并记录一次「先判定为缺陷、重新测量后又自己推翻」的过程。
 
 ### 新增
 
@@ -27,16 +28,31 @@
 
 ### 修复
 
-- **`site.webmanifest` 里的 SVG 图标条目**
-  - 清单把 `favicon.svg` 声明为图标，而 Chrome 的 manifest 解析器不接受 SVG 图标，
-    于是每次加载都记一条 `Error while trying to use the following icon from the
-    Manifest`，并连带两次 `favicon.svg` 的 `net::ERR_ABORTED`
-  - 这条是**用 REA 采集自家站点时发现的**：五家同一个场景、同一套参数，只有我们自己
-    留下这条控制台告警
-  - 清单里本就有合规的 `icon-192.png` / `icon-512.png` / `icon-maskable-512.png`，
-    那条 SVG 既多余又有害，删除即可
 - `site.webmanifest` 的 `description` 仍写着「按宽度等比缩放并一键导出 PNG」，而站点
   早已支持 6 种格式输出、AI 放大与在线修图 —— 改为如实描述
+
+### 记录：一次被自己推翻的「缺陷」
+
+这一节留着，是因为过程比结论更值得记。
+
+- REA 采集自家站点时看到一条控制台告警
+  `Error while trying to use the following icon from the Manifest: .../favicon.svg`，
+  当时判定为「manifest 里不该放 SVG 图标」，删掉了那条。
+- 重新测量**推翻了这个结论**。用只放一条 SVG 图标的受控夹具，在
+  `service_workers=allow` 与 `block` 两种模式下都**不报任何告警** —— Chrome 接受
+  SVG manifest 图标。而删掉 SVG 那条之后，同一条告警改名为 `icon-192.png`（一张
+  192×192、尺寸与声明相符的合规 PNG），说明它指的从来不是「哪个图标有问题」。
+- 真正的成因是**采集配方自己**：`start_url` 已经导航过一次，动作里又 `goto` 同一个
+  地址，于是页面导航两次；第二次导航中断了第一次还在飞的请求
+  （所以证据里那两条 `net::ERR_ABORTED` 也一并有了来源），Chrome 便报「manifest
+  图标下载失败」，并点名清单里的第一个图标。去掉那次多余的 `goto`、只留
+  `wait_for_timeout`，同一页面在 `service_workers=block` 下**零控制台事件**。
+- 因此回滚了 manifest 图标的改动，只留下有独立依据的 `description` 修正。
+- **对既有结论的影响**：五家对比采集用的是同一套含多余 `goto` 的配方，那份报告里的
+  控制台与 `net::ERR_ABORTED` 计数都掺了这个伪影，不能按字面采信。逐条复核后：
+  Squoosh 的「Service Worker registration blocked by Playwright」是 `service_workers=block`
+  的直接结果、不是它的缺陷；docsmall 的 AdSense 报错与 iLoveIMG / Convertio 的
+  `ERR_CONNECTION_CLOSED` 成因不同，与本次伪影无关，仍然成立。
 
 ### 文档
 

@@ -160,15 +160,23 @@
       <article class="prose reveal">
 <p>本项目遵循 <a href="https://semver.org/lang/zh-CN/" target="_blank" rel="noopener">语义化版本</a>， 变更记录参考 <a href="https://keepachangelog.com/zh-CN/1.1.0/" target="_blank" rel="noopener">Keep a Changelog</a>。</p>
 <h2 id="1-4-0-2026-10-14"><a href="https://github.com/xuboboo/pixora/releases/tag/v1.4.0" target="_blank" rel="noopener">1.4.0</a> — 2026-10-14</h2>
-<p>一次「把同类工具的长处搬过来」的升级。用 REA 受控重放采集了四家同类工具 （Squoosh / iLoveIMG / Convertio / docsmall）并<strong>用同一把尺子量了自家站点</strong>， 按证据排出差距后落地：PNG 输出长出调色板量化，另修掉一条量自己时才暴露的 manifest 缺陷。</p>
+<p>一次「把同类工具的长处搬过来」的升级。用 REA 受控重放采集了四家同类工具 （Squoosh / iLoveIMG / Convertio / docsmall）并<strong>用同一把尺子量了自家站点</strong>， 按证据排出差距后落地 PNG 调色板量化；顺带修正一处过期的 manifest 文案， 并记录一次「先判定为缺陷、重新测量后又自己推翻」的过程。</p>
 <h3 id="新增">新增</h3>
 <ul><li><strong>PNG 调色板量化</strong></li><li>首页工具箱与 35 个转换页在输出 PNG 时多出一个「调色板量化」下拉，可选</li></ul>
 <p>    256 / 128 / 64 / 32 / 16 / 8 / 4 / 2 色，默认关闭   - 内核新增 <code>pixels.quantize(px, w, h, maxColors)</code>：5 bit/通道直方图 + median cut     切分 + 加权平均代表色 + LUT 查表，<strong>alpha 一个字节都不动</strong>   - 量化只在<strong>确实更小</strong>时才采用。它减少颜色数的同时会破坏 PNG 滤波所依赖的平滑性：     实测（<code>_audit/probe-quant.mjs</code>）对真实图形降 36–64%、照片类降 27–59%，但对手工     生成的平滑渐变反而会涨 3–7 倍。守卫会把这种情况退回未量化结果，并在结果卡上写明     「量化未生效（原图更小）」   - 量化只在 PNG 出现：BMP 无压缩（量化只降画质不缩体积），JPG / WEBP / AVIF 本身有损     （先量化再编码是双重劣化）   - 验收 29 项端到端（<code>_audit/palette.mjs</code>），三条主线是颜色确实收敛、alpha 确实不变、     变大时确实被拦下</p>
 <h3 id="修复">修复</h3>
-<ul><li><strong><code>site.webmanifest</code> 里的 SVG 图标条目</strong></li><li>清单把 <code>favicon.svg</code> 声明为图标，而 Chrome 的 manifest 解析器不接受 SVG 图标，</li></ul>
-<p>    于是每次加载都记一条 <code>Error while trying to use the following icon from the     Manifest</code>，并连带两次 <code>favicon.svg</code> 的 <code>net::ERR_ABORTED</code>   - 这条是<strong>用 REA 采集自家站点时发现的</strong>：五家同一个场景、同一套参数，只有我们自己     留下这条控制台告警   - 清单里本就有合规的 <code>icon-192.png</code> / <code>icon-512.png</code> / <code>icon-maskable-512.png</code>，     那条 SVG 既多余又有害，删除即可</p>
 <ul><li><code>site.webmanifest</code> 的 <code>description</code> 仍写着「按宽度等比缩放并一键导出 PNG」，而站点</li></ul>
 <p>  早已支持 6 种格式输出、AI 放大与在线修图 —— 改为如实描述</p>
+<h3 id="记录-一次被自己推翻的-缺陷">记录：一次被自己推翻的「缺陷」</h3>
+<p>这一节留着，是因为过程比结论更值得记。</p>
+<ul><li>REA 采集自家站点时看到一条控制台告警</li></ul>
+<p>  <code>Error while trying to use the following icon from the Manifest: .../favicon.svg</code>，   当时判定为「manifest 里不该放 SVG 图标」，删掉了那条。</p>
+<ul><li>重新测量<strong>推翻了这个结论</strong>。用只放一条 SVG 图标的受控夹具，在</li></ul>
+<p>  <code>service_workers=allow</code> 与 <code>block</code> 两种模式下都<strong>不报任何告警</strong> —— Chrome 接受   SVG manifest 图标。而删掉 SVG 那条之后，同一条告警改名为 <code>icon-192.png</code>（一张   192×192、尺寸与声明相符的合规 PNG），说明它指的从来不是「哪个图标有问题」。</p>
+<ul><li>真正的成因是<strong>采集配方自己</strong>：<code>start_url</code> 已经导航过一次，动作里又 <code>goto</code> 同一个</li></ul>
+<p>  地址，于是页面导航两次；第二次导航中断了第一次还在飞的请求   （所以证据里那两条 <code>net::ERR_ABORTED</code> 也一并有了来源），Chrome 便报「manifest   图标下载失败」，并点名清单里的第一个图标。去掉那次多余的 <code>goto</code>、只留   <code>wait_for_timeout</code>，同一页面在 <code>service_workers=block</code> 下<strong>零控制台事件</strong>。</p>
+<ul><li>因此回滚了 manifest 图标的改动，只留下有独立依据的 <code>description</code> 修正。</li><li><strong>对既有结论的影响</strong>：五家对比采集用的是同一套含多余 <code>goto</code> 的配方，那份报告里的</li></ul>
+<p>  控制台与 <code>net::ERR_ABORTED</code> 计数都掺了这个伪影，不能按字面采信。逐条复核后：   Squoosh 的「Service Worker registration blocked by Playwright」是 <code>service_workers=block</code>   的直接结果、不是它的缺陷；docsmall 的 AdSense 报错与 iLoveIMG / Convertio 的   <code>ERR_CONNECTION_CLOSED</code> 成因不同，与本次伪影无关，仍然成立。</p>
 <h3 id="文档">文档</h3>
 <ul><li><code>docs/api.md</code> 补第 6 节「调色板量化」：量纲、alpha 约定、幂等性、性能量级</li><li><code>README.md</code> 能力表补一行、内核能力列表补一项</li><li><code>docs/api.md</code> 与 <code>README.md</code> 的内核单测计数 59 → 69 修正（1.3.0 起就已过期）</li></ul>
 <h3 id="内核">内核</h3>
