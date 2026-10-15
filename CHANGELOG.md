@@ -3,6 +3,39 @@
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)，
 变更记录参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [1.7.1] — 2026-10-15
+
+一次 REA 受控采集把首页在空闲状态下的网络行为逐条记了下来，顺出来一个重复抓取。
+
+### 修复
+
+- **`site.webmanifest` 不再声明 `favicon.svg`**。它已经由 `index.html` 的
+  `<link rel="icon" type="image/svg+xml">` 声明过一次；清单里再声明一次，会让浏览器为
+  同一个文件发两次请求 —— 实测首页 8 次请求里有 1 次是纯冗余，两次都是独立事务、都 200。
+  清单图标只需满足安装条件，`icon-192` / `icon-512` / `icon-maskable-512` 已经够。
+  这一条在生产站上做过 A/B：只替换 manifest 的图标列表、其余完全不动，
+  含 SVG 时 `favicon.svg` 取 2 次，不含时取 1 次。
+
+### 新增
+
+- **`_audit/footprint.mjs` —— 网络足迹验收。** 覆盖首页 + 35 个转换落地页 + 编辑器页共
+  37 页，9 条断言：零跨源请求、零重复请求、零控制台 error/warning、零页面错误、
+  零请求失败、零 4xx/5xx、零 cookie 写入、每页请求数上界、首页请求数上界。
+  站点对外承诺里「图片不上传、不含任何追踪脚本」这两条，从此有能失败的断言盯着 ——
+  它最容易被一次「顺手加个统计」悄悄破坏，而页面看起来毫无变化。
+- **`_audit/rea-summary.mjs`**：把一份 REA 证据 JSON 压成可读摘要（结构、事件按
+  `kind | method | host | path | status` 聚合、控制台与失败清单、主机清单），
+  免得每次都要把几十万字符的证据整份读一遍。
+
+### 说明
+
+- **观测手段决定你能看见什么。** 用 playwright 默认的 `chromium.launch()` 时，Chrome
+  **根本不会去取 `site.webmanifest`**，清单里声明的图标永远不会被请求，这类重复就完全
+  看不见。实测对照（同一页面）：默认启动 6 次请求 / `webmanifest` 0 次；持久化 profile
+  8 次请求 / `webmanifest` 1 次 / `favicon.svg` 2 次。REA 用的正是「自有临时 profile」，
+  所以它一开始就看见了。`footprint.mjs` 因此改用 `launchPersistentContext`。
+- 本次未改动内核，站点 1.7.1 / 内核 1.5.0。
+
 ## [1.7.0] — 2026-10-15
 
 工具箱多了一个入口：**粘贴图片链接直接导入**，不必先把图存到本机再拖进来。
@@ -653,6 +686,7 @@ canvas 完成，而 `toBlob("image/png")` 永远按真彩色（color type 6）�
 - 首个版本不包含图层级编辑能力。若需要精细修图，建议搭配 Photopea 等完整编辑器使用。
 - 结构化数据刻意不含 `aggregateRating`，以避免标注虚假评价。
 
+[1.7.1]: https://github.com/xuboboo/pixora/releases/tag/v1.7.1
 [1.7.0]: https://github.com/xuboboo/pixora/releases/tag/v1.7.0
 [1.6.0]: https://github.com/xuboboo/pixora/releases/tag/v1.6.0
 [1.5.0]: https://github.com/xuboboo/pixora/releases/tag/v1.5.0

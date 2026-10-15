@@ -11,8 +11,8 @@
   "background_color": "#ffffff",
   "theme_color": "#4d6bfe",
   "categories": ["photo", "productivity", "utilities"],
+  "_note": "图标列表里不要再加 assets/img/favicon.svg。它已经由 index.html 的 <link rel=\"icon\" type=\"image/svg+xml\"> 声明过一次；在这里再声明一次会让浏览器为同一个文件发两次请求（REA 采集实测：首页 8 次请求里有 1 次是它的重复）。清单图标只需满足安装条件，192/512 的 PNG 已经够。同类问题在 iLoveIMG 上表现为 preload 与正式请求的 credentials mode 不一致，见 _audit/footprint.mjs。",
   "icons": [
-    { "src": "assets/img/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
     { "src": "assets/img/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "assets/img/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
     { "src": "assets/img/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }

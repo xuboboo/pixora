@@ -6,13 +6,21 @@
     <description>Pixora 免费在线图片工具箱的版本更新与功能发布。</description>
     <language>zh-CN</language>
     <copyright>MIT License · Pixora contributors</copyright>
-    <lastBuildDate>Thu, 15 Oct 2026 17:10:00 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 15 Oct 2026 17:42:00 +0800</lastBuildDate>
     <atom:link href="https://xuboboo.github.io/pixora/feed.xml" rel="self" type="application/rss+xml"/>
     <image>
       <url>https://xuboboo.github.io/pixora/assets/img/logo.svg</url>
       <title>Pixora</title>
       <link>https://xuboboo.github.io/pixora/</link>
     </image>
+    <item>
+      <title>Pixora 1.7.1 发布：修掉一次 favicon 重复抓取，并给「零跨源」加上断言</title>
+      <link>https://xuboboo.github.io/pixora/#tool</link>
+      <guid isPermaLink="false">https://xuboboo.github.io/pixora/#release-1-7-1</guid>
+      <pubDate>Thu, 15 Oct 2026 17:42:00 +0800</pubDate>
+      <description><![CDATA[一次 REA 受控采集把首页在空闲状态下的网络行为逐条记下来，顺出来一个重复抓取：assets/img/favicon.svg 被请求了两次，两次都是独立事务、都返回 200。原因是它被声明了两遍——index.html 的 link rel=icon，以及 site.webmanifest 的 icons[0]。清单里不再声明 SVG 图标，icon-192/icon-512/icon-maskable-512 已满足安装条件。这一条在生产站上做过 A/B：只替换 manifest 的图标列表、其余完全不动，含 SVG 时 favicon 取 2 次，不含时取 1 次。同时新增 _audit/footprint.mjs 网络足迹验收，覆盖首页 + 35 个转换落地页 + 编辑器页共 37 页，9 条断言：零跨源请求、零重复请求、零控制台 error/warning、零页面错误、零请求失败、零 4xx/5xx、零 cookie 写入、每页请求数上界、首页请求数上界——站点「图片不上传、不含任何追踪脚本」的承诺从此有能失败的断言盯着。过程中还记下一个观测手段上的坑：用 playwright 默认启动方式时 Chrome 根本不会去取 site.webmanifest，这类重复完全看不见，必须用持久化 profile 才复现得出来。站点 1.7.1，内核 1.5.0。]]></description>
+      <category>Release</category>
+    </item>
     <item>
       <title>Pixora 1.7.0 发布：粘贴图片链接就能直接导入</title>
       <link>https://xuboboo.github.io/pixora/#tool</link>
