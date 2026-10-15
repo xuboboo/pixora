@@ -6,13 +6,21 @@
     <description>Pixora 免费在线图片工具箱的版本更新与功能发布。</description>
     <language>zh-CN</language>
     <copyright>MIT License · Pixora contributors</copyright>
-    <lastBuildDate>Wed, 14 Oct 2026 13:05:00 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 15 Oct 2026 17:10:00 +0800</lastBuildDate>
     <atom:link href="https://xuboboo.github.io/pixora/feed.xml" rel="self" type="application/rss+xml"/>
     <image>
       <url>https://xuboboo.github.io/pixora/assets/img/logo.svg</url>
       <title>Pixora</title>
       <link>https://xuboboo.github.io/pixora/</link>
     </image>
+    <item>
+      <title>Pixora 1.7.0 发布：粘贴图片链接就能直接导入</title>
+      <link>https://xuboboo.github.io/pixora/#tool</link>
+      <guid isPermaLink="false">https://xuboboo.github.io/pixora/#release-1-7-0</guid>
+      <pubDate>Thu, 15 Oct 2026 17:10:00 +0800</pubDate>
+      <description><![CDATA[工具箱多了一个入口：粘贴图片链接直接导入，不必先把图存到本机再拖进来。投放区正下方多了一行输入框与「导入」按钮，粘贴 http(s) 链接即可，回车提交，也可以把链接直接拖进投放区或复制后在页面上 Ctrl+V；35 个格式落地页同样有这个入口，且沿用该页预设的输出格式。取图由浏览器直接向那个地址发起，不经过 Pixora 也不经过任何中间服务器，请求带 credentials:"omit"，不带任何 cookie 去第三方站点。类型判定三重兜底：先看响应头，头不可信看魔数，魔数也认不出才退回扩展名——不少图床把 Content-Type 发成 application/octet-stream，raw.githubusercontent 对 .svg 直接发 text/plain，只信响应头会把好图判死。协议白名单只认 http/https，javascript:/data:/file: 一律拒绝。CORS 是这条路线的真实边界，页面如实说出来：对方站点没发 Access-Control-Allow-Origin 时浏览器不允许脚本读取响应，这不是链接写错了，失败提示会明确给出下一步（先把图下载到本机再拖进来）。链接导入的图走的是和拖入完全相同的解码/缩放/编码管线，验收用同一份字节分别经两条入口导入，产物逐字节一致。同时更正了首页「不产生任何网络请求」这一句——它在链接导入上线后不再无条件成立。站点 1.7.0，内核 1.5.0。]]></description>
+      <category>Release</category>
+    </item>
     <item>
       <title>Pixora 1.6.0 发布：自写索引色 PNG 编码器，调色板量化终于真的缩体积了</title>
       <link>https://xuboboo.github.io/pixora/#tool</link>

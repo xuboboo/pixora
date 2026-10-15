@@ -635,6 +635,26 @@ table.cmp .col-us { background: color-mix(in srgb, var(--brand) 6%, transparent)
 .drop .big { font-size: 1.9rem; }
 .drop h3 { margin: 10px 0 4px; font-size: 1.05rem; }
 .drop small { color: var(--muted); }
+/* ---------- 5a-2. 网络图片导入 ----------
+   链接导入走的是和拖入**完全相同**的那条管线，所以它不是二级功能，不该被藏进
+   折叠面板 —— 就摆在投放区正下方，和「拖进来」是并列的两种入口。
+   输入框 flex 收缩、按钮不缩，窄到 320px 也不会把按钮挤出容器。 */
+.url-row { margin-top: 12px; }
+.url-input { display: flex; align-items: center; gap: 8px; }
+.url-input > svg { width: 17px; height: 17px; flex: none; color: var(--muted); }
+.url-input input[type="url"] {
+  flex: 1 1 auto; min-width: 0; padding: 9px 12px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--surface); color: var(--text); font: inherit; font-size: .88rem;
+  transition: .18s var(--ease);
+}
+.url-input input[type="url"]::placeholder { color: var(--muted); }
+.url-input input[type="url"]:focus { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); outline: none; }
+.url-input .btn { flex: none; }
+/* 失败提示用 danger 色：CORS 被拦和「链接写错了」是两回事，前者不是用户的错，
+   提示得足够醒目才不会被当成又一句例行说明划过去。 */
+.url-hint.err { color: var(--danger); }
+.url-hint.ok { color: var(--ok); }
 /* Two columns on phones and tablets, one row of four from 860px up. auto-fit
    used to leave an orphaned fourth field on its own row at tablet widths. */
 /* ---------- 5c. 格式转换 vs 调整尺寸 ----------

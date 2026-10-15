@@ -142,7 +142,7 @@
       "applicationSubCategory": "Image Editing",
       "operatingSystem": "Any modern web browser",
       "browserRequirements": "Requires Canvas 2D and createImageBitmap support",
-      "softwareVersion": "1.6.0",
+      "softwareVersion": "1.7.0",
       "isAccessibleForFree": true,
       "license": "https://opensource.org/licenses/MIT",
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY", "availability": "https://schema.org/InStock" },
@@ -168,7 +168,7 @@
       "totalTime": "PT10S",
       "tool": [{ "@type": "HowToTool", "name": "Pixora 在线图片工具箱" }],
       "step": [
-        { "@type": "HowToStep", "position": 1, "name": "拖入图片", "text": "把图片拖入 Pixora 的投放区，或点击选择、直接粘贴截图，支持一次多张。", "url": "https://xuboboo.github.io/pixora/#tool" },
+        { "@type": "HowToStep", "position": 1, "name": "拖入图片", "text": "把图片拖入 Pixora 的投放区，或点击选择、直接粘贴截图；也可以粘贴图片链接导入，支持一次多张。", "url": "https://xuboboo.github.io/pixora/#tool" },
         { "@type": "HowToStep", "position": 2, "name": "选择处理方式", "text": "默认是「格式转换」：选好输出格式即可，图片尺寸保持原样。需要改宽高时切到「调整尺寸」，可选 400 / 600 等预设宽度或按原图比例缩放，高度自动按比例计算。", "url": "https://xuboboo.github.io/pixora/#tool" },
         { "@type": "HowToStep", "position": 3, "name": "下载或打包", "text": "结果卡片会显示转换后的格式、尺寸与体积变化，可逐张下载，也可一键打包成 ZIP，全程在本地完成。", "url": "https://xuboboo.github.io/pixora/#tool" }
       ]
@@ -185,6 +185,7 @@
         { "@type": "Question", "name": "透明背景会怎么处理？", "acceptedAnswer": { "@type": "Answer", "text": "目标格式支持透明（PNG、WEBP、AVIF、ICO）时透明通道原样保留；目标格式不支持透明（JPG、BMP）时，页面会显示背景填充色选项，可自选颜色填充透明区域，默认白色。" } },
         { "@type": "Question", "name": "可以一次处理多张图片吗？", "acceptedAnswer": { "@type": "Answer", "text": "可以。一次拖入多张图片即可批量按同一套设置处理，每张都会单独输出结果与下载链接；结果超过两张时可一键打包成 ZIP 下载。" } },
         { "@type": "Question", "name": "使用 Pixora 需要联网吗？", "acceptedAnswer": { "@type": "Answer", "text": "首次打开需要联网加载页面；页面加载完成后，全部处理逻辑都在本地运行，断网也能继续使用。" } },
+        { "@type": "Question", "name": "可以从图片链接直接导入吗？", "acceptedAnswer": { "@type": "Answer", "text": "可以。在投放区下方粘贴图片链接即可，也可以直接把链接拖进来，或复制链接后按 Ctrl + V。取图由浏览器直接向那个地址发起，不经过 Pixora，也不经过任何中间服务器。能否取到取决于对方站点的跨域策略（CORS）—— 有些站点不允许网页脚本读取自己的图片，遇到这种情况页面会给出明确提示，你可以先把图片下载到本机再拖进来。" } },
         { "@type": "Question", "name": "Pixora 和 Convertio 这类在线转换器有什么区别？", "acceptedAnswer": { "@type": "Answer", "text": "最根本的区别是文件去向。Convertio 属于上传式转换器，文件必须传到它的服务器，转换完再下载，官方承诺 24 小时内删除。Pixora 把解码、缩放、编码全部放在浏览器里完成，文件从不离开设备，不需要承诺删除，因为没有上传这回事。代价是格式覆盖不如服务端方案广，Pixora 只覆盖浏览器真正能处理的部分，并把边界写在明处。" } },
         { "@type": "Question", "name": "Pixora 和在线 PS / Photopea 有什么区别？", "acceptedAnswer": { "@type": "Answer", "text": "Pixora 专注把最高频的「改尺寸 + 转格式 + 导出」做成一步操作，没有复杂工具栏与上传等待；而 Photopea 这类完整编辑器适合图层级精修。两者定位互补。" } }
       ]
@@ -454,7 +455,7 @@
       <div class="section-head">
         <span class="eyebrow">开箱即用</span>
         <h2 id="tool-title">现在就试一下</h2>
-        <p>拖入图片 → 选处理方式 → 下载。默认只换格式、不动尺寸；要改宽高再切到「调整尺寸」。整个过程在本地完成，不产生任何网络请求。</p>
+        <p>拖入图片、粘贴图片链接或截图 → 选处理方式 → 下载。默认只换格式、不动尺寸；要改宽高再切到「调整尺寸」。图片的解码、处理、编码全程在本机完成，不经过任何服务器 —— 只有你主动粘贴链接时，浏览器才会直接去那个地址取图。</p>
       </div>
 
       <!-- Direct entry points into the per-format landing pages. The tool above
@@ -484,6 +485,18 @@
           <h3>把图片拖到这里</h3>
           <small>也可以点击选择文件，或直接按 Ctrl + V 粘贴截图 · 支持 PNG / JPG / WEBP / GIF / BMP / AVIF / SVG / ICO · 可多张批量</small>
           <input type="file" id="file" accept="image/*" multiple hidden>
+        </div>
+
+        <!-- 网络图片导入。链接导入走的是和拖入完全相同的那条管线，所以它和投放区
+             并列出现，而不是藏进某个二级面板。只有你主动给出链接时才会联网，且是
+             浏览器直接向那个地址取图 —— 不经过 Pixora，也不经过任何中间服务器。 -->
+        <div class="url-row">
+          <div class="url-input">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            <input type="url" id="imgurl" aria-label="图片链接" placeholder="或粘贴图片链接，如 https://…/photo.jpg" inputmode="url" autocomplete="off" spellcheck="false" enterkeyhint="go">
+            <button class="btn btn-ghost btn-sm" type="button" id="urlgo">导入</button>
+          </div>
+          <p class="field-hint url-hint" id="urlhint">浏览器直接向该地址取图，不经过任何中间服务器 · 对方站点需允许跨域读取</p>
         </div>
 
         <!-- 三种意图分开：格式转换不动尺寸，调整尺寸才动，AI 放大是把丢失的细节
@@ -706,7 +719,7 @@
         <article class="card reveal">
           <div class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
           <h3>隐私优先</h3>
-          <p>所有解码、缩放、编码都在你的浏览器内完成，图片不会上传、不会被存储，也不含任何追踪脚本。</p>
+          <p>所有解码、缩放、编码都在你的浏览器内完成，图片不会上传、不会被存储，也不含任何追踪脚本。用图片链接导入时，也是你的浏览器直接去取，不经过任何中间服务器。</p>
         </article>
 
         <article class="card reveal">
@@ -1004,6 +1017,10 @@
         <details>
           <summary>使用 Pixora 需要联网吗？</summary>
           <div class="answer"><p>首次打开需要联网加载页面；页面加载完成后，全部处理逻辑都在本地运行，断网也能继续使用。</p></div>
+        </details>
+        <details>
+          <summary>可以从图片链接直接导入吗？</summary>
+          <div class="answer"><p>可以。在投放区下方粘贴图片链接即可，也可以直接把链接拖进来，或复制链接后按 Ctrl + V。取图由浏览器直接向那个地址发起，不经过 Pixora，也不经过任何中间服务器。能否取到取决于对方站点的跨域策略（CORS）—— 有些站点不允许网页脚本读取自己的图片，遇到这种情况页面会给出明确提示，你可以先把图片下载到本机再拖进来。</p></div>
         </details>
         <details>
           <summary>Pixora 和 Convertio 这类在线转换器有什么区别？</summary>

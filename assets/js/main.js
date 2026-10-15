@@ -176,6 +176,7 @@
   var fmtEl = $("#format"), qEl = $("#q"), qvEl = $("#qv"), qwrap = $("#qwrap"), autoEl = $("#auto");
   var bgEl = $("#bgcolor"), bgVal = $("#bgval"), bgRow = $("#bgrow"), fmtHint = $("#fmthint");
   var palEl = $("#palcolors"), palWrap = $("#palwrap"), cmpEl = $("#cmp");
+  var urlEl = $("#imgurl"), urlGo = $("#urlgo"), urlHint = $("#urlhint");
   var modeHint = $("#modehint");
   var spresets = $("#spresets"), noupEl = $("#noup"), statEl = $("#stat");
   var zipBtn = $("#zip"), againBtn = $("#again"), clearBtn = $("#clear");
@@ -1079,6 +1080,139 @@
     });
   }
 
+  /* ---------- 网络图片导入 ----------
+     只做一件事：把用户给的链接变成一个 File，然后交给**完全相同的** handleFiles
+     管线。链接导入的图和拖进来的图必须走同一条解码/缩放/编码路径 —— 否则就成了
+     两套行为，而其中一套没人测。 */
+  var URL_HINT_DEFAULT = "浏览器直接向该地址取图，不经过任何中间服务器 · 对方站点需允许跨域读取";
+  var EXT_TYPE = {
+    png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", jpe: "image/jpeg",
+    webp: "image/webp", gif: "image/gif", bmp: "image/bmp", avif: "image/avif",
+    svg: "image/svg+xml", ico: "image/x-icon", tif: "image/tiff", tiff: "image/tiff",
+    heic: "image/heic", heif: "image/heif"
+  };
+  var TYPE_EXT = {
+    "image/png": "png", "image/jpeg": "jpg", "image/webp": "webp", "image/gif": "gif",
+    "image/bmp": "bmp", "image/avif": "avif", "image/svg+xml": "svg",
+    "image/x-icon": "ico", "image/tiff": "tiff", "image/heic": "heic", "image/heif": "heif"
+  };
+
+  function extOf(pathname) {
+    var m = /\.([a-z0-9]+)$/i.exec(pathname || "");
+    return m ? m[1].toLowerCase() : "";
+  }
+
+  /* 只信响应头会把好图判死：不少图床把 Content-Type 发成 application/octet-stream，
+     raw.githubusercontent 对 .svg 直接发 text/plain。所以头不可信时看魔数，魔数也
+     认不出才退回扩展名 —— 判型宁可多写几行，也不能因为对方服务器偷懒就回一句
+     「这不是图片」。 */
+  function sniffImageType(u8) {
+    if (u8.length < 12) return null;
+    if (u8[0] === 0x89 && u8[1] === 0x50 && u8[2] === 0x4e && u8[3] === 0x47) return "image/png";
+    if (u8[0] === 0xff && u8[1] === 0xd8 && u8[2] === 0xff) return "image/jpeg";
+    if (u8[0] === 0x47 && u8[1] === 0x49 && u8[2] === 0x46 && u8[3] === 0x38) return "image/gif";
+    if (u8[0] === 0x42 && u8[1] === 0x4d) return "image/bmp";
+    if (u8[0] === 0x00 && u8[1] === 0x00 && u8[2] === 0x01 && u8[3] === 0x00) return "image/x-icon";
+    if (u8[0] === 0x52 && u8[1] === 0x49 && u8[2] === 0x46 && u8[3] === 0x46 &&
+        u8[8] === 0x57 && u8[9] === 0x45 && u8[10] === 0x42 && u8[11] === 0x50) return "image/webp";
+    /* AVIF / HEIC 都是 ISO-BMFF：偏移 4 起是 'ftyp'，紧跟主品牌。 */
+    if (u8[4] === 0x66 && u8[5] === 0x74 && u8[6] === 0x79 && u8[7] === 0x70) {
+      var brand = String.fromCharCode(u8[8], u8[9], u8[10], u8[11]);
+      if (brand === "avif" || brand === "avis") return "image/avif";
+      if (brand === "heic" || brand === "heix" || brand === "hevc" || brand === "mif1") return "image/heic";
+    }
+    /* SVG 是文本，可能带 BOM、XML 声明、注释或 DOCTYPE。只看开头一小段。 */
+    var head = "";
+    for (var i = 0, n = Math.min(u8.length, 1024); i < n; i++) head += String.fromCharCode(u8[i]);
+    head = head.replace(/^\uFEFF/, "").trim();
+    if (/<svg[\s>]/i.test(head) && /^(?:<\?xml|<!doctype|<!--|<svg)/i.test(head)) return "image/svg+xml";
+    return null;
+  }
+
+  /* 从链接里抠出一个像样的文件名：投放区、结果卡、ZIP 条目都拿它当显示名。 */
+  function nameFromUrl(u, type) {
+    var raw = "";
+    try { raw = decodeURIComponent(u.pathname.split("/").filter(Boolean).pop() || ""); }
+    catch (e) { raw = u.pathname.split("/").filter(Boolean).pop() || ""; }
+    raw = raw.replace(/[\\/:*?"<>|]+/g, "_").slice(0, 80);
+    if (!raw) return "image." + (TYPE_EXT[type] || "png");
+    if (!/\.[a-z0-9]{2,5}$/i.test(raw)) raw += "." + (TYPE_EXT[type] || "png");
+    return raw;
+  }
+
+  function setUrlHint(text, kind) {
+    if (!urlHint) return;
+    urlHint.textContent = text;
+    urlHint.className = "field-hint url-hint" + (kind ? " " + kind : "");
+  }
+
+  var urlBusy = false;
+  function importFromUrl(raw) {
+    if (!urlEl || urlBusy) return Promise.resolve();
+    if (busy) { setUrlHint("正在处理上一批，稍等一下再导入", "err"); return Promise.resolve(); }
+
+    var text = String(raw == null ? urlEl.value : raw).trim();
+    if (!text) { setUrlHint("先粘贴一个图片链接", "err"); urlEl.focus(); return Promise.resolve(); }
+
+    /* 相对地址按同源解析 —— 站内图片直接取，不必绕一圈。其余只认 http/https：
+       javascript: 有注入面，data: 和 file: 要么读不到要么不该读。 */
+    var abs;
+    try { abs = new URL(text, location.href); }
+    catch (e) { setUrlHint("这看起来不是一个有效的链接", "err"); return Promise.resolve(); }
+    if (abs.protocol !== "http:" && abs.protocol !== "https:") {
+      setUrlHint("只支持 http / https 开头的图片链接", "err");
+      return Promise.resolve();
+    }
+
+    urlBusy = true;
+    if (urlGo) { urlGo.disabled = true; urlGo.textContent = "取图中…"; }
+    setUrlHint("正在向 " + abs.hostname + " 取图…", "");
+    statusEl.textContent = "正在下载图片…";
+
+    /* credentials:"omit" —— 不带任何 cookie 去第三方站点。少一处泄露面，也让这次
+       请求在对方看来就是一个匿名的普通请求。 */
+    return fetch(abs.href, { mode: "cors", credentials: "omit" })
+      .catch(function () {
+        /* fetch 只因「压根没拿到响应」而 reject：断网、DNS、TLS，以及最常见的 CORS
+           —— 对方站点没发 Access-Control-Allow-Origin，浏览器就不让 JS 读这份响应。
+           HTTP 4xx/5xx 不走这里（它们 res.ok === false）。这件事和「链接写错了」是
+           两回事，提示必须分开，否则用户会一遍遍检查自己有没有复制错，而问题根本
+           不在他那儿。 */
+        throw new Error("取不到这张图：对方站点不允许跨域读取（CORS），或链接已失效。" +
+          "可以先把它下载到本机，再拖进来。");
+      })
+      .then(function (res) {
+        if (!res.ok) throw new Error("对方返回了 " + res.status + (res.statusText ? " " + res.statusText : ""));
+        return res.blob();
+      })
+      .then(function (blob) {
+        if (!blob.size) throw new Error("取到的内容是空的");
+        return blob.arrayBuffer().then(function (buf) {
+          var u8 = new Uint8Array(buf);
+          var type = (/^image\//.test(blob.type) ? blob.type : null) ||
+                     sniffImageType(u8) || EXT_TYPE[extOf(abs.pathname)] || null;
+          if (!type) throw new Error("这个地址返回的不是图片");
+          if (/^image\/hei[cf]$/.test(type)) {
+            throw new Error("HEIC / HEIF 连浏览器都解不开，Pixora 也解不开");
+          }
+          return new File([buf], nameFromUrl(abs, type), { type: type });
+        });
+      })
+      .then(function (file) {
+        setUrlHint("已取到 " + file.name + " · " + humanSize(file.size), "ok");
+        urlEl.value = "";
+        return handleFiles([file]);
+      })
+      .catch(function (err) {
+        setUrlHint(err && err.message ? err.message : String(err), "err");
+        statusEl.textContent = "导入失败";
+      })
+      .then(function () {
+        urlBusy = false;
+        if (urlGo) { urlGo.disabled = false; urlGo.textContent = "导入"; }
+      });
+  }
+
   /* ---------- Input wiring ---------- */
   drop.addEventListener("click", function () { fileInput.click(); });
   drop.addEventListener("keydown", function (e) {
@@ -1092,7 +1226,17 @@
     drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove("over"); });
   });
   drop.addEventListener("drop", function (e) {
-    if (e.dataTransfer && e.dataTransfer.files) handleFiles(e.dataTransfer.files);
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
+      handleFiles(e.dataTransfer.files);
+      return;
+    }
+    /* 从别的标签页拖过来的往往不是文件而是链接。没有文件时看一眼文本：是 http(s)
+       就当成网络图片导入 —— 拖一个链接进来和粘贴一个链接进来，对用户是同一件事。 */
+    if (e.dataTransfer && urlEl) {
+      var t = e.dataTransfer.getData("text/uri-list") || e.dataTransfer.getData("text/plain") || "";
+      var first = t.split(/\r?\n/).filter(function (l) { return l && l.charAt(0) !== "#"; })[0];
+      if (first && /^https?:\/\//i.test(first.trim())) importFromUrl(first.trim());
+    }
   });
   document.addEventListener("paste", function (e) {
     if (!e.clipboardData || !results) return;
@@ -1100,8 +1244,29 @@
     for (var i = 0; i < items.length; i++) {
       if (items[i].kind === "file") { var f = items[i].getAsFile(); if (f) files.push(f); }
     }
-    if (files.length) { e.preventDefault(); handleFiles(files); }
+    if (files.length) { e.preventDefault(); handleFiles(files); return; }
+    /* 剪贴板里没有图片文件，但可能就是一串图片地址 —— 复制地址再 Ctrl+V，和把
+       链接拖进来是同一种意图。整段文本必须**恰好**是一个 URL 才认，否则一句带
+       链接的话也会被当成导入指令，那就太自作主张了。 */
+    if (urlEl && e.target === urlEl) return;   // 往链接框里粘贴时，交给输入框自己
+    var txt = (e.clipboardData.getData("text/plain") || "").trim();
+    if (/^https?:\/\/\S+$/i.test(txt)) { e.preventDefault(); importFromUrl(txt); }
   });
+
+  /* ---------- 链接导入接线 ---------- */
+  if (urlGo) urlGo.addEventListener("click", function () { importFromUrl(); });
+  if (urlEl) {
+    urlEl.addEventListener("keydown", function (e) {
+      /* Enter 提交是这个框唯一合理的默认行为；它不在任何 <form> 里，
+         所以不会顺带触发一次表单提交。 */
+      if (e.key === "Enter") { e.preventDefault(); importFromUrl(); }
+    });
+    /* 用户一动手输入，就把上一次的「已取到 / 失败」清掉 —— 否则旧结论会挂在那儿
+       冒充这次输入的结果。 */
+    urlEl.addEventListener("input", function () {
+      if (urlHint && /\b(err|ok)\b/.test(urlHint.className)) setUrlHint(URL_HINT_DEFAULT, "");
+    });
+  }
 
   /* ---------- Settings wiring ---------- */
   wEl.addEventListener("input", function () {

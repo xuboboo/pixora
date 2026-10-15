@@ -305,6 +305,18 @@ const TOOL = (from, to, loc) => `      <div class="tool reveal">
           <input type="file" id="file" accept="image/*" multiple hidden>
         </div>
 
+        <!-- 网络图片导入。链接导入走的是和拖入完全相同的那条管线，所以它和投放区
+             并列出现，而不是藏进某个二级面板。只有你主动给出链接时才会联网，且是
+             浏览器直接向那个地址取图 —— 不经过 Pixora，也不经过任何中间服务器。 -->
+        <div class="url-row">
+          <div class="url-input">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            <input type="url" id="imgurl" aria-label="图片链接" placeholder="或粘贴图片链接，如 https://…/photo.jpg" inputmode="url" autocomplete="off" spellcheck="false" enterkeyhint="go">
+            <button class="btn btn-ghost btn-sm" type="button" id="urlgo">导入</button>
+          </div>
+          <p class="field-hint url-hint" id="urlhint">浏览器直接向该地址取图，不经过任何中间服务器 · 对方站点需允许跨域读取</p>
+        </div>
+
         <div class="tool-controls">
           <div class="field" data-resize-only>
             <label for="w">目标宽度 (px)</label>
